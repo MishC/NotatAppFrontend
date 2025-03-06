@@ -139,11 +139,30 @@ const axiosInstance2 = axios.create({
           {notes.length === 0 ? (
             <p className="text-gray-500 text-black">No notes found.</p>
           ) : (
-            <ul className="space-y-4 flex flex-row flex-wrap justify-center p-3">
+            <ul className="space-y-4 flex flex-row flex-wrap justify-center p-3 fit-content">
               {notes.map((note) => (
+              (!note.content || note.content &&
+               (note.content.length<50))?
                 <li
                   key={note.id}
-                  className="bg-white p-4 m-4 rounded-lg shadow-md flex justify-between items-center w-full max-w-sm"
+                  className="bg-white p-4 m-4 rounded-lg shadow-md flex justify-between items-center w-full max-w-sm fit-content"
+                >
+                  <div className="w-full">
+                    <h3 className="text-xl font-bold text-black">{note.title}</h3>
+                    <p className="text-gray-600 text-black text-justify p-5">{note.content}</p>
+                  </div>
+                  <div className="flex flex-col items-end mt-0 justify-end h-full">
+                  <button
+                    onClick={() => handleDeleteNote(note.id)}
+                    className="bg-red-300 transparent hover:bg-red-400 text-white px-2 py-2 rounded justify-bottom text-sm"
+                  >
+                    🗑 
+                  </button>
+                  </div>
+                </li>:
+                  <li
+                  key={note.id}
+                  className="bg-white p-4 m-4 rounded-lg shadow-md flex justify-between items-center w-full"
                 >
                   <div className="w-full">
                     <h3 className="text-xl font-bold text-black">{note.title}</h3>
