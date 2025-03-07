@@ -53,12 +53,17 @@ const axiosInstance2 = axios.create({
       alert("Title is required!");
       return;
     }
+    if (newNote.title&&newNote.title.trim().length<3) {
+      alert("Title must be at least 3 characters long!");
+      return;
+    }
     if (!newNote.folderId) {
       alert("Please select a folder!");
       return;
     }
-    if (!newNote.content.trim().length<500) {
+    if (newNote.content && newNote.content.trim().length>500) {
       alert("Max number of characters are 500!");
+      setNewNote({ ...newNote, content: newNote.content.substring(0, 499) });
       return;
     }
 
@@ -103,7 +108,7 @@ const axiosInstance2 = axios.create({
         />
 
         <textarea
-          placeholder="Content (optional)"
+          placeholder="Content (optional, 500 characters max)"
           className="w-full p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
           value={newNote.content}
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
