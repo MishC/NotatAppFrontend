@@ -57,13 +57,15 @@ const axiosInstance2 = axios.create({
       alert("Please select a folder!");
       return;
     }
-    if (!newNote.content.trim().length>500) {
+    if (!newNote.content.trim().length<500) {
       alert("Max number of characters are 500!");
       return;
     }
 
     try {
+    
       const response = await axios.post(API_URL, newNote);
+    
       setNotes([...notes, response.data]);
       setNewNote({ title: "", content: "", folderId: "" });
 
