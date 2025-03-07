@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+// rest of the imports
+import {
+  draggable,
+  dropTargetForElements, // NEW
+} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine"; // NEW
 
 export default function NoteApp() {
   //const API_URL = "http://localhost:5152/api/notes"; 
