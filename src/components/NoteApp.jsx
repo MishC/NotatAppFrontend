@@ -1,32 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-// rest of the imports
-import {
-  draggable,
-  dropTargetForElements, // NEW
-} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine"; // NEW
+import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+import Card from "./Card";
 
 export default function NoteApp() {
-  //const API_URL = "http://localhost:5152/api/notes"; 
-  const API_URL = "https://localhost:5001/api/notes"; 
-  const API_URL2 = "https://localhost:5001/api/folders";
 
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true, // Allows cookies & sessions
-});
-const axiosInstance2 = axios.create({
-  baseURL: API_URL2,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true, // Allows cookies & sessions
-});
-
+   
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [newNote, setNewNote] = useState({ title: "", content: "", folderId:""});
   const [loading, setLoading] = useState(false);
+  const listRef = useRef(null);
+
+    //const API_URL = "http://localhost:5152/api/notes"; 
+    const API_URL = "https://localhost:5001/api/notes"; 
+    const API_URL2 = "https://localhost:5001/api/folders";
+  
+  const axiosInstance = axios.create({
+    baseURL: API_URL,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true, // Allows cookies & sessions
+  });
+  const axiosInstance2 = axios.create({
+    baseURL: API_URL2,
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true, // Allows cookies & sessions
+  });
 
   useEffect(() => {
     fetchNotes();
@@ -53,7 +53,6 @@ const axiosInstance2 = axios.create({
       console.error("Error fetching folders:", error);
     }
   };
-
   const handleAddNote = async () => {
     if (!newNote.title.trim()) {
       alert("Title is required!");
@@ -84,10 +83,8 @@ const axiosInstance2 = axios.create({
       console.error("Error adding note:", error);
     }
   };
-
   const handleDeleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
-
     try {
       await axios.delete(`${API_URL}/${id}`);
       setNotes(notes.filter((note) => note.id !== id));
@@ -96,7 +93,25 @@ const axiosInstance2 = axios.create({
     }
   };
 
+  // Drop Target (for the whole `ul`)
+  useEffect(() => {
+    if (!listRef.current) return;
 
+    return combine(
+      dropTargetForElements({
+        element: listRef.current,
+        getData: () => ({ type: "note-list" }),
+        onDrop: ({ source }) => {
+          console.log("Dropped: ", source);
+          setNotes((prevNotes) => {
+            const draggedNote = prevNotes.find(n => n.id === source.noteId);
+            const filteredNotes = prevNotes.filter(n => n.id !== source.noteId);
+            return [...filteredNotes, draggedNote]; // Moves dragged note to the end
+          });
+        },
+      })
+    );
+  }, []);
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-4xl">
     <h1 className="text-4xl font-bold text-gray-800 mb-6">📒 Note App</h1>
@@ -114,7 +129,7 @@ const axiosInstance2 = axios.create({
         />
 
         <textarea
-          placeholder="Content (optional, 500 characters max)"
+          placeholder="Content (optional)"
           className="w-full p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
           value={newNote.content}
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
@@ -152,32 +167,20 @@ const axiosInstance2 = axios.create({
           {notes.length === 0 ? (
             <p className="text-gray-500 text-black">No notes found.</p>
           ) : (
-            <ul className="space-y-4 flex flex-row flex-wrap justify-center p-3 fit-content">
+            <ul ref={listRef} className="space-y-4 flex flex-row flex-wrap justify-center p-3 fit-content">
               {notes.map((note) => (
               
-                <li
-                  key={note.id}
-                  className={`bg-white p-4 m-4 rounded-lg shadow-md flex justify-between items-center w-full fit-content
-                    ${!note.content || (note.content &&
-                 note.content.length<50)? "max-w-sm" : "w-full"}`}>
-                  <div className="w-full">
-                    <h3 className="text-xl font-bold text-black">{note.title}</h3>
-                    <p className="text-gray-600 text-black text-justify p-5">{note.content}</p>
-                  </div>
-                  <div className="flex flex-col items-end mt-0 justify-end h-full">
-                  <button
-                    onClick={() => handleDeleteNote(note.id)}
-                    className="bg-red-300 transparent hover:bg-red-400 text-white px-2 py-2 rounded justify-bottom text-sm"
-                  >
-                    🗑 
-                  </button>
-                  </div>
-                </li>
-              ))}
+                <Card key={note.id} note={note} onDelete={handleDeleteNote}  />
+             
+          ))}
             </ul>
           )}
         </div>
       )}
-    </div>
-  );
-}
+        </div>
+      )
+    
+    }
+    
+  
+  
