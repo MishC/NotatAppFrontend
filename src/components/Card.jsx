@@ -1,19 +1,56 @@
-import React, { useEffect, useRef, useState } from "react"; 
-import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-export default function Card({ note, onDelete }) {
+import React, { useEffect, useRef, useState } from "react";
+import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+
+export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
   const noteRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (!noteRef.current) return;
 
-    return draggable({
-      element: noteRef.current,
-      getInitialData: () => ({ type: "note", noteId: note.id }),
-      onDragStart: () => setIsDragging(true),
-      onDrop: () => setIsDragging(false),
-    });
+    return combine(
+      draggable({
+        element: noteRef.current,
+        getInitialData: () => {
+          console.log(`🎯 Setting drag data: sourceNoteId=${note.id}`);
+          return { type: "note", sourceNoteId: note.id };
+        },
+        onDragStart: () => {
+          console.log(`🚀 Dragging: sourceNoteId=${note.id}`);
+          setIsDragging(true);
+        },
+        onDrop: () => {
+          console.log(`✅ Dropped: sourceNoteId=${note.id}`);
+          setIsDragging(false);
+        },
+      }),
+
+      dropTargetForElements({
+        element: noteRef.current,
+        getData: () => {
+          console.log(`Setting drop target: targetNoteId=${note.id}`);
+          return { type: "note", targetNoteId: note.id };
+        },
+        onDragOver: ({ source }) => {
+          if (source && source.data && source.data.sourceNoteId) {
+            console.log(`Dragged over targetNoteId=${note.id} from sourceNoteId=${source.data.sourceNoteId}`);
+          } else {
+            console.warn("Dragging over but sourceNoteId is missing!");
+          }
+        },
+        onDrop: ({ source }) => {
+          if (source && source.data && source.data.sourceNoteId) {
+            console.log(`Swapping sourceNoteId=${source.data.sourceNoteId} ↔ targetNoteId=${note.id}`);
+            onSwap(source.data.sourceNoteId, note.id);
+          } else {
+            console.warn(`Cannot swap - sourceNoteId is missing!`);
+          }
+        },
+      })
+    );
   }, [note.id]);
+
 
   return (
     <li
@@ -37,4 +74,3 @@ export default function Card({ note, onDelete }) {
     </li>
   );
 }
-
