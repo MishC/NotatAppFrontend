@@ -147,7 +147,7 @@ export default function NoteApp() {
         </div>
       </div>
       {loading ? <p className="text-black">Loading...</p> : (
-        <ul ref={listRef} className="overflow-y-auto space-y-4 flex flex-row flex-wrap justify-center p-3 fit-content">
+        <ul ref={listRef} className="overflow-y-auto space-y-4 grid grid-cols-2 gap-4 p-4 w-full max-w-2xl bg-white shadow-md rounded-mdfit-content">
           {notes.map((note) => (
              <Card
              key={note.id}

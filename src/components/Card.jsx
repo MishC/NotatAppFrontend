@@ -13,15 +13,15 @@ export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
       draggable({
         element: noteRef.current,
         getInitialData: () => {
-          console.log(`🎯 Setting drag data: sourceNoteId=${note.id}`);
+          console.log(`Setting drag data: sourceNoteId=${note.id}`);
           return { type: "note", sourceNoteId: note.id };
         },
         onDragStart: () => {
-          console.log(`🚀 Dragging: sourceNoteId=${note.id}`);
+          console.log(`Dragging: sourceNoteId=${note.id}`);
           setIsDragging(true);
         },
         onDrop: () => {
-          console.log(`✅ Dropped: sourceNoteId=${note.id}`);
+          console.log(`Dropped: sourceNoteId=${note.id}`);
           setIsDragging(false);
         },
       }),
@@ -53,11 +53,12 @@ export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
 
 
   return (
+
     <li
       ref={noteRef}
       className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start w-full m-3 cursor-grab 
         ${isDragging ? "opacity-50" : ""}
-        ${!note.content || note.content.length < 50 ? "max-50" : "w-full"}`}
+        ${!note.content || note.content.length < 50 ? "max-50" : "col-span-2"}`}
     >
       <div className="w-full">
         <h3 className="text-xl font-bold text-black">{note.title}</h3>
