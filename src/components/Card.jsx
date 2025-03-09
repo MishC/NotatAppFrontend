@@ -55,9 +55,9 @@ export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
   return (
     <li
       ref={noteRef}
-      className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-center w-full m-3 cursor-grab 
+      className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start w-full m-3 cursor-grab 
         ${isDragging ? "opacity-50" : ""}
-        ${!note.content || note.content.length < 50 ? "max-w-sm" : "w-full"}`}
+        ${!note.content || note.content.length < 50 ? "max-50" : "w-full"}`}
     >
       <div className="w-full">
         <h3 className="text-xl font-bold text-black">{note.title}</h3>
