@@ -2,69 +2,84 @@ import React, { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 
-export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
+export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
   const noteRef = useRef(null);
+  const contentRef = useRef(null);
+
   const [isDragging, setIsDragging] = useState(false);
+
+  const normalizedNote = note === null ? { id: 0, title: '', content: '' } : note;
+
+  
 
   useEffect(() => {
     if (!noteRef.current) return;
 
-    return combine(
-      draggable({
-        element: noteRef.current,
-        getInitialData: () => {
-          console.log(`Setting drag data: sourceNoteId=${note.id}`);
-          return { type: "note", sourceNoteId: note.id };
-        },
-        onDragStart: () => {
-          console.log(`Dragging: sourceNoteId=${note.id}`);
-          setIsDragging(true);
-        },
-        onDrop: () => {
-          console.log(`Dropped: sourceNoteId=${note.id}`);
-          setIsDragging(false);
-        },
+    // Make all cards droppable
+    const dropConfig = dropTargetForElements({
+      element: noteRef.current,
+      getData: () => ({
+        type: "note-slot",
+        targetNoteId: normalizedNote.id,
+        rowIndex,
+        colIndex
       }),
+      onDrop: ({ source }) => {
+        if (!source?.data?.sourceNoteId) {
+          console.warn("Missing source ID");
+          return;
+        }
+        
+        if (source.data.sourceNoteId === normalizedNote.id) {
+          console.log("Cannot drop on self");
+          return;
+        }
 
-      dropTargetForElements({
-        element: noteRef.current,
-        getData: () => {
-          console.log(`Setting drop target: targetNoteId=${note.id}`);
-          return { type: "note", targetNoteId: note.id };
-        },
-        onDragOver: ({ source }) => {
-          if (source && source.data && source.data.sourceNoteId) {
-            console.log(`Dragged over targetNoteId=${note.id} from sourceNoteId=${source.data.sourceNoteId}`);
-          } else {
-            console.warn("Dragging over but sourceNoteId is missing!");
-          }
-        },
-        onDrop: ({ source }) => {
-          if (source && source.data && source.data.sourceNoteId) {
-            console.log(`Swapping sourceNoteId=${source.data.sourceNoteId} ↔ targetNoteId=${note.id}`);
-            onSwap(source.data.sourceNoteId, note.id);
-          } else {
-            console.warn(`Cannot swap - sourceNoteId is missing!`);
-          }
-        },
-      })
-    );
-  }, [note.id]);
+        console.log(`Swapping: ${source.data.sourceNoteId} ↔ ${normalizedNote.id}`);
+        onDrop(source.data.sourceNoteId, normalizedNote.id, rowIndex, colIndex);
+      },
+    });
 
+    // Make all cards draggable (including empty slots)
+    const dragConfig = draggable({
+      element: noteRef.current,
+      getInitialData: () => ({
+        type: "note",
+        sourceNoteId: normalizedNote.id,
+        rowIndex,
+        colIndex
+      }),
+      onDragStart: () => {
+        setIsDragging(true);
+        console.log(`🔵 Started dragging: ${normalizedNote.id}`);
+      },
+      onDrop: () => {
+        setIsDragging(false);
+        console.log(`🟢 Finished dragging: ${normalizedNote.id}`);
+      },
+    });
+
+    const cleanup = combine(dragConfig, dropConfig);
+    return () => cleanup();
+
+  }, [normalizedNote.id, rowIndex, colIndex, onDrop]);
 
   return (
 
     <li
       ref={noteRef}
-      className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start w-full m-3 cursor-grab 
-        ${isDragging ? "opacity-50" : ""}
-        ${!note.content || note.content.length < 50 ? "max-50" : "col-span-2"}`}
-    >
-      <div className="w-full">
+      className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start m-3 
+        ${isDragging ? "opacity-50" : "cursor-grab"}
+        ${normalizedNote.id === 0 ? "empty-slot" : ""}
+        ${!normalizedNote.content || normalizedNote.content.length < 50 ? "max-50" : "col-span-2"}`}
+    > 
+      {normalizedNote.id !== 0 ? (
+        <>
+      <div className="break-words flex-grow w-65">
         <h3 className="text-xl font-bold text-black">{note.title}</h3>
-        <p className="text-gray-600 text-black text-justify p-5">{note.content}</p>
+        <p className="text-gray-600 text-black p-5 mr-5">{note.content}</p>
       </div>
-      <div className="flex flex-col items-end">
+      <div className="justify-left pt-5 mt-5">
         <button
           onClick={() => onDelete(note.id)}
           className="bg-red-300 hover:bg-red-400 text-white px-2 py-2 rounded text-sm"
@@ -72,6 +87,13 @@ export default function Card({ note, onDelete, onSwap, setTargetNoteId }) {
           🗑 
         </button>
       </div>
+      </>
+    ) : (
+        <div ref={contentRef} className="w-full h-full flex items-center justify-center">
+          <span className="drop-target text-gray-500"></span>
+          <span class="hidden group-hover:inline">Drag&Drop</span>
+        </div>
+      )}
     </li>
   );
 }
