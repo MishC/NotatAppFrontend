@@ -10,8 +10,6 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
 
   const normalizedNote = note === null ? { id: 0, title: '', content: '' } : note;
 
-  
-
   useEffect(() => {
     if (!noteRef.current) return;
 
@@ -51,11 +49,11 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
       }),
       onDragStart: () => {
         setIsDragging(true);
-        console.log(`🔵 Started dragging: ${normalizedNote.id}`);
+        console.log(`Started dragging: ${normalizedNote.id}`);
       },
       onDrop: () => {
         setIsDragging(false);
-        console.log(`🟢 Finished dragging: ${normalizedNote.id}`);
+        console.log(`Finished dragging: ${normalizedNote.id}`);
       },
     });
 
@@ -65,33 +63,33 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
   }, [normalizedNote.id, rowIndex, colIndex, onDrop]);
 
   return (
-
     <li
-      ref={noteRef}
-      className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start m-3 
-        ${isDragging ? "opacity-50" : "cursor-grab"}
-        ${normalizedNote.id === 0 ? "empty-slot" : ""}
-        ${!normalizedNote.content || normalizedNote.content.length < 50 ? "max-50" : "col-span-2"}`}
-    > 
+    ref={noteRef}
+    key={normalizedNote.id}
+    className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start m-3 
+      ${isDragging ? "opacity-50" : "cursor-grab"} 
+      ${normalizedNote.id === 0 ? "empty-slot" : ""} 
+      ${normalizedNote.span === 2 ? "col-span-2" : ""}`}  
+  >
       {normalizedNote.id !== 0 ? (
         <>
-      <div className="break-words flex-grow w-65">
-        <h3 className="text-xl font-bold text-black">{note.title}</h3>
-        <p className="text-gray-600 text-black p-5 mr-5">{note.content}</p>
-      </div>
-      <div className="justify-left pt-5 mt-5">
-        <button
-          onClick={() => onDelete(note.id)}
-          className="bg-red-300 hover:bg-red-400 text-white px-2 py-2 rounded text-sm"
-        >
-          🗑 
-        </button>
-      </div>
-      </>
-    ) : (
+          <div className="break-words flex-grow w-65">
+            <h3 className="text-xl font-bold text-black">{normalizedNote.title}</h3>
+            <p className="text-gray-600 text-black p-5 mr-5">{normalizedNote.content}</p>
+          </div>
+          <div className="justify-left pt-5 mt-5">
+            <button
+              onClick={() => onDelete(note.id)}
+              className="bg-red-300 hover:bg-red-400 text-white px-2 py-2 rounded text-sm"
+            >
+              🗑 
+            </button>
+          </div>
+        </>
+      ) : (
         <div ref={contentRef} className="w-full h-full flex items-center justify-center">
           <span className="drop-target text-gray-500"></span>
-          <span class="hidden group-hover:inline">Drag&Drop</span>
+          <span className="hidden group-hover:inline">Drag&Drop</span>
         </div>
       )}
     </li>

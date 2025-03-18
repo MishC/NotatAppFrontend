@@ -51,12 +51,12 @@ export default function NoteApp() {
     notesList.forEach((note) => {
       if (note.content && note.content.length > 50) {
         if (row.length === 1) {
-          updatedGrid.push([...row, { id: 0, title: '', content: '' }]); 
+          row.push({ id: 0, title: "", content: "" }); //empty slot
         }
-        updatedGrid.push([note, note]); 
+        updatedGrid.push([{ ...note, span: 2 }]); 
         row = [];
       } else {
-        row.push(note);
+        row.push({ ...note, span: 1 });
         if (row.length === 2) {
           updatedGrid.push([...row]);
           row = [];
@@ -65,11 +65,23 @@ export default function NoteApp() {
     });
   
     if (row.length === 1) {
-      updatedGrid.push([...row, { id: 0, title: '', content: '' }]); 
+      row.push({ id: 0, title: "", content: "" });
+      updatedGrid.push([...row]);
     }
   
-    setGridSlots(updatedGrid);
+    const filteredGrid = updatedGrid.filter(row => {
+      const isEmptyRow = row.every(note => note.id === 0);
+      if (isEmptyRow) {
+        console.log("🗑️ Removing empty row");
+      }
+      return !isEmptyRow; 
+    });
+  
+    setGridSlots(filteredGrid);
   };
+  
+  
+
   const handleAddNote = async () => {
     if (!newNote.title.trim() || newNote.title.length < 3 || !newNote.folderId) {
       alert("Title and folder selection are required, with at least 3 characters in the title.");
@@ -100,10 +112,20 @@ export default function NoteApp() {
     }
   };
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
-    setGridSlots(prevGrid => {
-      // Find source position
+    setGridSlots((prevGrid) => {
+      if (!sourceNoteId || (targetNoteId === undefined)) {
+        console.warn(`⚠️ Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
+        return prevGrid;
+      }
+  
+      console.log(`Swapping ${sourceNoteId} ↔ ${targetNoteId || "Empty Slot"}`);
+  
+      let newGrid = prevGrid.map(row => row.map(note => ({ ...note })));
+  
       let sourcePos = null;
-      prevGrid.forEach((row, rowIndex) => {
+      let targetPos = { row: targetRow, col: targetCol };
+  
+      newGrid.forEach((row, rowIndex) => {
         row.forEach((note, colIndex) => {
           if (note.id === sourceNoteId) {
             sourcePos = { row: rowIndex, col: colIndex };
@@ -112,34 +134,21 @@ export default function NoteApp() {
       });
   
       if (!sourcePos) {
-        console.warn("Source position not found");
+        console.warn("⚠️ Source position not found!");
         return prevGrid;
       }
   
-      // Create new grid and perform swap
-      const newGrid = prevGrid.map(row => [...row]);
-      const sourceNote = {...newGrid[sourcePos.row][sourcePos.col]};
-      const targetNote = {...newGrid[targetRow][targetCol]};
+      [newGrid[sourcePos.row][sourcePos.col], newGrid[targetPos.row][targetPos.col]] =
+        [newGrid[targetPos.row][targetPos.col], newGrid[sourcePos.row][sourcePos.col]];
   
-      newGrid[sourcePos.row][sourcePos.col] = targetNote;
-      newGrid[targetRow][targetCol] = sourceNote;
-  
-      // Check for and remove rows that are all empty slots
-      const filteredGrid = newGrid.filter(row => {
-        const isEmptyRow = row.every(note => note.id === 0);
-        if (isEmptyRow) {
-          console.log("🗑️ Removing empty row");
-        }
-        return !isEmptyRow;
-      });
-  
-      return filteredGrid;
+      return newGrid;
     });
   };
   
+  
   useEffect(() => {
     if (!listRef.current) return;
-
+  
     return dropTargetForElements({
       element: listRef.current,
       getData: () => ({ type: "note-list" }),
@@ -152,13 +161,15 @@ export default function NoteApp() {
           console.warn("Target ID is missing in onDrop.");
           return;
         }
-
+  
         console.log(`Swapping: ${source.data.sourceNoteId} ↔ ${targetNoteId}`);
-        swapNotes(source.data.sourceNoteId, targetNoteId);
+  
+        setTimeout(() => {
+          swapNotes(source.data.sourceNoteId, targetNoteId);
+        }, 50); 
       },
     });
   }, [targetNoteId]);
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-4xl overflow-y-auto">
       <h1 className="text-4xl font-bold text-gray-800 mb-6">📒 Note App</h1>
