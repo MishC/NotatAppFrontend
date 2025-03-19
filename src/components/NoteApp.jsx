@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Card from "./Card";
 
@@ -16,7 +15,17 @@ export default function NoteApp() {
   const API_URL = "https://localhost:5001/api/notes"; 
   const API_URL2 = "https://localhost:5001/api/folders";
   
-  const axiosInstance = axios.create({ baseURL: API_URL, headers: { "Content-Type": "application/json" }, withCredentials: true });
+  const fetchWithBrowserAPI = async (url, options = {}) => {
+    const response = await fetch(url, {
+      headers: { "Content-Type": "application/json", ...options.headers },
+      credentials: "include",
+      ...options,
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  };
 
   useEffect(() => {
     fetchNotes();
@@ -26,9 +35,9 @@ export default function NoteApp() {
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get("/");
-      setNotes(response.data);
-      arrangeGrid(response.data);
+      const data = await fetchWithBrowserAPI(API_URL);
+      setNotes(data);
+      arrangeGrid(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
     }
@@ -37,8 +46,8 @@ export default function NoteApp() {
 
   const fetchFolders = async () => {
     try {
-      const response = await axios.get(API_URL2);
-      setFolders(response.data);
+      const data = await fetchWithBrowserAPI(API_URL2);
+      setFolders(data);
     } catch (error) {
       console.error("Error fetching folders:", error);
     }
@@ -161,9 +170,7 @@ export default function NoteApp() {
           console.warn("Target ID is missing in onDrop.");
           return;
         }
-  
-        console.log(`Swapping: ${source.data.sourceNoteId} ↔ ${targetNoteId}`);
-  
+    
         setTimeout(() => {
           swapNotes(source.data.sourceNoteId, targetNoteId);
         }, 50); 
@@ -201,9 +208,9 @@ export default function NoteApp() {
           <button onClick={handleAddNote} className="my-5 w-50 mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">➕ &nbsp; Add Note</button>
         </div>
       </div>
-      {loading ? (
+      {loading? (
         <p className="text-black">Loading...</p>
-      ) : (
+      ) : ( notes.length === 0 ? (<> </>) : (
         <ul ref={listRef} className="grid grid-cols-2 gap-4 p-4 w-full max-w-2xl bg-white shadow-md rounded-md">
           {gridSlots.map((row, rowIndex) =>
             row.map((note, colIndex) => (
@@ -219,7 +226,7 @@ export default function NoteApp() {
             ))
           )}
         </ul>
-      )}
+      ))}
     </div>
   );
 }
