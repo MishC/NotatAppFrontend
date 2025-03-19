@@ -110,7 +110,7 @@ export default function NoteApp() {
   const handleDeleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await fetchWithBrowserAPI(`${API_URL}/${id}`, { method: "DELETE" });
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
         arrangeGrid(updatedNotes);
