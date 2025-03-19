@@ -81,7 +81,7 @@ export default function NoteApp() {
     const filteredGrid = updatedGrid.filter(row => {
       const isEmptyRow = row.every(note => note.id === 0);
       if (isEmptyRow) {
-        console.log("🗑️ Removing empty row");
+        console.log("Removing empty row");
       }
       return !isEmptyRow; 
     });
@@ -123,7 +123,7 @@ export default function NoteApp() {
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
     setGridSlots((prevGrid) => {
       if (!sourceNoteId || (targetNoteId === undefined)) {
-        console.warn(`⚠️ Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
+        console.warn(`Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
         return prevGrid;
       }
   
@@ -143,7 +143,7 @@ export default function NoteApp() {
       });
   
       if (!sourcePos) {
-        console.warn("⚠️ Source position not found!");
+        console.warn("Source position not found!");
         return prevGrid;
       }
   
