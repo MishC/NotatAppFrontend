@@ -108,9 +108,16 @@ export default function NoteApp() {
   };
 
   const handleDeleteNote = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this note?")) return;
+   // if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
-      await fetchWithBrowserAPI(`${API_URL}/${id}`, { method: "DELETE" });
+      fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .catch(error => console.error("Error deleting:", error));
+      
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
         arrangeGrid(updatedNotes);
