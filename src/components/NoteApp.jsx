@@ -10,11 +10,12 @@ export default function NoteApp() {
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
   const [targetNoteId, setTargetNoteId] = useState(null);
+  const [error, setError] = useState("");              // ← new
 
   // API Configurations
-  const API_URL = "https://localhost:5001/api/notes"; 
+  const API_URL = "https://localhost:5001/api/notes";
   const API_URL2 = "https://localhost:5001/api/folders";
-  
+
   const fetchWithBrowserAPI = async (url, options = {}) => {
     const response = await fetch(url, {
       headers: { "Content-Type": "application/json", ...options.headers },
@@ -22,7 +23,9 @@ export default function NoteApp() {
       ...options,
     });
     if (!response.ok) {
+      setError(`HTTP error! status: ${response.status}`);
       throw new Error(`HTTP error! status: ${response.status}`);
+
     }
     return response.json();
   };
@@ -40,6 +43,8 @@ export default function NoteApp() {
       arrangeGrid(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
+      setError("Error fetching notes:", error, ". Please try again later.")
+
     }
     setLoading(false);
   };
@@ -49,6 +54,7 @@ export default function NoteApp() {
       const data = await fetchWithBrowserAPI(API_URL2);
       setFolders(data);
     } catch (error) {
+      setError("Error fetching folders:", error);
       console.error("Error fetching folders:", error);
     }
   };
@@ -56,13 +62,13 @@ export default function NoteApp() {
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
     let row = [];
-  
+
     notesList.forEach((note) => {
       if (note.content && note.content.length > 50) {
         if (row.length === 1) {
           row.push({ id: 0, title: "", content: "" }); //empty slot
         }
-        updatedGrid.push([{ ...note, span: 2 }]); 
+        updatedGrid.push([{ ...note, span: 2 }]);
         row = [];
       } else {
         row.push({ ...note, span: 1 });
@@ -72,27 +78,27 @@ export default function NoteApp() {
         }
       }
     });
-  
+
     if (row.length === 1) {
       row.push({ id: 0, title: "", content: "" });
       updatedGrid.push([...row]);
     }
-  
+
     const filteredGrid = updatedGrid.filter(row => {
       const isEmptyRow = row.every(note => note.id === 0);
       if (isEmptyRow) {
         console.log("Removing empty row");
       }
-      return !isEmptyRow; 
+      return !isEmptyRow;
     });
-  
+
     setGridSlots(filteredGrid);
   };
-  
-  
+
+
 
   const handleAddNote = async () => {
-    if (!newNote.title.trim() || newNote.title.length <  1 || !newNote.folderId) {
+    if (!newNote.title.trim() || newNote.title.length < 1 || !newNote.folderId) {
       alert("Title and folder selection are required!");
       return;
     }
@@ -104,6 +110,7 @@ export default function NoteApp() {
         body: JSON.stringify(newNote),
       });
       if (!response.ok) {
+        setError(`HTTP error! status: ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
@@ -113,11 +120,12 @@ export default function NoteApp() {
       arrangeGrid(updatedNotes);
     } catch (error) {
       console.error("Error adding note:", error);
+      setError("Error adding note:", error);
     }
   };
 
   const handleDeleteNote = async (id) => {
-   // if (!window.confirm("Are you sure you want to delete this note?")) return;
+    // if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
       fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
@@ -125,14 +133,15 @@ export default function NoteApp() {
           'Content-Type': 'application/json'
         }
       })
-      .catch(error => console.error("Error deleting:", error));
-      
+        .catch(error => console.error("Error deleting:", error));
+
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
         arrangeGrid(updatedNotes);
         return updatedNotes;
       });
     } catch (error) {
+      setError("Error deleting note:", error);
       console.error("Error deleting note:", error);
     }
   };
@@ -142,14 +151,14 @@ export default function NoteApp() {
         console.warn(`Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
         return prevGrid;
       }
-  
+
       console.log(`Swapping ${sourceNoteId} ↔ ${targetNoteId || "Empty Slot"}`);
-  
+
       let newGrid = prevGrid.map(row => row.map(note => ({ ...note })));
-  
+
       let sourcePos = null;
       let targetPos = { row: targetRow, col: targetCol };
-  
+
       newGrid.forEach((row, rowIndex) => {
         row.forEach((note, colIndex) => {
           if (note.id === sourceNoteId) {
@@ -157,23 +166,23 @@ export default function NoteApp() {
           }
         });
       });
-  
+
       if (!sourcePos) {
         console.warn("Source position not found!");
         return prevGrid;
       }
-  
+
       [newGrid[sourcePos.row][sourcePos.col], newGrid[targetPos.row][targetPos.col]] =
         [newGrid[targetPos.row][targetPos.col], newGrid[sourcePos.row][sourcePos.col]];
-  
+
       return newGrid;
     });
   };
-  
-  
+
+
   useEffect(() => {
     if (!listRef.current) return;
-  
+
     return dropTargetForElements({
       element: listRef.current,
       getData: () => ({ type: "note-list" }),
@@ -183,13 +192,14 @@ export default function NoteApp() {
           return;
         }
         if (!targetNoteId) {
+          setError("Target ID is missing. Please hover over a valid slot.");
           console.warn("Target ID is missing in onDrop.");
           return;
         }
-    
+
         setTimeout(() => {
           swapNotes(source.data.sourceNoteId, targetNoteId);
-        }, 50); 
+        }, 50);
       },
     });
   }, [targetNoteId]);
@@ -224,9 +234,15 @@ export default function NoteApp() {
           <button onClick={handleAddNote} className="my-5 w-50 mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">➕ &nbsp; Add Note</button>
         </div>
       </div>
-      {loading? (
+      {error && (
+        <div className="error text-red-600 bg-red-100 p-2 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
         <p className="text-black">Loading...</p>
-      ) : ( notes.length === 0 ? (<> </>) : (
+      ) : (notes.length === 0 ? (<> </>) : (
         <ul ref={listRef} className="grid grid-cols-2 gap-4 p-4 w-full max-w-2xl bg-white shadow-md rounded-md">
           {gridSlots.map((row, rowIndex) =>
             row.map((note, colIndex) => (
