@@ -29,11 +29,11 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
         }
         
         if (source.data.sourceNoteId === normalizedNote.id) {
-          console.log("Cannot drop on self");
+         // console.log("Cannot drop on self");
           return;
         }
 
-        console.log(`Swapping: ${source.data.sourceNoteId} ↔ ${normalizedNote.id}`);
+        //console.log(`Swapping: ${source.data.sourceNoteId} ↔ ${normalizedNote.id}`);
         onDrop(source.data.sourceNoteId, normalizedNote.id, rowIndex, colIndex);
       },
     });
@@ -49,11 +49,11 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
       }),
       onDragStart: () => {
         setIsDragging(true);
-        console.log(`Started dragging: ${normalizedNote.id}`);
+       // console.log(`Started dragging: ${normalizedNote.id}`);
       },
       onDrop: () => {
         setIsDragging(false);
-        console.log(`Finished dragging: ${normalizedNote.id}`);
+       // console.log(`Finished dragging: ${normalizedNote.id}`);
       },
     });
 
