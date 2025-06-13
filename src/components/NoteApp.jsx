@@ -92,13 +92,22 @@ export default function NoteApp() {
   
 
   const handleAddNote = async () => {
-    if (!newNote.title.trim() || newNote.title.length < 3 || !newNote.folderId) {
-      alert("Title and folder selection are required, with at least 3 characters in the title.");
+    if (!newNote.title.trim() || newNote.title.length <  1 || !newNote.folderId) {
+      alert("Title and folder selection are required!");
       return;
     }
     try {
-      const response = await axios.post(API_URL, newNote);
-      const updatedNotes = [...notes, response.data];
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newNote),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      const updatedNotes = [...notes, data];
       setNotes(updatedNotes);
       setNewNote({ title: "", content: "", folderId: "" });
       arrangeGrid(updatedNotes);
