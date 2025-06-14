@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 
-export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
+export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop }) {
   const noteRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -80,7 +80,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
       {normalizedNote.title}
     </h3>
     <button
-  onClick={() => onDelete(note.id)}
+  onClick={() => onUpdate(4,note.id)}
   className="ml-6 mr-1
     bg-gradient-to-r from-green-400 to-teal-400
     hover:from-green-500 hover:to-teal-500
@@ -100,7 +100,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
 </button>
 
     <button
-      onClick={() => onDelete(note.id)}
+      onClick={() =>onDelete(note.id)}
       className="mr-auto
         bg-gradient-to-r from-red-500 to-pink-500
         hover:from-red-600 hover:to-pink-600

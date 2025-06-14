@@ -10,7 +10,8 @@ export default function NoteApp() {
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
   const [targetNoteId, setTargetNoteId] = useState(null);
-  const [error, setError] = useState("");              // ← new
+  const [error, setError] = useState("");            
+  const [msg, setMsg] = useState(""); // For future use, if needed
 
   // API Configurations
   const API_URL = "https://localhost:5001/api/notes";
@@ -38,7 +39,7 @@ export default function NoteApp() {
   const fetchNotes = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithBrowserAPI(API_URL);
+      const data = await fetchWithBrowserAPI(API_URL + "/pending");
       setNotes(data);
       arrangeGrid(data);
     } catch (error) {
@@ -139,6 +140,7 @@ export default function NoteApp() {
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
         arrangeGrid(updatedNotes);
+        
         return updatedNotes;
       });
     } catch (error) {
@@ -146,6 +148,35 @@ export default function NoteApp() {
       console.error("Error deleting note:", error);
     }
   };
+
+  const handleUpdateNote = async (id, folderId) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}/${folderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ folderId }),
+      });
+      if (!response.ok) {
+        setError(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      if (response.status === 204) {
+        console.log("Note updated successfully");
+        fetchNotes(); // Refresh notes after update
+        return;
+      }
+    } catch (error) {
+      setError("Error updating note:", error);
+      console.error("Error updating note:", error);
+    }
+  };
+
+  // Function to swap notes in the grid
+  // sourceNoteId: ID of the note being dragged
+  // targetNoteId: ID of the note being hovered over (target slot)
+  // targetRow: Row index of the target slot
+  // targetCol: Column index of the target slot
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
     setGridSlots((prevGrid) => {
       if (!sourceNoteId || (targetNoteId === undefined)) {
@@ -276,7 +307,7 @@ export default function NoteApp() {
           <button
             onClick={handleAddNote}
             className="mt-10 mb-6  mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
-            style={{ paddingBottom: 0 }} // Remove extra bottom padding
+            style={{ paddingBottom: 0 }}
           >
             <span className="text-white font-bold text-2xl mb-5" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
             <span className="text-lg px-2 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
@@ -286,6 +317,11 @@ export default function NoteApp() {
       {error && (
         <div className="error text-red-600 bg-red-100 p-2 rounded mb-4">
           {error}
+        </div>
+      )}
+      {msg && (
+        <div className="msg text-green-600 bg-green-100 p-2 rounded mb-4">
+          {msg}
         </div>
       )}
       <div className="mt-6">&nbsp;</div>
@@ -319,6 +355,7 @@ export default function NoteApp() {
                 rowIndex={rowIndex}
                 colIndex={colIndex}
                 onDelete={handleDeleteNote}
+                onUpdate={handleUpdateNote}
                 onDrop={swapNotes}
                 onHover={setTargetNoteId}
               />
