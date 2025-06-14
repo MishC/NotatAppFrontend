@@ -206,7 +206,7 @@ export default function NoteApp() {
   }, [targetNoteId]);
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 mx-auto w-full max-w-8xl overflow-y-auto">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
+      <h1 className="text-6xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
       <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
           type="text"
@@ -300,11 +300,11 @@ export default function NoteApp() {
     overflow-x-hidden overflow-y-auto 
     p-0 rounded-md
      sm:p-4
-     md:max-w-6xl
+     md:max-w-7xl
     sm:grid sm:grid-cols-2            /* ≥640px: switch to grid with 2 columns */
     lg:grid-cols-3                   /* ≥1024px: 3 columns */
-    xl:grid-cols-4                   /* ≥1280px: 4 columns */
-    3xl:grid-cols-5              /* ≥1536px: 5 columns */
+    xl:grid-cols-4                   /* ≥1280px: 3 columns */
+    3xl:grid-cols-4             /* ≥1536px: 4columns */
 
     bg-gray-100 
     

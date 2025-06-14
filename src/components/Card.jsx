@@ -66,39 +66,62 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
     <li
       ref={noteRef}
       key={normalizedNote.id}
-      className={`bg-white p-6 rounded-xl shadow-lg border-4 border-white flex justify-between items-start m-3 
+      className={`bg-white p-6 rounded-xl shadow-lg border-4 border-white flex  px-2 items-start m-3 
         ${isDragging ? "opacity-50" : "cursor-grab"} 
         ${normalizedNote.id === 0 ? "empty-slot" : ""} 
         ${normalizedNote.span === 2 ? "sm:col-span-2" : ""}`}  
     >
       {normalizedNote.id !== 0 ? (
         <>
-          <div className="break-words flex-grow w-65">
-            <h3 className="text-xl font-bold text-black">{normalizedNote.title}</h3>
-            <p className="text-gray-600 text-black p-5 mr-5 justify-left">{normalizedNote.content}</p>
-          </div>
-            <button
-              onClick={() => onDelete(note.id)}
-              className="
-                bg-red-400
-                hover:bg-red-500
-                text-white
-                font-size-16
-                font-bold
-              
-                rounded
-                transition
-                duration-150
-                ease-in-out
-                hover:scale-[1.18]
-              "
-              style={{
-                fontSize: "16px",
-                transition: "transform 0.15s, font-size 0.15s",
-              }}
-            >
-              x
-            </button>
+       <div className="break-words flex-grow w-65">
+  {/* Header row: title on the left, delete button on the right */}
+  <div className="flex  items-center mb-4">
+    <h3 className="text-2xl font-extrabold text-black truncate max-w-[80%]">
+      {normalizedNote.title}
+    </h3>
+    <button
+  onClick={() => onDelete(note.id)}
+  className="ml-6 mr-1
+    bg-gradient-to-r from-green-400 to-teal-400
+    hover:from-green-500 hover:to-teal-500
+    text-white font-bold
+    rounded-md
+    transition duration-150 ease-in-out
+    hover:scale-110
+    focus:outline-none focus:ring-2 focus:ring-green-300
+    flex items-center justify-center
+    w-10 h-8
+    text-3xl
+  "
+  aria-label="Mark complete"
+  title="Mark complete"
+>
+  ✓
+</button>
+
+    <button
+      onClick={() => onDelete(note.id)}
+      className="mr-auto
+        bg-gradient-to-r from-red-500 to-pink-500
+        hover:from-red-600 hover:to-pink-600
+        text-white font-bold
+           rounded-md
+        transition duration-150 ease-in-out
+        hover:scale-110
+        focus:outline-none focus:ring-1 focus:ring-red-400
+        text-3xl flex items-center justify-center
+        w-10 h-8
+      "
+      aria-label="Delete note"
+      title="Delete note"
+    >
+      ×
+    </button>
+  </div>
+  <p className="mt-3 mr-10 text-gray-600 text-justify">
+    {normalizedNote.content}
+  </p>
+</div>
           
         </>
       ) : (
