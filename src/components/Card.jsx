@@ -64,13 +64,13 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
 
   return (
     <li
-    ref={noteRef}
-    key={normalizedNote.id}
-    className={`bg-white p-4 rounded-lg shadow-md flex justify-between items-start m-3 
-      ${isDragging ? "opacity-50" : "cursor-grab"} 
-      ${normalizedNote.id === 0 ? "empty-slot" : ""} 
-      ${normalizedNote.span === 2 ? "col-span-2" : ""}`}  
-  >
+      ref={noteRef}
+      key={normalizedNote.id}
+      className={`bg-white p-6 rounded-xl shadow-lg border-4 border-white flex justify-between items-start m-3 
+        ${isDragging ? "opacity-50" : "cursor-grab"} 
+        ${normalizedNote.id === 0 ? "empty-slot" : ""} 
+        ${normalizedNote.span === 2 ? "sm:col-span-2" : ""}`}  
+    >
       {normalizedNote.id !== 0 ? (
         <>
           <div className="break-words flex-grow w-65">
@@ -80,7 +80,24 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
           <div className="justify-left pt-5 mt-5">
             <button
               onClick={() => onDelete(note.id)}
-              className="bg-red-300 hover:bg-red-400 text-white px-2 py-2 rounded text-sm"
+              className="
+                bg-red-400
+                hover:bg-red-500
+                text-white
+                font-size-16
+                font-bold
+                py-1
+                px-3
+                rounded
+                transition
+                duration-150
+                ease-in-out
+                hover:scale-[1.18]
+              "
+              style={{
+                fontSize: "16px",
+                transition: "transform 0.15s, font-size 0.15s",
+              }}
             >
               🗑 
             </button>

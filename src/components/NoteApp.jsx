@@ -100,6 +100,7 @@ export default function NoteApp() {
   const handleAddNote = async () => {
     if (!newNote.title.trim() || newNote.title.length < 1 || !newNote.folderId) {
       alert("Title and folder selection are required!");
+      setError("Title and folder cannot be empty. Please fill them out.");
       return;
     }
     try {
@@ -133,7 +134,7 @@ export default function NoteApp() {
           'Content-Type': 'application/json'
         }
       })
-        .catch(error => console.error("Error deleting:", error));
+        .catch(error => { setError("Error deleting a note:", error); console.error("Error deleting:", error) });
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
@@ -204,19 +205,19 @@ export default function NoteApp() {
     });
   }, [targetNoteId]);
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-4xl overflow-y-auto">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">📒 Note App</h1>
-      <div className="max-w-lg bg-white p-6 rounded-lg shadow-md my-6">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-8xl overflow-y-auto mt-6">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6 my-6">📒 Note Board</h1>
+      <div className="max-w-6xl bg-white p-6 rounded-lg shadow-md my-6">
         <input
           type="text"
           placeholder="Title"
-          className="w-full p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300 my-2"
+          className="w-full p-5 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300 my-2"
           value={newNote.title}
           onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
         />
         <textarea
           placeholder="Content (optional)"
-          className="w-full p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
+          className="w-full h-30 p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
           value={newNote.content}
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
         />
@@ -231,7 +232,9 @@ export default function NoteApp() {
           ))}
         </select>
         <div className="flex justify-center">
-          <button onClick={handleAddNote} className="my-5 w-50 mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">➕ &nbsp; Add Note</button>
+          <button onClick={handleAddNote} className="my-5 w-50 mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">
+            <span className="text-white font-bold" style={{ fontSize: 22 }} aria-hidden="true">+</span>&nbsp; Add Note
+          </button>
         </div>
       </div>
       {error && (
@@ -239,11 +242,26 @@ export default function NoteApp() {
           {error}
         </div>
       )}
-
+      <div className="mt-6">&nbsp;</div>     
       {loading ? (
         <p className="text-black">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
-        <ul ref={listRef} className="grid grid-cols-2 gap-4 p-4 w-full max-w-2xl bg-white shadow-md rounded-md">
+        <ul
+          ref={listRef}
+          className={`mt-6
+    flex flex-col gap-4               /* mobile: one-column flex list */
+    w-full max-w-full                 /* never exceed viewport width */
+    overflow-x-hidden overflow-y-auto 
+    p-4 rounded-md
+
+    sm:grid sm:grid-cols-2            /* ≥640px: switch to grid with 2 columns */
+    md:grid-cols-3                    /* ≥768px: 3 columns */
+    lg:grid-cols-4                    /* ≥1024px: 4 columns */
+    bg-gray-100 
+    
+  `}
+        >
+
           {gridSlots.map((row, rowIndex) =>
             row.map((note, colIndex) => (
               <Card
