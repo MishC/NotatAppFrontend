@@ -205,7 +205,7 @@ export default function NoteApp() {
     });
   }, [targetNoteId]);
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-8xl overflow-y-auto mt-6">
+    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 mx-auto w-full max-w-8xl overflow-y-auto">
       <h1 className="text-4xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
       <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
@@ -278,8 +278,8 @@ export default function NoteApp() {
             className="mt-10 mb-6  mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
             style={{ paddingBottom: 0 }} // Remove extra bottom padding
           >
-            <span className="text-white font-bold text-2xl pb-1" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
-            <span className="text-lg px-2 my-4 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
+            <span className="text-white font-bold text-2xl mb-5" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
+            <span className="text-lg px-2 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
           </button>
         </div>
       </div>
@@ -290,19 +290,22 @@ export default function NoteApp() {
       )}
       <div className="mt-6">&nbsp;</div>
       {loading ? (
-        <p className="text-black">Loading...</p>
+        <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <ul
           ref={listRef}
           className={`mt-6
     flex flex-col gap-4               /* mobile: one-column flex list */
-    w-full max-w-full                 /* never exceed viewport width */
+    w-full max-w-full              /* never exceed viewport width */
     overflow-x-hidden overflow-y-auto 
-    p-4 rounded-md
-
+    p-0 rounded-md
+     sm:p-4
+     md:max-w-6xl
     sm:grid sm:grid-cols-2            /* ≥640px: switch to grid with 2 columns */
-    md:grid-cols-3                    /* ≥768px: 3 columns */
-    lg:grid-cols-4                    /* ≥1024px: 4 columns */
+    lg:grid-cols-3                   /* ≥1024px: 3 columns */
+    xl:grid-cols-4                   /* ≥1280px: 4 columns */
+    3xl:grid-cols-5              /* ≥1536px: 5 columns */
+
     bg-gray-100 
     
   `}

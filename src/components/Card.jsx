@@ -75,9 +75,8 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
         <>
           <div className="break-words flex-grow w-65">
             <h3 className="text-xl font-bold text-black">{normalizedNote.title}</h3>
-            <p className="text-gray-600 text-black p-5 mr-5">{normalizedNote.content}</p>
+            <p className="text-gray-600 text-black p-5 mr-5 justify-left">{normalizedNote.content}</p>
           </div>
-          <div className="justify-left pt-5 mt-5">
             <button
               onClick={() => onDelete(note.id)}
               className="
@@ -86,8 +85,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
                 text-white
                 font-size-16
                 font-bold
-                py-1
-                px-3
+              
                 rounded
                 transition
                 duration-150
@@ -99,9 +97,9 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onDrop }) {
                 transition: "transform 0.15s, font-size 0.15s",
               }}
             >
-              🗑 
+              x
             </button>
-          </div>
+          
         </>
       ) : (
         <div ref={contentRef} className="w-full h-full flex items-center justify-center">
