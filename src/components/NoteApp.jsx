@@ -205,35 +205,81 @@ export default function NoteApp() {
     });
   }, [targetNoteId]);
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-8xl overflow-y-auto mt-6">
+    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-8xl overflow-y-auto mt-6">
       <h1 className="text-4xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
-      <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-md my-6">
+      <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
           type="text"
           placeholder="Title"
-          className="w-full p-4 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300 my-2"
+          autoFocus
           value={newNote.title}
           onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+          className="
+     w-full p-4 my-4
+
+    border-2 border-gray-300 rounded-md
+
+    text-gray-800
+
+    transition-colors duration-200
+
+    focus:outline-none
+    focus:border-blue-300    /* same 2px thickness, just recolored */
+  "
         />
+
         <textarea
           placeholder="Content (optional)"
-          className="w-full h-30 p-4 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
           value={newNote.content}
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+          className="
+    w-full p-4 my-2 mb-4
+
+    border-2 border-gray-300 rounded-md
+
+    text-gray-800
+
+    transition-colors duration-200
+
+    focus:outline-none
+    focus:border-blue-300    /* same 2px thickness, just recolored */
+  "
         />
+
         <select
-          className="w-full p-4 mb-6 border rounded-md focus:outline-none focus:ring focus:ring-gray-300 text-black bg-white"
           value={newNote.folderId}
           onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
+          className="
+ w-full p-4 my-2
+
+    border-2 border-gray-300 rounded-md
+
+    text-gray-800
+
+    transition-colors duration-200
+
+    focus:outline-none
+    focus:border-blue-300    /* same 2px thickness, just recolored */
+  "
         >
-          <option value="" disabled className="text-gray-200">Select a folder</option>
+          <option value="" disabled className="text-gray-400">
+            Select a folder
+          </option>
           {folders.map((folder) => (
-            <option key={folder.id} value={folder.id}>{folder.name}</option>
+            <option key={folder.id} value={folder.id}>
+              {folder.name}
+            </option>
           ))}
         </select>
+
         <div className="flex justify-center">
-          <button onClick={handleAddNote} className="my-5 w-50 mx-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">
-            <span className="text-white font-bold" style={{ fontSize: 22 }} aria-hidden="true">+</span>&nbsp; Add Note
+          <button
+            onClick={handleAddNote}
+            className="mt-10 mb-6  mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
+            style={{ paddingBottom: 0 }} // Remove extra bottom padding
+          >
+            <span className="text-white font-bold text-2xl pb-1" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
+            <span className="text-lg px-2 my-4 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
           </button>
         </div>
       </div>
@@ -242,7 +288,7 @@ export default function NoteApp() {
           {error}
         </div>
       )}
-      <div className="mt-6">&nbsp;</div>     
+      <div className="mt-6">&nbsp;</div>
       {loading ? (
         <p className="text-black">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
