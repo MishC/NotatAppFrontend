@@ -206,23 +206,23 @@ export default function NoteApp() {
   }, [targetNoteId]);
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4 mx-auto w-full max-w-8xl overflow-y-auto mt-6">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6 my-6">📒 Note Board</h1>
-      <div className="max-w-6xl bg-white p-6 rounded-lg shadow-md my-6">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
+      <div className="max-w-2xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
           type="text"
           placeholder="Title"
-          className="w-full p-5 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300 my-2"
+          className="w-full p-4 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300 my-2"
           value={newNote.title}
           onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
         />
         <textarea
           placeholder="Content (optional)"
-          className="w-full h-30 p-3 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
+          className="w-full h-30 p-4 mb-3 border rounded-md text-black focus:outline-none focus:ring focus:ring-blue-300"
           value={newNote.content}
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
         />
         <select
-          className="w-full p-2 mb-6 border rounded-md focus:outline-none focus:ring focus:ring-gray-300 text-black bg-white"
+          className="w-full p-4 mb-6 border rounded-md focus:outline-none focus:ring focus:ring-gray-300 text-black bg-white"
           value={newNote.folderId}
           onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
         >
