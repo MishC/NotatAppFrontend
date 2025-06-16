@@ -26,7 +26,6 @@ export default function NoteApp() {
     if (!response.ok) {
       setError(`HTTP error! status: ${response.status}`);
       throw new Error(`HTTP error! status: ${response.status}`);
-
     }
     return response.json();
   };
@@ -44,8 +43,7 @@ export default function NoteApp() {
       arrangeGrid(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
-      setError("Error fetching notes:", error, ". Please try again later.")
-
+      setError("Error fetching notes. Please try again later.");
     }
     setLoading(false);
   };
@@ -55,20 +53,18 @@ export default function NoteApp() {
       const data = await fetchWithBrowserAPI(API_URL2);
       setFolders(data);
     } catch (error) {
-      setError("Error fetching folders:", error);
+      setError("Error fetching folders.");
       console.error("Error fetching folders:", error);
     }
   };
 
+  // ARRANGE GRID WITHOUT EMPTY SLOTS
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
     let row = [];
 
     notesList.forEach((note) => {
       if (note.content && note.content.length > 50) {
-        if (row.length === 1) {
-          row.push({ id: 0, title: "", content: "" }); //empty slot
-        }
         updatedGrid.push([{ ...note, span: 2 }]);
         row = [];
       } else {
@@ -80,26 +76,16 @@ export default function NoteApp() {
       }
     });
 
+    // If there's an incomplete row (just one note left), just add it as a row of one (no empty slot)
     if (row.length === 1) {
-      row.push({ id: 0, title: "", content: "" });
       updatedGrid.push([...row]);
     }
 
-    const filteredGrid = updatedGrid.filter(row => {
-      const isEmptyRow = row.every(note => note.id === 0);
-      if (isEmptyRow) {
-        console.log("Removing empty row");
-      }
-      return !isEmptyRow;
-    });
-
-    setGridSlots(filteredGrid);
+    setGridSlots(updatedGrid);
   };
 
-
-
   const handleAddNote = async () => {
-    if (!newNote.title.trim() || newNote.title.length < 1 || !newNote.folderId) {
+    if (!newNote.title.trim() || !newNote.folderId) {
       alert("Title and folder selection are required!");
       setError("Title and folder cannot be empty. Please fill them out.");
       return;
@@ -122,34 +108,32 @@ export default function NoteApp() {
       arrangeGrid(updatedNotes);
     } catch (error) {
       console.error("Error adding note:", error);
-      setError("Error adding note:", error);
+      setError("Error adding note.");
     }
   };
 
   const handleDeleteNote = async (id) => {
-    // if (!window.confirm("Are you sure you want to delete this note?")) return;
+    if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
       fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       })
-        .catch(error => { setError("Error deleting a note:", error); console.error("Error deleting:", error) });
+        .catch(error => { setError("Error deleting a note."); console.error("Error deleting:", error) });
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
         arrangeGrid(updatedNotes);
-        
+        setMsg(`Note deleted successfully.`);
         return updatedNotes;
       });
     } catch (error) {
-      setError("Error deleting note:", error);
+      setError("Error deleting note.");
       console.error("Error deleting note:", error);
     }
   };
 
-  const handleUpdateNote = async (id, folderId) => {
+  const handleUpdateNote = async (id, folderId, title) => {
     try {
       const response = await fetch(`${API_URL}/${id}/${folderId}`, {
         method: "PUT",
@@ -162,29 +146,23 @@ export default function NoteApp() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       if (response.status === 204) {
-        console.log("Note updated successfully");
-        fetchNotes(); // Refresh notes after update
+        setMsg(`Note "${title}" is done!`);
+        fetchNotes();
         return;
       }
     } catch (error) {
-      setError("Error updating note:", error);
+      setError("Error updating note.");
       console.error("Error updating note:", error);
     }
   };
 
-  // Function to swap notes in the grid
-  // sourceNoteId: ID of the note being dragged
-  // targetNoteId: ID of the note being hovered over (target slot)
-  // targetRow: Row index of the target slot
-  // targetCol: Column index of the target slot
+  // Swap logic unchanged
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
     setGridSlots((prevGrid) => {
       if (!sourceNoteId || (targetNoteId === undefined)) {
         console.warn(`Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
         return prevGrid;
       }
-
-      console.log(`Swapping ${sourceNoteId} ↔ ${targetNoteId || "Empty Slot"}`);
 
       let newGrid = prevGrid.map(row => row.map(note => ({ ...note })));
 
@@ -211,10 +189,8 @@ export default function NoteApp() {
     });
   };
 
-
   useEffect(() => {
     if (!listRef.current) return;
-
     return dropTargetForElements({
       element: listRef.current,
       getData: () => ({ type: "note-list" }),
@@ -225,18 +201,20 @@ export default function NoteApp() {
         }
         if (!targetNoteId) {
           setError("Target ID is missing. Please hover over a valid slot.");
-          console.warn("Target ID is missing in onDrop.");
           return;
         }
-
         setTimeout(() => {
           swapNotes(source.data.sourceNoteId, targetNoteId);
         }, 50);
       },
     });
   }, [targetNoteId]);
+
+  useEffect(() => {setTimeout( () => {setError(""), setMsg("")},10000);}, [error.length>1, msg.length>1]);
+
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 mx-auto w-full max-w-8xl overflow-y-auto">
+    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
+       mx-auto w-full max-w-full overflow-y-auto">
       <h1 className="text-6xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
       <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
@@ -315,12 +293,12 @@ export default function NoteApp() {
         </div>
       </div>
       {error && (
-        <div className="error text-red-600 bg-red-100 p-2 rounded mb-4">
+        <div className="error text-red-600 bg-red-100 mt-10 p-10 rounded mb-4 text-2xl">
           {error}
         </div>
       )}
       {msg && (
-        <div className="msg text-green-600 bg-green-100 p-2 rounded mb-4">
+        <div className="msg text-green-600 bg-green-100 mt-10 p-10 rounded mb-4 text-2xl">
           {msg}
         </div>
       )}
@@ -328,25 +306,24 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
+        <div className="w-full max-w-full">
         <ul
           ref={listRef}
           className={`mt-6
-    flex flex-col gap-4               /* mobile: one-column flex list */
-    w-full max-w-full              /* never exceed viewport width */
-    overflow-x-hidden overflow-y-auto 
-    p-0 rounded-md
-     sm:p-4
-     md:max-w-7xl
-    sm:grid sm:grid-cols-2            /* ≥640px: switch to grid with 2 columns */
-    lg:grid-cols-3                   /* ≥1024px: 3 columns */
-    xl:grid-cols-4                   /* ≥1280px: 3 columns */
-    3xl:grid-cols-4             /* ≥1536px: 4columns */
-
-    bg-gray-100 
-    
-  `}
+            flex flex-col gap-4
+            w-full max-w-full
+            overflow-x-hidden overflow-y-auto
+            p-0 rounded-md
+            sm:p-4
+            md:max-w-7xl
+            sm:grid sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-3
+            2xl:max-w-full
+            2xl:grid-cols-4
+            bg-gray-100
+          `}
         >
-
           {gridSlots.map((row, rowIndex) =>
             row.map((note, colIndex) => (
               <Card
@@ -362,6 +339,7 @@ export default function NoteApp() {
             ))
           )}
         </ul>
+        </div>
       ))}
     </div>
   );
