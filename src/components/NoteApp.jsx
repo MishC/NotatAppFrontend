@@ -306,7 +306,6 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
-        <div className="w-full max-w-full">
         <ul
           ref={listRef}
           className={`mt-6
@@ -319,7 +318,8 @@ export default function NoteApp() {
             sm:grid sm:grid-cols-2
             lg:grid-cols-3
             xl:grid-cols-3
-            2xl:max-w-full
+            2xl:max-w-[110rem]
+        
             2xl:grid-cols-4
             bg-gray-100
           `}
@@ -339,7 +339,6 @@ export default function NoteApp() {
             ))
           )}
         </ul>
-        </div>
       ))}
     </div>
   );
