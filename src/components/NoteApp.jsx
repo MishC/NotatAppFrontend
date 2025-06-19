@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Card from "./Card";
+import Modal from "./Modal";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
@@ -11,7 +12,9 @@ export default function NoteApp() {
   const [gridSlots, setGridSlots] = useState([]);
   const [targetNoteId, setTargetNoteId] = useState(null);
   const [error, setError] = useState("");            
-  const [msg, setMsg] = useState(""); // For future use, if needed
+  const [msg, setMsg] = useState(""); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [selectedNote, setSelectedNote] = useState(null);
 
   // API Configurations
   const API_URL = "https://localhost:5001/api/notes";
@@ -57,6 +60,19 @@ export default function NoteApp() {
       console.error("Error fetching folders:", error);
     }
   };
+
+ const switchModalState = (note) => {
+  if (!note) {
+    setIsModalOpen(false);
+    setSelectedNote(null);
+    return;
+  }  
+  setSelectedNote(note);
+    setIsModalOpen(true);
+   // return;
+    
+  };
+
 
   // ARRANGE GRID WITHOUT EMPTY SLOTS
   const arrangeGrid = (notesList) => {
@@ -335,11 +351,16 @@ export default function NoteApp() {
                 onUpdate={handleUpdateNote}
                 onDrop={swapNotes}
                 onHover={setTargetNoteId}
+                
+                onSwitch={switchModalState}
+                onClick={() => switchModalState(note)}
               />
             ))
           )}
         </ul>
       ))}
+      {isModalOpen && selectedNote && (<Modal selectedNote={selectedNote} switchModal={switchModalState}/>)};
+
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 
-export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop }) {
+export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, onClick }) {
   const noteRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -43,9 +43,11 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
     <li
       ref={noteRef}
       key={note.id}
+      onClick={onClick}
       className={`flex flex-col bg-white rounded-xl shadow-lg border-4 border-dashed border-white p-6 m-3 min-w-0
         ${isDragging ? "opacity-50" : "cursor-grab"}
         ${note.span === 2 ? "sm:col-span-2" : ""}
+        cursor-pointer hover:shadow-lg transition duration-150 ease-in-out
       `}
     >
       {/* Header row: Title and action buttons */}
