@@ -44,17 +44,17 @@ export default function NoteApp() {
     fetchFolders();
   }, []);
 
-  useEffect(() => {fetchNotes(activeFolder);}, [activeFolder]);
+  useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
 
   const fetchNotes = async (activeFolder) => {
     setLoading(true);
     try {
-    
-      const data = 
-      (activeFolder===4)?await fetchWithBrowserAPI(API_URL + "/done"):await fetchWithBrowserAPI(API_URL + "/pending");
-       
 
-    
+      const data =
+        (activeFolder === 4) ? await fetchWithBrowserAPI(API_URL + "/done") : await fetchWithBrowserAPI(API_URL + "/pending");
+
+
+
       setNotes(data);
       arrangeGrid(data);
 
@@ -69,7 +69,7 @@ export default function NoteApp() {
     try {
       const data = await fetchWithBrowserAPI(API_URL2);
       setFolders(data);
-      setFolderOptions( [
+      setFolderOptions([
         { id: null, label: "All" },
         ...data.map(folder => ({
           id: folder.id,
@@ -95,14 +95,14 @@ export default function NoteApp() {
   };
 
 
-  // ARRANGE GRID WITHOUT EMPTY SLOTS
+  // ArrangeGrid function to create a grid layout based on note content length
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
     let row = [];
 
     notesList.forEach((note) => {
       if (note.content && note.content.length > 50) {
-        updatedGrid.push([{ ...note, span: 2 }]);
+        updatedGrid.push([{ ...note, span: 2 }]); //span 2 cols for long content
         row = [];
       } else {
         row.push({ ...note, span: 1 });
@@ -113,7 +113,7 @@ export default function NoteApp() {
       }
     });
 
-    // If there's an incomplete row (just one note left), just add it as a row of one (no empty slot)
+    // If there's an incomplete row (just one note left), just add it as a row of one 
     if (row.length === 1) {
       updatedGrid.push([...row]);
     }
@@ -121,6 +121,7 @@ export default function NoteApp() {
     setGridSlots(updatedGrid);
   };
 
+  //HandleAddNote function to add a new note, passed to the Noteform component
   const handleAddNote = async () => {
     if (!newNote.title.trim() || !newNote.folderId) {
       alert("Title and folder selection are required!");
@@ -228,14 +229,8 @@ export default function NoteApp() {
     }
   };
 
-  //Close or open the modal
-  const handleNoteSaved = () => {
-    fetchNotes();       // Refresh notes list after update
-    setIsModalOpen(false);
-    setSelectedNote(null);
-  };
 
-  // Swap logic unchanged
+  // Swap logic
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
     setGridSlots((prevGrid) => {
       if (!sourceNoteId || (targetNoteId === undefined)) {
@@ -292,10 +287,10 @@ export default function NoteApp() {
   useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
   return (
-        <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
+    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
        mx-auto w-full max-w-full overflow-y-auto">
       <h1 className="text-6xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
-  <Noteform folders={folders} handleAddNote={handleAddNote} />
+      <Noteform folders={folders} handleAddNote={handleAddNote} />
       {error && (
         <div className="error text-red-600 bg-red-100 mt-10 p-10 rounded mb-4 text-2xl">
           {error}
@@ -311,21 +306,21 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-        <div className="flex justify-center gap-6 m-6 text-xl">
-           {folderOptions.map(opt => (
-                  <button
-                  key={opt.id ?? "all"}
-                  onClick={() => setActiveFolder(opt.id)}
-                  className={`px-10 py-4 rounded-full border font-semibold  transition
+          <div className="flex justify-center gap-6 m-6 text-xl">
+            {folderOptions.map(opt => (
+              <button
+                key={opt.id ?? "all"}
+                onClick={() => setActiveFolder(opt.id)}
+                className={`px-10 py-4 rounded-full border font-semibold  transition
                   ${activeFolder === opt.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-blue-100"}
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-blue-100"}
                   `} >{opt.label} </button>))}
-        </div>
+          </div>
 
-        <ul
-          ref={listRef}
-          className={`mt-6
+          <ul
+            ref={listRef}
+            className={`mt-6
             flex flex-col gap-4
             w-full max-w-full
             overflow-x-hidden overflow-y-auto
@@ -340,27 +335,27 @@ export default function NoteApp() {
             2xl:grid-cols-4
             bg-gray-100
           `}
-        >
-          {gridSlots
-    .map(row => row.filter(note =>
-      !activeFolder || note.folderId === activeFolder
-    ))
-    .filter(row => row.length > 0).map((row, rowIndex) => 
-            row.map((note, colIndex) => (
-              <Card
-                key={`${rowIndex}-${colIndex}`}
-                note={note}
-                rowIndex={rowIndex}
-                colIndex={colIndex}
-                onDelete={handleDeleteNote}
-                onUpdate={handleUpdateNote}
-                onDrop={swapNotes}
-                folders={folders}
-                onClick={() => switchModalState(note)}
-              />
-            ))
-          )}
-        </ul>
+          >
+            {gridSlots
+              .map(row => row.filter(note =>
+                !activeFolder || note.folderId === activeFolder
+              ))
+              .filter(row => row.length > 0).map((row, rowIndex) =>
+                row.map((note, colIndex) => (
+                  <Card
+                    key={`${rowIndex}-${colIndex}`}
+                    note={note}
+                    rowIndex={rowIndex}
+                    colIndex={colIndex}
+                    onDelete={handleDeleteNote}
+                    onUpdate={handleUpdateNote}
+                    onDrop={swapNotes}
+                    folders={folders}
+                    onClick={() => switchModalState(note)}
+                  />
+                ))
+              )}
+          </ul>
         </>
       ))}
       {isModalOpen && selectedNote && (
