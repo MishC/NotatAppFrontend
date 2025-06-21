@@ -21,8 +21,8 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  const API_URL = "https://localhost:5001/api/notes";
-  const API_URL2 = "https://localhost:5001/api/folders";
+  const API_URL = "http://localhost:5001/api/notes";
+  const API_URL2 = "http://localhost:5001/api/folders";
 
 
 
