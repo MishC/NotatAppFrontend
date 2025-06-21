@@ -186,31 +186,6 @@ export default function NoteApp() {
     }
   };
 
-
-  // To make an update folderId=4 to done
-  const handleUpdateNote = async (id, folderId, title) => {
-    try {
-      const response = await fetch(`${API_URL}/${id}/${folderId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ folderId }),
-      });
-      if (!response.ok) {
-        setError(`HTTP error! status: ${response.status}`);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      if (response.status === 204) {
-        setMsg(`Note "${title}" is done!`);
-        fetchNotes();
-        return;
-      }
-    } catch (error) {
-      setError("Error updating note.");
-      console.error("Error updating note:", error);
-    }
-  };
-
   //Open and close modal
   const switchModalState = (note) => {
     if (!note) {
@@ -280,6 +255,9 @@ export default function NoteApp() {
 
   useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
+  //
+  
+
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
        mx-auto w-full max-w-full overflow-y-auto">
@@ -305,10 +283,10 @@ export default function NoteApp() {
               <button
                 key={opt.id ?? "all"}
                 onClick={() => setActiveFolder(opt.id)}
-                className={`px-10 py-4 rounded-full border font-semibold  transition
+                className={`px-10 py-4 rounded-full  font-semibold transition
                   ${activeFolder === opt.id
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-blue-100"}
+                    : "bg-gray-200 text-gray-700 hover:bg-blue-100"}
                   `} >{opt.label} </button>))}
           </div>
 
@@ -318,6 +296,7 @@ export default function NoteApp() {
             flex flex-col gap-4
             w-full max-w-full
             overflow-x-hidden overflow-y-auto
+           
             p-0 rounded-md
             sm:p-4
             md:max-w-7xl
@@ -328,6 +307,7 @@ export default function NoteApp() {
         
             2xl:grid-cols-4
             bg-gray-100
+           
           `}
           >
             {gridSlots
@@ -335,14 +315,14 @@ export default function NoteApp() {
                 !activeFolder || note.folderId === activeFolder
               ))
               .filter(row => row.length > 0).map((row, rowIndex) =>
-                row.map((note, colIndex) => (
+                row.map((note, colIndex) => ( 
                   <Card
                     key={`${rowIndex}-${colIndex}`}
                     note={note}
                     rowIndex={rowIndex}
                     colIndex={colIndex}
                     onDelete={handleDeleteNote}
-                    onUpdate={handleUpdateNote}
+                    onUpdate={updateNote}
                     onDrop={swapNotes}
                     folders={folders}
                     onClick={() => switchModalState(note)}

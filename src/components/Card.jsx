@@ -5,7 +5,7 @@ import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, folders, onClick }) {
   const noteRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [activeFolder, setActiveFolder] = useState(null); // null = show all
+  const [folderId, setFolderId] = useState(note.folderId || "");
 
 
 
@@ -65,7 +65,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           {note.title}
         </h3>
         <button
-          onClick={() => onUpdate(4, note.id, note.title)}
+          onClick={(e) => {e.stopPropagation();setFolderId(4);onUpdate(note.id,{...note, folderId: 4})}}
           className="ml-2 bg-gradient-to-r from-green-400 to-teal-400 hover:from-green-500 hover:to-teal-500 text-white
           font-bold rounded-md transition duration-150 ease-in-out 
           hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-300
@@ -78,7 +78,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           ✓
         </button>
         <button
-          onClick={() => onDelete(note.id, note.title)}
+          onClick={(e) => {e.stopPropagation();onDelete(note.id, note.title)}}
           className="ml-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white
     font-bold rounded-md transition duration-150 ease-in-out hover:scale-110
     focus:outline-none focus:ring-2 focus:ring-red-400
