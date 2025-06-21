@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-export default function Modal({ selectedNote, switchModal, updateNote, folders}) {
+export default function Modal({ selectedNote, switchModal, updateNote, folders }) {
   const [error, setError] = useState(null);
   const [msg, setMsg] = useState(null);
   const [folderId, setFolderId] = useState(selectedNote.folderId);
   const [title, setTitle] = useState(selectedNote.title);
   const [content, setContent] = useState(selectedNote.content);
- // const [folderName,setFolderName]= useState(folders[selectedNote.folderId].name);
 
- 
+  const handleSave = async () => {
+    const success = await updateNote(selectedNote.id, { title, content, folderId });
+    if (!success) {
+      setError("Failed to update note!");
+      return;
+    }
+    // Modal will close from NoteApp on success
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
@@ -31,21 +37,10 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders})
           value={content}
           onChange={e => setContent(e.target.value)}
         />
-         <select
-          value={selectedNote.folderId}
-          onChange={(e) => setFolderId( e.target.value)}
-          className="
- w-full p-4 my-2
-
-    border-2 border-gray-300 rounded-md
-
-    text-gray-800
-
-    transition-colors duration-200
-
-    focus:outline-none
-    focus:border-blue-300    /* same 2px thickness, just recolored */
-  "
+        <select
+          value={folderId}
+          onChange={(e) => setFolderId(Number(e.target.value))}
+          className="w-full p-4 my-2 border-2 border-gray-300 rounded-md text-gray-800 transition-colors duration-200 focus:outline-none focus:border-blue-300"
         >
           <option value="" disabled className="text-gray-400">
             Select a folder
@@ -59,13 +54,13 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders})
         <div className="flex justify-end">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-            onClick={() => updateNote(folderId)}
+            onClick={handleSave}
           >
             Save
           </button>
           <button
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-            onClick={() => switchModal()}
+            onClick={() => switchModal(null)}
           >
             Cancel
           </button>
