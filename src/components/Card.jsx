@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 
-export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, onClick }) {
+export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, folders, onClick }) {
   const noteRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [activeFolder, setActiveFolder] = useState(null); // null = show all
+
+
 
   useEffect(() => {
     if (!noteRef.current) return;
@@ -40,6 +43,9 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   }, [note.id, rowIndex, colIndex, onDrop]);
 
   return (
+
+
+
     <li
       ref={noteRef}
       key={note.id}

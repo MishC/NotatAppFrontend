@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Card from "./Card";
 import Modal from "./Modal";
+import Noteform from "./Noteform";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [newNote, setNewNote] = useState({ title: "", content: "", folderId: "" });
   const [loading, setLoading] = useState(false);
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
@@ -15,10 +15,16 @@ export default function NoteApp() {
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [activeFolder, setActiveFolder] = useState(null);
+  const [folderOptions, setFolderOptions] = useState([
+    { id: null, label: "All" } // Default option to show all notes
+  ]);
 
   // API Configurations
   const API_URL = "https://localhost:5001/api/notes";
   const API_URL2 = "https://localhost:5001/api/folders";
+
+
 
   const fetchWithBrowserAPI = async (url, options = {}) => {
     const response = await fetch(url, {
@@ -34,16 +40,24 @@ export default function NoteApp() {
   };
 
   useEffect(() => {
-    fetchNotes();
+    fetchNotes(activeFolder);
     fetchFolders();
   }, []);
 
-  const fetchNotes = async () => {
+  useEffect(() => {fetchNotes(activeFolder);}, [activeFolder]);
+
+  const fetchNotes = async (activeFolder) => {
     setLoading(true);
     try {
-      const data = await fetchWithBrowserAPI(API_URL + "/pending");
+    
+      const data = 
+      (activeFolder===4)?await fetchWithBrowserAPI(API_URL + "/done"):await fetchWithBrowserAPI(API_URL + "/pending");
+       
+
+    
       setNotes(data);
       arrangeGrid(data);
+
     } catch (error) {
       console.error("Error fetching notes:", error);
       setError("Error fetching notes. Please try again later.");
@@ -55,6 +69,13 @@ export default function NoteApp() {
     try {
       const data = await fetchWithBrowserAPI(API_URL2);
       setFolders(data);
+      setFolderOptions( [
+        { id: null, label: "All" },
+        ...data.map(folder => ({
+          id: folder.id,
+          label: folder.name
+        }))
+      ]);
     } catch (error) {
       setError("Error fetching folders.");
       console.error("Error fetching folders:", error);
@@ -150,41 +171,41 @@ export default function NoteApp() {
   };
 
   // Update note function in modal
-const updateNote = async (noteId, updatedFields) => {
-  // updatedFields = { title, content, folderId }
-  try {
-    const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        ...selectedNote,
-        ...updatedFields,
-        id: noteId, // C# expects an ID in the body
-        folderId: updatedFields.folderId,
-        title: updatedFields.title,
-        content: updatedFields.content,
-      }),
-    });
-    if (!response.ok) {
-      setError(`HTTP error! status: ${response.status}`);
+  const updateNote = async (noteId, updatedFields) => {
+    // updatedFields = { title, content, folderId }
+    try {
+      const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          ...selectedNote,
+          ...updatedFields,
+          id: noteId, // C# expects an ID in the body
+          folderId: updatedFields.folderId,
+          title: updatedFields.title,
+          content: updatedFields.content,
+        }),
+      });
+      if (!response.ok) {
+        setError(`HTTP error! status: ${response.status}`);
+        return false;
+      }
+      // Success: reload notes, close modal, show message
+      setMsg(`Note "${updatedFields.title}" updated successfully!`);
+      fetchNotes();
+      setIsModalOpen(false);
+      setSelectedNote(null);
+      return true;
+    } catch (error) {
+      setError("Error updating note.");
       return false;
     }
-    // Success: reload notes, close modal, show message
-    setMsg(`Note "${updatedFields.title}" updated successfully!`);
-    fetchNotes();
-    setIsModalOpen(false);
-    setSelectedNote(null);
-    return true;
-  } catch (error) {
-    setError("Error updating note.");
-    return false;
-  }
-};
+  };
 
 
   // To make an update folderId=4 to done
- const handleUpdateNote = async (id, folderId, title) => {
+  const handleUpdateNote = async (id, folderId, title) => {
     try {
       const response = await fetch(`${API_URL}/${id}/${folderId}`, {
         method: "PUT",
@@ -206,13 +227,13 @@ const updateNote = async (noteId, updatedFields) => {
       console.error("Error updating note:", error);
     }
   };
- 
-//Close or open the modal
+
+  //Close or open the modal
   const handleNoteSaved = () => {
-  fetchNotes();       // Refresh notes list after update
-  setIsModalOpen(false);
-  setSelectedNote(null);
-};
+    fetchNotes();       // Refresh notes list after update
+    setIsModalOpen(false);
+    setSelectedNote(null);
+  };
 
   // Swap logic unchanged
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
@@ -271,85 +292,10 @@ const updateNote = async (noteId, updatedFields) => {
   useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
+        <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
        mx-auto w-full max-w-full overflow-y-auto">
       <h1 className="text-6xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
-      <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
-        <input
-          type="text"
-          placeholder="Title"
-          autoFocus
-          value={newNote.title}
-          onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-          className="
-     w-full p-4 my-4
-
-    border-2 border-gray-300 rounded-md
-
-    text-gray-800
-
-    transition-colors duration-200
-
-    focus:outline-none
-    focus:border-blue-300    /* same 2px thickness, just recolored */
-  "
-        />
-
-        <textarea
-          placeholder="Content (optional)"
-          value={newNote.content}
-          onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-          className="
-    w-full p-4 my-2 mb-4
-
-    border-2 border-gray-300 rounded-md
-
-    text-gray-800
-
-    transition-colors duration-200
-
-    focus:outline-none
-    focus:border-blue-300    /* same 2px thickness, just recolored */
-  "
-        />
-
-        <select
-          value={newNote.folderId}
-          onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
-          className="
- w-full p-4 my-2
-
-    border-2 border-gray-300 rounded-md
-
-    text-gray-800
-
-    transition-colors duration-200
-
-    focus:outline-none
-    focus:border-blue-300    /* same 2px thickness, just recolored */
-  "
-        >
-          <option value="" disabled className="text-gray-400">
-            Select a folder
-          </option>
-          {folders.map((folder) => (
-            <option key={folder.id} value={folder.id}>
-              {folder.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex justify-center">
-          <button
-            onClick={handleAddNote}
-            className="mt-10 mb-6  mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
-            style={{ paddingBottom: 0 }}
-          >
-            <span className="text-white font-bold text-2xl mb-5" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
-            <span className="text-lg px-2 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
-          </button>
-        </div>
-      </div>
+  <Noteform folders={folders} handleAddNote={handleAddNote} />
       {error && (
         <div className="error text-red-600 bg-red-100 mt-10 p-10 rounded mb-4 text-2xl">
           {error}
@@ -364,6 +310,19 @@ const updateNote = async (noteId, updatedFields) => {
       {loading ? (
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
+        <>
+        <div className="flex justify-center gap-6 m-6 text-xl">
+           {folderOptions.map(opt => (
+                  <button
+                  key={opt.id ?? "all"}
+                  onClick={() => setActiveFolder(opt.id)}
+                  className={`px-10 py-4 rounded-full border font-semibold  transition
+                  ${activeFolder === opt.id
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-blue-100"}
+                  `} >{opt.label} </button>))}
+        </div>
+
         <ul
           ref={listRef}
           className={`mt-6
@@ -382,7 +341,11 @@ const updateNote = async (noteId, updatedFields) => {
             bg-gray-100
           `}
         >
-          {gridSlots.map((row, rowIndex) =>
+          {gridSlots
+    .map(row => row.filter(note =>
+      !activeFolder || note.folderId === activeFolder
+    ))
+    .filter(row => row.length > 0).map((row, rowIndex) => 
             row.map((note, colIndex) => (
               <Card
                 key={`${rowIndex}-${colIndex}`}
@@ -392,20 +355,19 @@ const updateNote = async (noteId, updatedFields) => {
                 onDelete={handleDeleteNote}
                 onUpdate={handleUpdateNote}
                 onDrop={swapNotes}
-                onHover={setTargetNoteId}
-
-                onSwitch={switchModalState}
+                folders={folders}
                 onClick={() => switchModalState(note)}
               />
             ))
           )}
         </ul>
+        </>
       ))}
       {isModalOpen && selectedNote && (
         <Modal
           selectedNote={selectedNote}
           switchModal={switchModalState}
-          updateNote={updateNote}  
+          updateNote={updateNote}
           folders={folders}
         />
       )}
