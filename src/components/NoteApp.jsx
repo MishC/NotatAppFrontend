@@ -156,7 +156,7 @@ const updateNote = async (folderId) => {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ ...selectedNote, title, content, folders }),
+      body: JSON.stringify({ ...selectedNote, title, content, folderId }),
     });
     if (!response.ok) {
       setError(`HTTP error! status: ${response.status}`);
