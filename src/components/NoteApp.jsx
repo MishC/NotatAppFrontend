@@ -150,29 +150,38 @@ export default function NoteApp() {
   };
 
   // Update note function in modal
-const updateNote = async (folderId) => {
+const updateNote = async (noteId, updatedFields) => {
+  // updatedFields = { title, content, folderId }
   try {
-    const response = await fetch(`${API_URL}/${folderId}/${selectedNote.id}`, {
+    const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ ...selectedNote, title, content, folderId }),
+      body: JSON.stringify({
+        ...selectedNote,
+        ...updatedFields,
+        id: noteId, // C# expects an ID in the body
+        folderId: updatedFields.folderId,
+        title: updatedFields.title,
+        content: updatedFields.content,
+      }),
     });
     if (!response.ok) {
       setError(`HTTP error! status: ${response.status}`);
-      return;
+      return false;
     }
-    if (response.status === 204) {
-      setMsg(`Note "${title}" updated successfully!`);
-      fetchNotes();
-      handleNoteSaved(); // Close modal and refresh notes
-      return;
-    }
-  
+    // Success: reload notes, close modal, show message
+    setMsg(`Note "${updatedFields.title}" updated successfully!`);
+    fetchNotes();
+    setIsModalOpen(false);
+    setSelectedNote(null);
+    return true;
   } catch (error) {
     setError("Error updating note.");
+    return false;
   }
 };
+
 
   // To make an update folderId=4 to done
  const handleUpdateNote = async (id, folderId, title) => {
