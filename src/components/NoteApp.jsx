@@ -11,10 +11,10 @@ export default function NoteApp() {
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
   const [targetNoteId, setTargetNoteId] = useState(null);
-  const [error, setError] = useState("");            
-  const [msg, setMsg] = useState(""); 
+  const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-const [selectedNote, setSelectedNote] = useState(null);
+  const [selectedNote, setSelectedNote] = useState(null);
 
   // API Configurations
   const API_URL = "https://localhost:5001/api/notes";
@@ -61,16 +61,16 @@ const [selectedNote, setSelectedNote] = useState(null);
     }
   };
 
- const switchModalState = (note) => {
-  if (!note) {
-    setIsModalOpen(false);
-    setSelectedNote(null);
-    return;
-  }  
-  setSelectedNote(note);
+  const switchModalState = (note) => {
+    if (!note) {
+      setIsModalOpen(false);
+      setSelectedNote(null);
+      return;
+    }
+    setSelectedNote(note);
     setIsModalOpen(true);
-   // return;
-    
+    // return;
+
   };
 
 
@@ -149,7 +149,33 @@ const [selectedNote, setSelectedNote] = useState(null);
     }
   };
 
-  const handleUpdateNote = async (id, folderId, title) => {
+  // Update note function in modal
+const updateNote = async (folderId) => {
+  try {
+    const response = await fetch(`${API_URL}/${folderId}/${selectedNote.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ ...selectedNote, title, content, folders }),
+    });
+    if (!response.ok) {
+      setError(`HTTP error! status: ${response.status}`);
+      return;
+    }
+    if (response.status === 204) {
+      setMsg(`Note "${title}" updated successfully!`);
+      fetchNotes();
+      handleNoteSaved(); // Close modal and refresh notes
+      return;
+    }
+  
+  } catch (error) {
+    setError("Error updating note.");
+  }
+};
+
+  // To make an update folderId=4 to done
+ const handleUpdateNote = async (id, folderId, title) => {
     try {
       const response = await fetch(`${API_URL}/${id}/${folderId}`, {
         method: "PUT",
@@ -171,6 +197,13 @@ const [selectedNote, setSelectedNote] = useState(null);
       console.error("Error updating note:", error);
     }
   };
+ 
+//Close or open the modal
+  const handleNoteSaved = () => {
+  fetchNotes();       // Refresh notes list after update
+  setIsModalOpen(false);
+  setSelectedNote(null);
+};
 
   // Swap logic unchanged
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
@@ -226,7 +259,7 @@ const [selectedNote, setSelectedNote] = useState(null);
     });
   }, [targetNoteId]);
 
-  useEffect(() => {setTimeout( () => {setError(""), setMsg("")},10000);}, [error.length>1, msg.length>1]);
+  useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
@@ -351,7 +384,7 @@ const [selectedNote, setSelectedNote] = useState(null);
                 onUpdate={handleUpdateNote}
                 onDrop={swapNotes}
                 onHover={setTargetNoteId}
-                
+
                 onSwitch={switchModalState}
                 onClick={() => switchModalState(note)}
               />
@@ -359,8 +392,14 @@ const [selectedNote, setSelectedNote] = useState(null);
           )}
         </ul>
       ))}
-      {isModalOpen && selectedNote && (<Modal selectedNote={selectedNote} switchModal={switchModalState}/>)};
-
+      {isModalOpen && selectedNote && (
+        <Modal
+          selectedNote={selectedNote}
+          switchModal={switchModalState}
+          updateNote={updateNote}  
+          folders={folders}
+        />
+      )}
     </div>
   );
 }
