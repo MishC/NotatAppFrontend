@@ -82,19 +82,6 @@ export default function NoteApp() {
     }
   };
 
-  const switchModalState = (note) => {
-    if (!note) {
-      setIsModalOpen(false);
-      setSelectedNote(null);
-      return;
-    }
-    setSelectedNote(note);
-    setIsModalOpen(true);
-    // return;
-
-  };
-
-
   // ArrangeGrid function to create a grid layout based on note content length
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
@@ -122,12 +109,8 @@ export default function NoteApp() {
   };
 
   //HandleAddNote function to add a new note, passed to the Noteform component
-  const handleAddNote = async () => {
-    if (!newNote.title.trim() || !newNote.folderId) {
-      alert("Title and folder selection are required!");
-      setError("Title and folder cannot be empty. Please fill them out.");
-      return;
-    }
+  const handleAddNote = async (newNote) => {
+   
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -142,7 +125,6 @@ export default function NoteApp() {
       const data = await response.json();
       const updatedNotes = [...notes, data];
       setNotes(updatedNotes);
-      setNewNote({ title: "", content: "", folderId: "" });
       arrangeGrid(updatedNotes);
     } catch (error) {
       console.error("Error adding note:", error);
@@ -229,6 +211,18 @@ export default function NoteApp() {
     }
   };
 
+  //Open and close modal
+  const switchModalState = (note) => {
+    if (!note) {
+      setIsModalOpen(false);
+      setSelectedNote(null);
+      return;
+    }
+    setSelectedNote(note);
+    setIsModalOpen(true);
+    // return;
+
+  };
 
   // Swap logic
   const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
