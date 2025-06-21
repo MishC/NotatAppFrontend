@@ -5,6 +5,7 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders})
   const [folderId, setFolderId] = useState(selectedNote.folderId);
   const [title, setTitle] = useState(selectedNote.title);
   const [content, setContent] = useState(selectedNote.content);
+ // const [folderName,setFolderName]= useState(folders[selectedNote.folderId].name);
 
  
 
@@ -31,8 +32,8 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders})
           onChange={e => setContent(e.target.value)}
         />
          <select
-          value={newNote.folderId}
-          onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
+          value={selectedNote.folderId}
+          onChange={(e) => setFolderId( e.target.value)}
           className="
  w-full p-4 my-2
 
