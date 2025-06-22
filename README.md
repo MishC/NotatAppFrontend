@@ -16,9 +16,9 @@ This app let you see your notes on the board, where each note is draggable, so t
 
    Runs in your browser.
 
-## What is interesting on your code?
+## What is interesting on the code
 
-For fast set up of dragable cards with notes I installed pragmatic-drag-and-drop from Atlassian
+For fast set up of dragable cards with notes I installed pragmatic-drag-and-drop library from Atlassian
 
 ``` npm i @atlaskit/pragmatic-drag-and-drop ```
 
