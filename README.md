@@ -16,10 +16,55 @@ This app let you see your notes on the board, where each note is draggable, so t
 
    Runs in your browser.
 
+## What is interesting on your code?
+
+For fast set up of dragable cards with notes I installed pragmatic-drag-and-drop from Atlassian
+
+``` npm i @atlaskit/pragmatic-drag-and-drop ```
+
+[Documentation](https://atlassian.design/components/pragmatic-drag-and-drop/about)
+
+Each card is made draggable and each card is the drop target. OnDrop function swap the notes ids, row and col indices.
+
+``` 
+  useEffect(() => {
+    if (!noteRef.current) return;
+
+    const dropConfig = dropTargetForElements({
+      element: noteRef.current,
+      getData: () => ({
+        type: "note-slot",
+        targetNoteId: note.id,
+        rowIndex,
+        colIndex
+      }),
+      onDrop: ({ source }) => {
+        if (!source?.data?.sourceNoteId || source.data.sourceNoteId === note.id) return;
+        onDrop(source.data.sourceNoteId, note.id, rowIndex, colIndex);
+      },
+    });
+
+    const dragConfig = draggable({
+      element: noteRef.current,
+      getInitialData: () => ({
+        type: "note",
+        sourceNoteId: note.id,
+        rowIndex,
+        colIndex
+      }),
+      onDragStart: () => setIsDragging(true),
+      onDrop: () => setIsDragging(false),
+    });
+
+    const cleanup = combine(dragConfig, dropConfig);
+    return () => cleanup();
+  }, [note.id, rowIndex, colIndex, onDrop]);
+
+```
 
 
 
-# Modern approach: React + Vite
+## Modern approach: React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

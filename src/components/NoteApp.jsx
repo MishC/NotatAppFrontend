@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, use } from "react";
-import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { useState, useEffect, useRef, use } from "react";
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
@@ -239,30 +238,12 @@ export default function NoteApp() {
     });
   };
 
-  useEffect(() => {
-    if (!listRef.current) return;
-    return dropTargetForElements({
-      element: listRef.current,
-      getData: () => ({ type: "note-list" }),
-      onDrop: ({ source }) => {
-        if (!source?.data?.sourceNoteId) {
-          console.warn("Source ID is missing in onDrop.");
-          return;
-        }
-        if (!targetNoteId) {
-          setError("Target ID is missing. Please hover over a valid slot.");
-          return;
-        }
-        setTimeout(() => {
-          swapNotes(source.data.sourceNoteId, targetNoteId);
-        }, 50);
-      },
-    });
-  }, [targetNoteId]);
+
+  // Clear error and message after 10 seconds
 
   useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
-  //
+  
   
 
   return (
@@ -331,7 +312,6 @@ export default function NoteApp() {
                     onDelete={handleDeleteNote}
                     onUpdate={updateNote}
                     onDrop={swapNotes}
-                    folders={folders}
                     onClick={() => switchModalState(note)}
                   />
                 ))
