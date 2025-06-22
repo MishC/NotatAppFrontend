@@ -3,7 +3,7 @@ name: CI/CD Deploy to AWS EC2
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
@@ -19,8 +19,8 @@ jobs:
       # Build and push frontend Docker image
       - name: Build and push frontend Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/notatapp:latest .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/notatapp:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/noteapp:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/noteapp:latest
 
       # SSH to EC2 and redeploy
       - name: SSH and deploy
