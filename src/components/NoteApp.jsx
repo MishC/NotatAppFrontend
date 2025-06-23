@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, use } from "react";
+import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
@@ -7,6 +8,7 @@ export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [lengthNotes, setLengthNotes] = useState(0);
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
   const [targetNoteId, setTargetNoteId] = useState(null);
@@ -20,8 +22,8 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  const API_URL = "http://51.20.51.192:5001/api/notes"; 
-  const API_URL2 = "http://51.20.51.192:5001/api/folders"; 
+  const API_URL = "http://51.20.51.192:5001/api/notes";
+  const API_URL2 = "http://51.20.51.192:5001/api/folders";
 
 
 
@@ -39,9 +41,10 @@ export default function NoteApp() {
   };
 
   useEffect(() => {
-    try{
-    fetchNotes(activeFolder);
-    fetchFolders();}
+    try {
+      fetchNotes(activeFolder);
+      fetchFolders();
+    }
     catch (error) {
       API_URL = "http://localhost:5001/api/notes"; // Fallback to local API
       API_URL2 = "http://localhost:5001/api/folders"; // Fallback to local API
@@ -61,7 +64,8 @@ export default function NoteApp() {
 
 
 
-      setNotes(data);
+      data&& setNotes(data);
+      activeFolder===null?setLengthNotes(data.length):setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
       arrangeGrid(data);
 
     } catch (error) {
@@ -87,7 +91,7 @@ export default function NoteApp() {
       console.error("Error fetching folders:", error);
     }
   };
-
+  
   // ArrangeGrid function to create a grid layout based on note content length
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
@@ -116,7 +120,7 @@ export default function NoteApp() {
 
   //HandleAddNote function to add a new note, passed to the Noteform component
   const handleAddNote = async (newNote) => {
-   
+
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -192,6 +196,28 @@ export default function NoteApp() {
     }
   };
 
+  //
+  useEffect(() => {
+    if (!listRef.current) return;
+    return dropTargetForElements({
+      element: listRef.current,
+      getData: () => ({ type: "note-list" }),
+      onDrop: ({ source }) => {
+        if (!source?.data?.sourceNoteId) {
+          console.warn("Source ID is missing in onDrop.");
+          return;
+        }
+        if (!targetNoteId) {
+          setError("Target ID is missing. Please hover over a valid slot.");
+          return;
+        }
+        setTimeout(() => {
+          swapNotes(source.data.sourceNoteId, targetNoteId);
+        }, 50);
+      },
+    });
+  }, [targetNoteId]);
+
   //Open and close modal
   const switchModalState = (note) => {
     if (!note) {
@@ -243,8 +269,8 @@ export default function NoteApp() {
 
   useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
 
-  
-  
+
+
 
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
@@ -275,35 +301,26 @@ export default function NoteApp() {
                   ${activeFolder === opt.id
                     ? "bg-blue-600 text-white"
                     : "bg-gray-200 text-gray-700 hover:bg-blue-100"}
-                  `} >{opt.label} </button>))}
+                  `} >{opt.label} </button>
+            ))}
           </div>
 
           <ul
             ref={listRef}
-            className={`mt-6
-            flex flex-col gap-4
-            w-full max-w-full
-            overflow-x-hidden overflow-y-auto
-           
-            p-0 rounded-md
-            sm:p-4
-            md:max-w-7xl
-            sm:grid sm:grid-cols-2
-            lg:grid-cols-3
-            xl:grid-cols-3
-            2xl:max-w-[110rem]
-        
-            2xl:grid-cols-4
-            bg-gray-100
-           
-          `}
+            className={`mt-6 w-full max-w-full overflow-x-hidden overflow-y-auto
+    p-0 rounded-md sm:p-4 md:max-w-7xl bg-gray-100
+    ${(lengthNotes<3)
+                ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+              }`
+            }
           >
             {gridSlots
               .map(row => row.filter(note =>
                 !activeFolder || note.folderId === activeFolder
               ))
               .filter(row => row.length > 0).map((row, rowIndex) =>
-                row.map((note, colIndex) => ( 
+                row.map((note, colIndex) => (
                   <Card
                     key={`${rowIndex}-${colIndex}`}
                     note={note}
