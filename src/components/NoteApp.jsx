@@ -22,8 +22,8 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  const API_URL = "/api/notes";
-  const API_URL2 = "/api/folders";
+  const API_URL = `${window.location.origin}/api/notes`;
+  const API_URL2 = `${window.location.origin}/api/folders`;
 
 
 
