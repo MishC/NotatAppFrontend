@@ -22,8 +22,8 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  let API_URL = "/api/notes";
-  let API_URL2 = "/api/folders";
+  const API_URL = "/api/notes";
+  const API_URL2 = "/api/folders";
 
 
 
@@ -41,16 +41,9 @@ export default function NoteApp() {
   };
 
   useEffect(() => {
-    try {
+  
       fetchNotes(activeFolder);
       fetchFolders();
-    }
-    catch (error) {
-      API_URL = "http://localhost:5001/api/notes"; // Fallback to local API
-      API_URL2 = "http://localhost:5001/api/folders"; // Fallback to local API
-      fetchNotes(activeFolder);
-      fetchFolders();
-    }
   }, []);
 
   useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
