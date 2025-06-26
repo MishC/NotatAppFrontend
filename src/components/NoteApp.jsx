@@ -22,8 +22,8 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  let API_URL = "http://51.20.51.192:5001/api/notes";
-  let API_URL2 = "http://51.20.51.192:5001/api/folders";
+  let API_URL = "https://noteappsolutions.com:5001/api/notes";
+  let API_URL2 = "https://noteappsolutions.com:5001/api/folders";
 
 
 
