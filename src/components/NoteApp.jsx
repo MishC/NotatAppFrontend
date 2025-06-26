@@ -22,13 +22,11 @@ export default function NoteApp() {
   ]);
 
   // API Configurations
-  const isLocalhost = window.location.origin.includes("localhost");
-  const API_URL = isLocalhost
-    ? "http://localhost:5001/api/notes"
-    : `${window.location.origin}/api/notes`;
-  const API_URL2 = isLocalhost
-    ? "http://localhost:5001/api/folders"
-    : `${window.location.origin}/api/folders`;
+  //const isLocalhost = window.location.origin.includes("localhost");
+  // const API_URL = isLocalhost ? "http://localhost:5001/api/notes" : "/api/notes";
+  // const API_URL2 = isLocalhost ? "http://localhost:5001/api/folders" : "/api/folders";
+  const API_URL =  `${window.location.origin}/api/notes`;
+  const API_URL2 =  `${window.location.origin}/api/folders`;
 
 
 
