@@ -2,7 +2,11 @@
 
 This app let you see your notes on the board, where each note is draggable, so that you can set the priority of notes. You can add a note through the formular on the webside. After clicking on the note, it is available to edit it. 
 
-## How to run the application
+## See live
+
+https://www.noteappsolutions.com or https://noteappsolutions.com
+
+## How to run the application locally
 
 1. Run Backend in NotatApp
    
