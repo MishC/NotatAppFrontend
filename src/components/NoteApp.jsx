@@ -25,8 +25,8 @@ export default function NoteApp() {
   //const isLocalhost = window.location.origin.includes("localhost");
   // const API_URL = isLocalhost ? "http://localhost:5001/api/notes" : "/api/notes";
   // const API_URL2 = isLocalhost ? "http://localhost:5001/api/folders" : "/api/folders";
-  const API_URL =  `${window.location.origin}/api/notes`;
-  const API_URL2 =  `${window.location.origin}/api/folders`;
+  const API_URL = `${window.location.origin}/api/notes`;
+  const API_URL2 = `${window.location.origin}/api/folders`;
 
 
 
@@ -44,9 +44,9 @@ export default function NoteApp() {
   };
 
   useEffect(() => {
-  
-      fetchNotes(activeFolder);
-      fetchFolders();
+
+    fetchNotes(activeFolder);
+    fetchFolders();
   }, []);
 
   useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
@@ -60,8 +60,8 @@ export default function NoteApp() {
 
 
 
-      data&& setNotes(data);
-      activeFolder===null?setLengthNotes(data.length):setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
+      data && setNotes(data);
+      activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
       arrangeGrid(data);
 
     } catch (error) {
@@ -87,7 +87,7 @@ export default function NoteApp() {
       console.error("Error fetching folders:", error);
     }
   };
-  
+
   // ArrangeGrid function to create a grid layout based on note content length
   const arrangeGrid = (notesList) => {
     let updatedGrid = [];
@@ -288,24 +288,30 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-          <div className="flex justify-center gap-6 m-6 text-xl">
-            {folderOptions.map(opt => (
-              <button
-                key={opt.id ?? "all"}
-                onClick={() => setActiveFolder(opt.id)}
-                className={`px-10 py-4 rounded-full  font-semibold transition
-                  ${activeFolder === opt.id
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-blue-100"}
-                  `} >{opt.label} </button>
-            ))}
+          <div className="flex justify-center m-6">
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+              {folderOptions.map((opt) => (
+                <button
+                  key={opt.id ?? "all"}
+                  onClick={() => setActiveFolder(opt.id)}
+                  className={[
+                    "px-5 py-2 rounded-md font-medium transition",
+                    activeFolder === opt.id
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-slate-600 hover:text-blue-600",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <ul
             ref={listRef}
             className={`mt-6 w-full max-w-full overflow-x-hidden overflow-y-auto
     p-0 rounded-md sm:p-4 md:max-w-7xl bg-gray-100
-    ${(lengthNotes<3)
+    ${(lengthNotes < 3)
                 ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
                 : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
               }`
