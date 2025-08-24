@@ -19,7 +19,7 @@ jobs:
       # Build and push frontend Docker image
       - name: Build and push frontend Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/noteapp:latest .
+          docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/noteapp:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/noteapp:latest
 
       # SSH to EC2 and redeploy
@@ -32,4 +32,5 @@ jobs:
           script: |
             cd ~/NoteApp
             sudo docker-compose pull
-            sudo docker-compose up -d
+            sudo docker-compose up -d --force-recreate frontend
+            sudo docker-compose image prune -f
