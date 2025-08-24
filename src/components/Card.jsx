@@ -88,9 +88,21 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           ×
         </button>
       </div>
+       {/* subtle divider */}
+      <div className="mt-3 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+
       {/* Content */}
+                
+
       {note.content && note.content.length > 1 && (
-        <p className="mt-2 text-gray-700 text-justify border border-gray-200 bg-amber-50 p-4 rounded-lg break-words">
+          <p
+          className={[
+            "mt-3 text-slate-700 leading-relaxed",
+            "bg-slate-50/70 border border-slate-200 rounded-xl",
+            "p-4 break-words",
+            "group-hover:bg-slate-50",
+          ].join(" ")}
+        >
           {note.content}
         </p>
       )}
