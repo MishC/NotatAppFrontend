@@ -33,4 +33,3 @@ jobs:
             cd ~/NoteApp
             sudo docker-compose pull
             sudo docker-compose up -d --force-recreate frontend
-            sudo docker-compose image prune -f
