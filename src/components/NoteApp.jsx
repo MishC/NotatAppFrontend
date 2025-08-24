@@ -288,24 +288,25 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-          <div className="flex justify-center m-6">
-            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
-              {folderOptions.map((opt) => (
-                <button
-                  key={opt.id ?? "all"}
-                  onClick={() => setActiveFolder(opt.id)}
-                  className={[
-                    "px-5 py-2 rounded-md font-medium transition",
-                    activeFolder === opt.id
-                      ? "bg-white text-blue-600 shadow-sm"
-                      : "text-slate-600 hover:text-blue-600",
-                  ].join(" ")}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
+         <div className="flex justify-center m-6 w-full max-w-4xl mx-auto">
+  <div className="inline-flex flex-wrap justify-center gap-4 rounded-xl border border-slate-200 bg-slate-100 p-2 w-full">
+    {folderOptions.map((opt) => (
+      <button
+        key={opt.id ?? "all"}
+        onClick={() => setActiveFolder(opt.id)}
+        className={[
+          "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+          activeFolder === opt.id
+            ? "bg-white text-blue-600 shadow-md"
+            : "text-slate-600 hover:text-blue-600",
+        ].join(" ")}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+</div>
+
 
           <ul
             ref={listRef}
