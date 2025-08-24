@@ -1,73 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 
 export default function Noteform({ folders, handleAddNote }) {
-  const [newNote, setNewNote] = useState({ title: "", content: "", folderId: "" });
-  const [err, setErr] = useState("");
+    const [newNote, setNewNote] = useState({
+        title: '',
+        content: '',
+        folderId: ''
+    });
+    const [error, setError] = useState(null);
 
-  const addNote = (e) => {
-    e.preventDefault();
-    if (!newNote.title.trim() || !newNote.folderId) {
-      setErr("Title and folder are required.");
+    const addNote = (e,newNote) => {
+        e.preventDefault();
+      
+           if (!newNote.title.trim() || !newNote.folderId) {
+      alert("Title and folder selection are required!");
+      setError("Title and folder cannot be empty. Please fill them out.");
       return;
+    }     handleAddNote(newNote);
+        setNewNote({ title: '', content: '', folderId: '' });
     }
-    handleAddNote({ ...newNote, folderId: Number(newNote.folderId) });
-    setNewNote({ title: "", content: "", folderId: "" });
-    setErr("");
-  };
 
-  return (
-    <form onSubmit={addNote} className="space-y-3">
-      {/* floating label inputs */}
-      <div className="relative">
+return (
+    <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
         <input
-          id="title"
-          type="text"
-          value={newNote.title}
-          onChange={(e)=>setNewNote(v=>({ ...v, title: e.target.value }))}
-          className="peer w-full rounded-xl border border-gray-300 p-4 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-          placeholder="Title"
-          autoFocus
+            type="text"
+            placeholder="Title"
+            autoFocus
+            value={newNote.title}
+            onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+            className="
+                w-full p-4 my-4
+                border-2 border-gray-300 rounded-md
+                text-gray-800
+                transition-colors duration-200
+                focus:outline-none
+                focus:border-blue-300
+            "
         />
-        <label htmlFor="title" className="absolute left-4 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-blue-600">
-          Title
-        </label>
-      </div>
 
-      <div className="relative">
         <textarea
-          id="content"
-          value={newNote.content}
-          onChange={(e)=>setNewNote(v=>({ ...v, content: e.target.value }))}
-          className="peer w-full rounded-xl border border-gray-300 p-4 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-blue-300"
-          placeholder="Content (optional)"
-          rows={4}
+            placeholder="Content (optional)"
+            value={newNote.content}
+            onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+            className="
+                w-full p-4 my-2 mb-4
+                border-2 border-gray-300 rounded-md
+                text-gray-800
+                transition-colors duration-200
+                focus:outline-none
+                focus:border-blue-300
+            "
         />
-        <label htmlFor="content" className="absolute left-4 -top-2.5 px-1 bg-white text-xs text-gray-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-blue-600">
-          Content (optional)
-        </label>
-      </div>
 
-      <div className="relative">
         <select
-          value={newNote.folderId}
-          onChange={(e)=>setNewNote(v=>({ ...v, folderId: e.target.value }))}
-          className="peer w-full appearance-none rounded-xl border border-gray-300 p-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            value={newNote.folderId}
+            onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
+            className="
+                w-full p-4 my-2
+                border-2 border-gray-300 rounded-md
+                text-gray-800
+                transition-colors duration-200
+                focus:outline-none
+                focus:border-blue-300
+            "
         >
-          <option value="" disabled>Select a folder</option>
-          {folders.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+            <option value="" disabled className="text-gray-400">
+                Select a folder
+            </option>
+            {folders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                    {folder.name}
+                </option>
+            ))}
         </select>
-        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">▾</span>
-        <label className="absolute left-4 -top-2.5 px-1 bg-white text-xs text-gray-500">Folder</label>
-      </div>
 
-      {err && <div className="text-sm text-red-600">{err}</div>}
-
-      <button
-        type="submit"
-        className="w-100 mt-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 transition shadow"
-      >
-        + Add Note
-      </button>
-    </form>
-  );
+        <div className="flex justify-center">
+            <button
+                onClick={(e) => addNote(e, newNote)}
+                className="mt-10 mb-6  mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
+                style={{ paddingBottom: 0 }}
+            >
+                <span className="text-white font-bold text-2xl mb-5" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
+                <span className="text-lg px-2 mb-5" style={{ lineHeight: 1 }}>&nbsp;&nbsp;Add Note</span>
+            </button>
+        </div>
+    </div>
+)
 }
