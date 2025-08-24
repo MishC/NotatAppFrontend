@@ -47,11 +47,19 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
       ref={noteRef}
       key={note.id}
       onClick={onClick}
-      className={`flex flex-col bg-white rounded-xl shadow-lg border-4 border-dashed border-white p-6 m-3 min-w-0
-        ${isDragging ? "opacity-50" : "cursor-grab"}
-        ${note.span === 2 ? "sm:col-span-2" : ""}
-        cursor-pointer hover:shadow-lg transition duration-150 ease-in-out
-      `}
+      className={[
+        // card shell
+        "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
+        "bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60",
+        "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
+        // padding & spacing
+        "p-4 sm:p-5 m-2",
+        // grid span
+        note.span === 2 ? "sm:col-span-2" : "",
+        // interactions
+        isDragging ? "opacity-75 scale-[0.98] ring-2 ring-blue-400/40" : "cursor-grab hover:-translate-y-0.5",
+        "focus-within:ring-2 focus-within:ring-blue-400/40",
+      ].join(" ")}
     >
       {/* Header row: Title and action buttons */}
       <div className="flex items-center gap-2 mb-3 min-w-0">
