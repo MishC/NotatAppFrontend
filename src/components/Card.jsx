@@ -47,49 +47,66 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
       ref={noteRef}
       key={note.id}
       onClick={onClick}
-      className={`flex flex-col bg-white rounded-xl shadow-lg border-4 border-dashed border-white p-6 m-3 min-w-0
-        ${isDragging ? "opacity-50" : "cursor-grab"}
-        ${note.span === 2 ? "sm:col-span-2" : ""}
-        cursor-pointer hover:shadow-lg transition duration-150 ease-in-out
-      `}
+     className={[
+        // card shell
+        "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
+        "bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60",
+        "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
+        // padding & spacing
+        "p-4 sm:p-5 m-2",
+        // grid span
+        note.span === 2 ? "sm:col-span-2" : "",
+        // interactions
+        isDragging ? "opacity-75 scale-[0.98] ring-2 ring-blue-400/40" : "cursor-grab hover:-translate-y-0.5",
+        "focus-within:ring-2 focus-within:ring-blue-400/40",
+      ].join(" ")}
     >
       {/* Header row: Title and action buttons */}
       <div className="flex items-center gap-2 mb-3 min-w-0">
         <h3
-          className="text-2xl font-extrabold text-black truncate flex-grow min-w-0"
+          className="flex-1 min-w-0 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate"
           title={note.title}
         >
           {note.title}
         </h3>
+         <div className="flex items-center gap-2 shrink-0">
+
         <button
           onClick={(e) => {e.stopPropagation();setFolderId(4);onUpdate(note.id,{...note, folderId: 4})}}
-          className="ml-2 bg-gradient-to-r from-green-400 to-teal-400 hover:from-green-500 hover:to-teal-500 text-white
-          font-bold rounded-md transition duration-150 ease-in-out 
-          hover:scale-110 focus:outline-none focus:ring-2 focus:ring-green-300
-          flex items-center justify-center
-          w-14 aspect-[2/1]   // 2:1 ratio
-          text-2xl"
-          aria-label="Mark complete"
-          title="Mark complete"
+          className={[
+              "inline-flex items-center justify-center",
+              "h-9 w-9 rounded-full",
+              "bg-gradient-to-br from-emerald-400 to-teal-500",
+              "text-white text-lg font-bold",
+              "shadow-sm hover:shadow focus:outline-none",
+              "hover:scale-105 active:scale-95",
+              "focus-visible:ring-2 focus-visible:ring-emerald-300",
+            ].join(" ")}
+            aria-label="Mark complete"
+            title="Mark complete"
         >
           ✓
         </button>
         <button
           onClick={(e) => {e.stopPropagation();onDelete(note.id, note.title)}}
-          className="ml-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white
-    font-bold rounded-md transition duration-150 ease-in-out hover:scale-110
-    focus:outline-none focus:ring-2 focus:ring-red-400
-    flex items-center justify-center
-    w-14 aspect-[2/1]   // 2:1 ratio
-    text-2xl"
-          aria-label="Delete note"
-          title="Delete note"
+     className={[
+              "inline-flex items-center justify-center",
+              "h-9 w-9 rounded-full",
+              "bg-gradient-to-br from-rose-500 to-pink-500",
+              "text-white text-xl font-bold",
+              "shadow-sm hover:shadow focus:outline-none",
+              "hover:scale-105 active:scale-95",
+              "focus-visible:ring-2 focus-visible:ring-rose-300",
+            ].join(" ")}
+            aria-label="Delete note"
+            title="Delete note"
         >
           ×
         </button>
+        </div>
       </div>
        {/* subtle divider */}
-      <div className="mt-3 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+      {/*<div className="mt-3 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />*/}
 
       {/* Content */}
                 
