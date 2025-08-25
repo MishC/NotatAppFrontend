@@ -6,6 +6,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   const noteRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [folderId, setFolderId] = useState(note.folderId || "");
+  const [showMenu, setShowMenu] = useState(false);
 
 
 

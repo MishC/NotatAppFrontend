@@ -20,7 +20,7 @@ export default function Noteform({ folders, handleAddNote }) {
     }
 
 return (
-    <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-6">
+    <div className="max-w-xl w-full bg-white p-6 rounded-lg shadow-md my-10">
         <input
             type="text"
             placeholder="Title"
