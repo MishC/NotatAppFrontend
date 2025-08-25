@@ -274,8 +274,8 @@ export default function NoteApp() {
        mx-auto w-full max-w-full overflow-y-auto">
      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
   <div className="flex items-center gap-4">
-    <KanbanNoteIcon className="text-blue-600" />
-    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800">
+    <KanbanNoteIcon className="text-blue-600 text-center" />
+    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
       Note Board
     </h1>
   </div>
