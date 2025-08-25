@@ -3,6 +3,7 @@ import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
+import KanbanNoteIcon from "./Kanban";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
@@ -271,7 +272,21 @@ export default function NoteApp() {
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
        mx-auto w-full max-w-full overflow-y-auto">
-      <h1 className="text-6xl font-bold text-gray-800 mb-6 my-10">📒 Note Board</h1>
+     <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
+  <div className="flex items-center gap-4">
+    <KanbanNoteIcon className="text-blue-600" />
+    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800">
+      Note Board
+    </h1>
+  </div>
+  <p className="mt-2 text-slate-500 text-lg">
+    Organize your notes like cards on a board.
+  </p>
+
+  {/* subtle divider under header */}
+  <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+</div>
+
       <Noteform folders={folders} handleAddNote={handleAddNote} />
       {error && (
         <div className="error text-red-600 bg-red-100 mt-10 p-10 rounded mb-4 text-2xl">
@@ -288,7 +303,7 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-       <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6">
+       <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
   <div className="inline-flex w-full rounded-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
     {folderOptions.map((opt) => (
       <button
