@@ -288,7 +288,7 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-        <div className="max-w-xl w-full mx-auto mb-8">
+       <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6">
   <div className="inline-flex w-full rounded-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
     {folderOptions.map((opt) => (
       <button

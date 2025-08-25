@@ -63,12 +63,12 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
     >
       {/* Header row: Title and action buttons */}
       <div className="flex items-center gap-2 mb-3 min-w-0">
-        <h3
+        <h4
           className="flex-1 min-w-0 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate"
           title={note.title}
         >
           {note.title}
-        </h3>
+        </h4>
        <div className="flex items-center gap-2 shrink-0">
 
         <button
