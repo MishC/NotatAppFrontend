@@ -295,7 +295,7 @@ export default function NoteApp() {
         key={opt.id ?? "all"}
         onClick={() => setActiveFolder(opt.id)}
         className={[
-          "flex-1 px-6 py-4 text-3xl font-semibold rounded-lg transition",
+          "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
           activeFolder === opt.id
             ? "bg-white text-blue-600 shadow-md"
             : "text-slate-600 hover:text-blue-600",
