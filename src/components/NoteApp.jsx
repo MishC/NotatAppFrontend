@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import Card from "./Card";
 import Modal from "./Modal";
@@ -12,7 +12,7 @@ export default function NoteApp() {
   const [lengthNotes, setLengthNotes] = useState(0);
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
-  const [targetNoteId, setTargetNoteId] = useState(null);
+  const [targetNoteId] = useState(null);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -272,20 +272,20 @@ export default function NoteApp() {
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
        mx-auto w-full max-w-full overflow-y-auto">
-     <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
-  <div className="flex items-center gap-4">
-    <KanbanNoteIcon className="text-blue-600 text-center" />
-    <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
-      Note Board
-    </h1>
-  </div>
-  <p className="mt-2 text-slate-500 text-lg">
-    Organize your notes like cards on a board.
-  </p>
+      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
+        <div className="flex items-center gap-4">
+          <KanbanNoteIcon className="text-blue-600 text-center" />
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
+            Note Board
+          </h1>
+        </div>
+        <p className="mt-2 text-slate-500 text-lg">
+          Organize your notes like cards on a board.
+        </p>
 
-  {/* subtle divider under header */}
-  <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
-</div>
+        {/* subtle divider under header */}
+        <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+      </div>
 
       <Noteform folders={folders} handleAddNote={handleAddNote} />
       {error && (
@@ -303,24 +303,24 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-       <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
-  <div className="inline-flex w-full rounded-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
-    {folderOptions.map((opt) => (
-      <button
-        key={opt.id ?? "all"}
-        onClick={() => setActiveFolder(opt.id)}
-        className={[
-          "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
-          activeFolder === opt.id
-            ? "bg-white text-blue-600 shadow-md"
-            : "text-slate-600 hover:text-blue-600",
-        ].join(" ")}
-      >
-        {opt.label}
-      </button>
-    ))}
-  </div>
-</div>
+          <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
+            <div className="inline-flex w-full rounded-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+              {folderOptions.map((opt) => (
+                <button
+                  key={opt.id ?? "all"}
+                  onClick={() => setActiveFolder(opt.id)}
+                  className={[
+                    "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+                    activeFolder === opt.id
+                      ? "bg-white text-blue-600 shadow-md"
+                      : "text-slate-600 hover:text-blue-600",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
 
           <ul
