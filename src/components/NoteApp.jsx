@@ -304,55 +304,58 @@ export default function NoteApp() {
         <p className="text-black m-auto text-8xl">Loading...</p>
       ) : (notes.length === 0 ? (<> </>) : (
         <>
-          <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
-            <div className="inline-flex w-full rounded-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
-              {folderOptions.map((opt) => (
-                <button
-                  key={opt.id ?? "all"}
-                  onClick={() => setActiveFolder(opt.id)}
-                  className={[
-                    "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
-                    activeFolder === opt.id
-                      ? "bg-white text-blue-600 shadow-md"
-                      : "text-slate-600 hover:text-blue-600",
-                  ].join(" ")}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
+     <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
+  {/* Folder menu */}
+  <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+    {folderOptions.map((opt) => (
+      <button
+        key={opt.id ?? "all"}
+        onClick={() => setActiveFolder(opt.id)}
+        className={[
+          "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+          activeFolder === opt.id
+            ? "bg-white text-blue-600 shadow-md"
+            : "text-slate-600 hover:text-blue-600",
+        ].join(" ")}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
 
+  {/* Notes grid as white paper, attached below */}
+  <ul
+    ref={listRef}
+    className={`w-full max-w-full overflow-x-hidden overflow-y-auto
+      p-4 border-x border-b border-slate-300 rounded-b-xl
+      bg-white md:max-w-7xl
+      ${(lengthNotes < 3)
+        ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
+        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+      }`
+    }
+  >
+    {gridSlots
+      .map(row => row.filter(note =>
+        !activeFolder || note.folderId === activeFolder
+      ))
+      .filter(row => row.length > 0).map((row, rowIndex) =>
+        row.map((note, colIndex) => (
+          <Card
+            key={`${rowIndex}-${colIndex}`}
+            note={note}
+            rowIndex={rowIndex}
+            colIndex={colIndex}
+            onDelete={handleDeleteNote}
+            onUpdate={updateNote}
+            onDrop={swapNotes}
+            onClick={() => switchModalState(note)}
+          />
+        ))
+      )}
+  </ul>
+</div>
 
-          <ul
-            ref={listRef}
-            className={`mt-6 w-full max-w-full overflow-x-hidden overflow-y-auto
-    p-0 rounded-md sm:p-4 md:max-w-7xl bg-gray-100
-    ${(lengthNotes < 3)
-                ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
-              }`
-            }
-          >
-            {gridSlots
-              .map(row => row.filter(note =>
-                !activeFolder || note.folderId === activeFolder
-              ))
-              .filter(row => row.length > 0).map((row, rowIndex) =>
-                row.map((note, colIndex) => (
-                  <Card
-                    key={`${rowIndex}-${colIndex}`}
-                    note={note}
-                    rowIndex={rowIndex}
-                    colIndex={colIndex}
-                    onDelete={handleDeleteNote}
-                    onUpdate={updateNote}
-                    onDrop={swapNotes}
-                    onClick={() => switchModalState(note)}
-                  />
-                ))
-              )}
-          </ul>
         </>
       ))}
       {isModalOpen && selectedNote && (
