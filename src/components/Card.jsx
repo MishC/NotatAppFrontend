@@ -59,8 +59,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
         "bg-white",
         "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
-        // padding & spacing
-        "p-4 sm:p-5 m-2",
+      
         // grid span
         note.span === 2 ? "sm:col-span-2" : "",
         // interactions
