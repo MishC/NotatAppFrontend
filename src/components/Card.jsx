@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
+import HamburgerIcon from "./HamburgerIcon";
 
 export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, onClick }) {
   const noteRef = useRef(null);
@@ -74,53 +75,62 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         </h4>
 
         {/* Dropdown menu */}
-        <div className="relative">
+         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
               setShowMenu((prev) => !prev);
             }}
-            className="p-2 rounded-full hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            aria-label="More options"
+            className="h-10 w-10 inline-flex items-center justify-center rounded-full
+                       text-slate-700 hover:text-blue-600 hover:bg-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-blue-300"
+            aria-haspopup="menu"
+            aria-expanded={showMenu}
+            aria-label="Actions"
+            title="Actions"
           >
-            ⋮
+            <HamburgerIcon />
           </button>
 
           {showMenu && (
             <ul
-              className="absolute right-0 mt-2 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-10"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+              role="menu"
+              className="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-lg shadow-lg z-10 py-1"
+              onClick={(e) => e.stopPropagation()}
             >
               <li>
                 <button
+                  role="menuitem"
+                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-green-600"
                   onClick={() => {
                     setFolderId(4);
                     onUpdate(note.id, { ...note, folderId: 4 });
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-green-600"
                 >
-                  ✓ Mark Complete
+                  ✓ Mark complete
                 </button>
               </li>
               <li>
                 <button
+                  role="menuitem"
+                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-blue-600"
                   onClick={() => {
-                    onClick(note); // open modal edit
+                    onClick(note); // edit/modal
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-blue-600"
                 >
                   ✏️ Edit
                 </button>
               </li>
               <li>
                 <button
+                  role="menuitem"
+                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
                   onClick={() => {
                     onDelete(note.id, note.title);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
                 >
                   × Delete
                 </button>
