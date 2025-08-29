@@ -12,7 +12,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   const [isDragging, setIsDragging] = useState(false);
   const [folderId, setFolderId] = useState(note.folderId || "");
   const [showMenu, setShowMenu] = useState(false);
-  const cardColor = useMemo(() => getRandomColor(), [note.id]);
+  const cardColor = useMemo(() => getRandomColor(), [note.title]);
 
 
 
