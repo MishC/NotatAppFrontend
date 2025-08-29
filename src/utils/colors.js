@@ -13,3 +13,14 @@ export const colors = [
 export function getRandomColor() {
   return colors[Math.floor(Math.random() * colors.length)];
 }
+
+export function getColorById(id) {
+  // make sure id is a string
+  const str = String(id);
+  // simple hash: sum of char codes
+  const hash = [...str].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  // pick consistent index
+  return colors[hash % colors.length];
+}
+
+
