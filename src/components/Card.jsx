@@ -116,7 +116,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                     setShowMenu(false);
                   }}
                 >
-                  <span className="mr-2" aria-label="Check" role="img">✓ </span>Mark complete
+                  <span className="text-xl mr-2" aria-label="Check" role="img">✓ </span>Mark complete
                 </button>
               </li>
               <li>
@@ -140,7 +140,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                     setShowMenu(false);
                   }}
                 >
-                 <span className=" mr-2" aria-label="Delete" role="img">×</span>  Delete
+                 <span className="text-xl mr-2" aria-label="Delete" role="img">×</span>  Delete
                 </button>
               </li>
             </ul>
