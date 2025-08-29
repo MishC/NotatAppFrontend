@@ -327,7 +327,7 @@ export default function NoteApp() {
   <ul
     ref={listRef}
     className={`w-full max-w-full overflow-x-hidden overflow-y-auto
-      p-4 border-x border-b border-slate-300 rounded-b-xl
+      p-4 border-x border-b border-slate-300 rounded-b-xl pt-10
       bg-white md:max-w-7xl
       ${(lengthNotes < 3)
         ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"

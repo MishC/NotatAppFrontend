@@ -120,7 +120,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                     setShowMenu(false);
                   }}
                 >
-                  ✏️ Edit
+                 <span className="text-xs/8"> ✏️</span> Edit
                 </button>
               </li>
               <li>
