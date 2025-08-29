@@ -118,16 +118,16 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                   onClick={() => {
                     onClick(note); // edit/modal
                     setShowMenu(false);
-                  }}
-                >
-                 <span className="text-xs/8"> ✏️</span> Edit
-                </button>
-              </li>
-              <li>
-                <button
-                  role="menuitem"
-                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
-                  onClick={() => {
+                    }}
+                  >
+                    <span className="text-xs/8 mr-2" aria-label="Edit" role="img">🖉</span> Edit
+                  </button>
+                  </li>
+                  <li>
+                  <button
+                    role="menuitem"
+                    className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
+                    onClick={() => {
                     onDelete(note.id, note.title);
                     setShowMenu(false);
                   }}
