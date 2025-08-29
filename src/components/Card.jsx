@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import HamburgerIcon from "./HamburgerIcon";
-import { getRandomColor } from "../utils/colors"; 
+import { getRandomColor, getColorById } from "../utils/colors"; 
 
 
 
@@ -12,7 +12,8 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   const [isDragging, setIsDragging] = useState(false);
   const [folderId, setFolderId] = useState(note.folderId || "");
   const [showMenu, setShowMenu] = useState(false);
-  const cardColor = useMemo(() => getRandomColor(), []);
+  const cardColor = useMemo(() => getColorById(note.id), [note.id]);
+
 
 
 
