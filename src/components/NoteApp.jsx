@@ -341,23 +341,25 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     }`}
   >
     {gridSlots
-      .map(row => row.filter(note =>
-        !activeFolder || note.folderId === activeFolder
-      ))
-      .filter(row => row.length > 0).map((row, rowIndex) =>
-        row.map((note, colIndex) => (
-          <Card
-            key={`${rowIndex}-${colIndex}`}
-            note={note}
-            rowIndex={rowIndex}
-            colIndex={colIndex}
-            onDelete={handleDeleteNote}
-            onUpdate={updateNote}
-            onDrop={swapNotes}
-            onClick={() => switchModalState(note)}
-          />
-        ))
-      )}
+  .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
+  .filter(row => row.length > 0)
+  .map((row, rowIndex) =>
+    row.map((note, colIndex) => (
+      note && (
+        <Card
+          key={`${rowIndex}-${colIndex}`}
+          note={note}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
+          onDelete={handleDeleteNote}
+          onUpdate={updateNote}
+          onDrop={swapNotes}
+          onClick={() => switchModalState(note)}
+        />
+      )
+    ))
+  )}
+
   </ul>
 </div>
 
