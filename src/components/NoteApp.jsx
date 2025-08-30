@@ -351,8 +351,8 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     lengthNotes < 1
       ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
       : [
-          "grid gap-6 min-h-[50vh]",                  // ✅ real min height
-          "justify-center place-content-start",       // center the grid area
+          "grid gap-6 min-h-[50vh]",                 
+          "justify-center place-content-center",       // center the grid area
           "justify-items-center",                     // center items in columns
           "grid-cols-[repeat(auto-fit,minmax(280px,1fr))]", // ✅ auto-fit & centered last row
         ].join(" ")
