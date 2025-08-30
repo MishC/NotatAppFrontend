@@ -64,7 +64,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         // grid span
         note.span === 2 ? "sm:col-span-2" : "",
         // interactions
-         "min-w-[204px] max-w-[350px] m-2 p-4 sm:p-5",
+         "min-w-[204px] m-2 p-4 sm:p-5",
         cardColor,
 
          isDragging
