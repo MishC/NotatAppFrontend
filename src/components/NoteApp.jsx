@@ -343,17 +343,18 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
   {/* Notes grid as white paper*/}
  <ul
   ref={listRef}
-  className={[
-    "w-full justify-center",
-    "md:max-w-7xl mx-auto px-5",              // same width as cards
+ className={[
+    "w-full md:max-w-7xl mx-auto px-5",             
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
     "overflow-x-hidden overflow-y-auto",
-    "py-6",                                           // breathing room
+    "py-6",                                         
     lengthNotes < 1
-      ? "flex flex-col items-center justify-center min-h-[40vh] gap-4"
+      ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
       : [
-          "grid  min-h-[40vh]",                 
-          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4", 
+          "grid min-h-[40vh]",                      
+          "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4",
+          "gap-x-6 gap-y-6",                        
+          "justify-items-center",                   
         ].join(" ")
   ].join(" ")}
 >
