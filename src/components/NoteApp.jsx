@@ -345,11 +345,12 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     ref={listRef}
     className={`w-full max-w-full overflow-x-hidden overflow-y-auto
     p-4 border-x border-b border-slate-300 rounded-b-xl p-8
-    bg-white md:max-w-7xl
+    bg-white md:max-w-7xl min-h-[20vh]
     ${
       lengthNotes < 3
-        ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-        : "grid justify-center place-items-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+        ? "flex flex-col items-center justify-center gap-4"
+        : "grid justify-center place-items-center grid-cols-1 sm:grid-cols-2",
+        "lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 "
     }`}
   >
     {gridSlots
