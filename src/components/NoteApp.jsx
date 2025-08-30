@@ -272,9 +272,10 @@ export default function NoteApp() {
 //////////////////  Return  ###################################
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center 
-   background: #ADA996;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996);  /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to right, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+ background: #ADA996;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
 
     p-6 mx-auto w-full max-w-full overflow-y-auto">
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
