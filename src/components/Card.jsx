@@ -58,7 +58,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
       className={[
         // card shell
         "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
-     
+        "w-full max-w-[340px]",
         "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
       
         // grid span

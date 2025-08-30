@@ -341,24 +341,28 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
   </div>
 
   {/* Notes grid as white paper*/}
-  <ul
-    ref={listRef}
-    className={`w-full max-w-full overflow-x-hidden overflow-y-auto
-    p-4 border-x border-b border-slate-300 rounded-b-xl p-8
-    bg-white md:max-w-7xl min-h-[20vh]
-    ${
-      lengthNotes < 3
-        ? "flex flex-col items-center justify-center gap-4"
-        : "grid justify-center place-items-center grid-cols-1 sm:grid-cols-2",
-        "lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 "
-    }`}
-  >
-    {gridSlots
-  .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
-  .filter(row => row.length > 0)
-  .map((row, rowIndex) =>
-    row.map((note, colIndex) => (
-      note && (
+ <ul
+  ref={listRef}
+  className={[
+    "w-full md:max-w-7xl mx-auto px-5",              // same width as cards
+    "bg-white rounded-2xl border border-slate-200 shadow-sm",
+    "overflow-x-hidden overflow-y-auto",
+    "py-6",                                           // breathing room
+    lengthNotes < 1
+      ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
+      : [
+          "grid gap-6 min-h-[50vh]",                  // ✅ real min height
+          "justify-center place-content-start",       // center the grid area
+          "justify-items-center",                     // center items in columns
+          "grid-cols-[repeat(auto-fit,minmax(280px,1fr))]", // ✅ auto-fit & centered last row
+        ].join(" ")
+  ].join(" ")}
+>
+  {gridSlots
+    .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
+    .filter(row => row.length > 0)
+    .flatMap((row, rowIndex) =>
+      row.map((note, colIndex) => (
         <Card
           key={`${rowIndex}-${colIndex}`}
           note={note}
@@ -369,11 +373,10 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
           onDrop={swapNotes}
           onClick={() => switchModalState(note)}
         />
-      )
-    ))
-  )}
+      ))
+    )}
+</ul>
 
-  </ul>
 </div>
 
         </>
