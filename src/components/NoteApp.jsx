@@ -271,9 +271,10 @@ export default function NoteApp() {
 ///////////////////////###############################
 //////////////////  Return  ###################################
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100
-     p-6 
-       mx-auto w-full max-w-full overflow-y-auto">
+    <div className=" min-h-screen flex flex-col justify-center items-center 
+    bg-[repeating-linear-gradient(45deg,#f8f9fa,#f8f9fa_10px,#e5e7eb_10px,#e5e7eb_20px)]
+    
+    p-6  mx-auto w-full max-w-full overflow-y-auto">
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
         <div className="flex items-center gap-4 justify-center text-center">
           <KanbanNoteIcon className="text-blue-600 text-center" />
@@ -324,49 +325,37 @@ export default function NoteApp() {
     ))}
   </div>
 
-  {/* Notes grid as white paper */}
-<ul
-  ref={listRef}
-  className={[
-    // šírka kontajnera zarovnaná s kartami
-    "w-full md:max-w-7xl mx-auto px-5",
-    // podklad a okraje
-    "bg-white rounded-2xl border border-slate-200 shadow-sm",
-    // vnútorný padding
-    "p-4 sm:p-6",
-    // scroll správanie
-    "overflow-x-hidden overflow-y-auto",
-    // layout: fallback pre málo poznámok vs. grid
-    (lengthNotes < 3)
-      ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-      : [
-          "grid gap-6",                 // krajšie medzery
-          "grid-flow-row dense",        // kompaktnejšie usporiadanie
-          "grid-cols-1",
-          "sm:grid-cols-2",
-          "lg:grid-cols-3",
-          "2xl:grid-cols-4",
-        ].join(" ")
-  ].join(" ")}
->
-  {gridSlots
-    .map(row => row.filter(note => !activeFolder || note.folderId === activeFolder))
-    .filter(row => row.length > 0)
-    .map((row, rowIndex) =>
-      row.map((note, colIndex) => (
-        <Card
-          key={`${rowIndex}-${colIndex}`}
-          note={note}
-          rowIndex={rowIndex}
-          colIndex={colIndex}
-          onDelete={handleDeleteNote}
-          onUpdate={updateNote}
-          onDrop={swapNotes}
-          onClick={() => switchModalState(note)}
-        />
+  {/* Notes grid as white paper*/}
+  <ul
+    ref={listRef}
+    className={`w-full max-w-full overflow-x-hidden overflow-y-auto
+      p-4 border-x border-b border-slate-300 rounded-b-xl p-8
+      bg-white md:max-w-7xl
+      ${(lengthNotes < 3)
+        ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
+        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+      }`
+    }
+  >
+    {gridSlots
+      .map(row => row.filter(note =>
+        !activeFolder || note.folderId === activeFolder
       ))
-    )}
-</ul>
+      .filter(row => row.length > 0).map((row, rowIndex) =>
+        row.map((note, colIndex) => (
+          <Card
+            key={`${rowIndex}-${colIndex}`}
+            note={note}
+            rowIndex={rowIndex}
+            colIndex={colIndex}
+            onDelete={handleDeleteNote}
+            onUpdate={updateNote}
+            onDrop={swapNotes}
+            onClick={() => switchModalState(note)}
+          />
+        ))
+      )}
+  </ul>
 </div>
 
         </>
