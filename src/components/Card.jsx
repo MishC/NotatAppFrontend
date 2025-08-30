@@ -156,6 +156,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
             "bg-slate-50 border border-slate-200 rounded-xl",
             "p-4 break-words",
             "group-hover:bg-slate-50",
+            "text-left",
           ].join(" ")}
         >
           {note.content}
