@@ -271,7 +271,8 @@ export default function NoteApp() {
 ///////////////////////###############################
 //////////////////  Return  ###################################
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center bg-gray-100 p-6 
+    <div className=" min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100
+     p-6 
        mx-auto w-full max-w-full overflow-y-auto">
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
         <div className="flex items-center gap-4 justify-center text-center">
