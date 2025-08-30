@@ -272,9 +272,11 @@ export default function NoteApp() {
 //////////////////  Return  ###################################
   return (
     <div className=" min-h-screen flex flex-col justify-center items-center 
-    bg-[repeating-linear-gradient(45deg,#f8f9fa,#f8f9fa_10px,#e5e7eb_10px,#e5e7eb_20px)]
-    
-    p-6  mx-auto w-full max-w-full overflow-y-auto">
+   background: #ADA996;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    p-6 mx-auto w-full max-w-full overflow-y-auto">
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
         <div className="flex items-center gap-4 justify-center text-center">
           <KanbanNoteIcon className="text-blue-600 text-center" />
@@ -328,16 +330,14 @@ export default function NoteApp() {
   {/* Notes grid as white paper*/}
   <ul
     ref={listRef}
-   className={[
-    "w-full md:max-w-7xl mx-auto px-5",
-    "bg-white rounded-2xl border border-slate-200 shadow-sm",
-    "p-4 sm:p-6",
-    "overflow-x-hidden overflow-y-auto",
-    lengthNotes < 3
-      ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-      : "grid gap-6 grid-flow-row dense justify-center", // ⬅️ tu
-    "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
-  ].join(" ")}
+    className={`w-full max-w-full overflow-x-hidden overflow-y-auto
+      p-4 border-x border-b border-slate-300 rounded-b-xl p-8
+      bg-white md:max-w-7xl
+      ${(lengthNotes < 3)
+        ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
+        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+      }`
+    }
   >
     {gridSlots
       .map(row => row.filter(note =>
