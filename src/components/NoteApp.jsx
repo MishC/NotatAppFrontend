@@ -343,7 +343,7 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
   {/* Notes grid as white paper*/}
  <ul
   ref={listRef}
- className={[
+  className={[
     "w-full justify-center justify-items-center",
     "md:max-w-7xl mx-auto px-5",             
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
@@ -363,18 +363,41 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
     .filter(row => row.length > 0)
     .flatMap((row, rowIndex) =>
-      row.map((note, colIndex) => (
-        <Card
-          key={`${rowIndex}-${colIndex}`}
-          note={note}
-          rowIndex={rowIndex}
-          colIndex={colIndex}
-          onDelete={handleDeleteNote}
-          onUpdate={updateNote}
-          onDrop={swapNotes}
-          onClick={() => switchModalState(note)}
-        />
-      ))
+      row.length === 1 ? (
+        // If only one note in the row, center it
+        <li
+          key={`centered-${rowIndex}`}
+          className="flex justify-center w-full"
+        >
+          <Card
+            key={`${rowIndex}-0`}
+            note={row[0]}
+            rowIndex={rowIndex}
+            colIndex={0}
+            onDelete={handleDeleteNote}
+            onUpdate={updateNote}
+            onDrop={swapNotes}
+            onClick={() => switchModalState(row[0])}
+          />
+        </li>
+      ) : (
+        row.map((note, colIndex) => (
+          <li
+            key={`${rowIndex}-${colIndex}`}
+            className="flex justify-center"
+          >
+            <Card
+              note={note}
+              rowIndex={rowIndex}
+              colIndex={colIndex}
+              onDelete={handleDeleteNote}
+              onUpdate={updateNote}
+              onDrop={swapNotes}
+              onClick={() => switchModalState(note)}
+            />
+          </li>
+        ))
+      )
     )}
 </ul>
 
