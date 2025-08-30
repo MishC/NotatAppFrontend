@@ -328,14 +328,16 @@ export default function NoteApp() {
   {/* Notes grid as white paper*/}
   <ul
     ref={listRef}
-    className={`w-full max-w-full overflow-x-hidden overflow-y-auto
-      p-4 border-x border-b border-slate-300 rounded-b-xl p-8
-      bg-white md:max-w-7xl
-      ${(lengthNotes < 3)
-        ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
-      }`
-    }
+   className={[
+    "w-full md:max-w-7xl mx-auto px-5",
+    "bg-white rounded-2xl border border-slate-200 shadow-sm",
+    "p-4 sm:p-6",
+    "overflow-x-hidden overflow-y-auto",
+    lengthNotes < 3
+      ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
+      : "grid gap-6 grid-flow-row dense justify-center", // ⬅️ tu
+    "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4",
+  ].join(" ")}
   >
     {gridSlots
       .map(row => row.filter(note =>
