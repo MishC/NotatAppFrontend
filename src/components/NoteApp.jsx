@@ -337,7 +337,7 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     ${
       lengthNotes < 3
         ? "flex flex-col items-center justify-center min-h-[20vh] gap-4"
-        : "grid justify-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
+        : "grid justify-center place-items-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4"
     }`}
   >
     {gridSlots
