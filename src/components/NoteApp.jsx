@@ -91,21 +91,33 @@ export default function NoteApp() {
 
   // ArrangeGrid function to create a grid layout based on note content length
   const arrangeGrid = (notesList) => {
-    let updatedGrid = [];
-    let row = [];
+  if (!Array.isArray(notesList)) {
+    setGridSlots([]);
+    return;
+  }
 
-    notesList.forEach((note) => {
-      if (note.content && note.content.length > 50) {
-        updatedGrid.push([{ ...note, span: 2 }]); //span 2 cols for long content
+  // clean nuull/undefined/unvalid objects
+  const clean = notesList.filter(n => n && typeof n === "object");
+
+  const updatedGrid = [];
+  let row = [];
+
+  clean.forEach((note) => {
+    const len = note?.content?.length ?? 0;
+
+    if (len > 50) {
+      // long note content
+      updatedGrid.push([{ ...note, span: 2 }]);
+      row = [];
+    } else {
+      // short note content
+      row.push({ ...note, span: 1 });
+      if (row.length === 2) {
+        updatedGrid.push([...row]);
         row = [];
-      } else {
-        row.push({ ...note, span: 1 });
-        if (row.length === 2) {
-          updatedGrid.push([...row]);
-          row = [];
-        }
       }
-    });
+    }
+  });
 
     // If there's an incomplete row (just one note left), just add it as a row of one 
     if (row.length === 1) {
