@@ -344,7 +344,8 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
  <ul
   ref={listRef}
  className={[
-    "w-full justify-center md:max-w-7xl mx-auto px-5",             
+    "w-full justify-center justify-items-center",
+    "md:max-w-7xl mx-auto px-5",             
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
     "overflow-x-hidden overflow-y-auto",
     "py-6",                                         
