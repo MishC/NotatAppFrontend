@@ -343,19 +343,19 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
   {/* Notes grid as white paper*/}
  <ul
   ref={listRef}
-  className={[
+ className={[
     "w-full justify-center justify-items-center",
     "md:max-w-7xl mx-auto px-5",             
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
     "overflow-x-hidden overflow-y-auto",
     "py-6",                                         
     lengthNotes < 1
-      ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
+      ? "flex flex-col min-h-[40vh] gap-6"
       : [
           "grid min-h-[40vh]",                      
           "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4",
           "gap-x-6 gap-y-6",                        
-          "justify-items-center",                   
+                           
         ].join(" ")
   ].join(" ")}
 >
@@ -363,41 +363,18 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
     .filter(row => row.length > 0)
     .flatMap((row, rowIndex) =>
-      row.length === 1 ? (
-        // If only one note in the row, center it
-        <li
-          key={`centered-${rowIndex}`}
-          className="flex justify-center w-full"
-        >
-          <Card
-            key={`${rowIndex}-0`}
-            note={row[0]}
-            rowIndex={rowIndex}
-            colIndex={0}
-            onDelete={handleDeleteNote}
-            onUpdate={updateNote}
-            onDrop={swapNotes}
-            onClick={() => switchModalState(row[0])}
-          />
-        </li>
-      ) : (
-        row.map((note, colIndex) => (
-          <li
-            key={`${rowIndex}-${colIndex}`}
-            className="flex justify-center"
-          >
-            <Card
-              note={note}
-              rowIndex={rowIndex}
-              colIndex={colIndex}
-              onDelete={handleDeleteNote}
-              onUpdate={updateNote}
-              onDrop={swapNotes}
-              onClick={() => switchModalState(note)}
-            />
-          </li>
-        ))
-      )
+      row.map((note, colIndex) => (
+        <Card
+          key={`${rowIndex}-${colIndex}`}
+          note={note}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
+          onDelete={handleDeleteNote}
+          onUpdate={updateNote}
+          onDrop={swapNotes}
+          onClick={() => switchModalState(note)}
+        />
+      ))
     )}
 </ul>
 
