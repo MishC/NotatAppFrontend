@@ -344,16 +344,15 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
  <ul
   ref={listRef}
   className={[
-    "w-full md:max-w-7xl mx-auto px-5",              // same width as cards
+    "w-full justify-center",
+    "md:max-w-7xl mx-auto px-5",              // same width as cards
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
     "overflow-x-hidden overflow-y-auto",
     "py-6",                                           // breathing room
     lengthNotes < 1
-      ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
+      ? "flex flex-col items-center justify-center min-h-[40vh] gap-4"
       : [
           "grid  min-h-[40vh]",                 
-          "justify-center place-content-center",       // center the grid area
-          "justify-items-center",                     // center items in columns
           "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4", 
         ].join(" ")
   ].join(" ")}
