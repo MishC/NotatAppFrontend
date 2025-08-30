@@ -351,10 +351,10 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     lengthNotes < 1
       ? "flex flex-col items-center justify-center min-h-[40vh] gap-6"
       : [
-          "grid gap-6 min-h-[50vh]",                 
+          "grid  min-h-[40vh]",                 
           "justify-center place-content-center",       // center the grid area
           "justify-items-center",                     // center items in columns
-          "grid-cols-[repeat(auto-fit,minmax(280px,1fr))]", // ✅ auto-fit & centered last row
+          "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4", 
         ].join(" ")
   ].join(" ")}
 >
