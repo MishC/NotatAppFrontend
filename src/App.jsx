@@ -4,7 +4,7 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="App mb-[50px]">
+    <div className="App mb-[150px]">
       <NoteApp />
     </div>
   );
