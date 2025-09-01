@@ -5,6 +5,7 @@ export const colors = [
   "bg-amber-100",
   "bg-yellow-100",
   "bg-green-100",
+  "bg-lime-100",
   "bg-teal-100",
   "bg-blue-100",
   "bg-sky-100",
