@@ -74,7 +74,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
       ].join(" ")}
     >
       {/* Header row: Title and action menu */}
-      <div className="flex items-start gap-2 mb-3 min-w-0">
+      <div className="flex items-start gap-2 mb-3 min-w-0 align-middle">
         <h4
           className="flex-1 min-w-0 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate"
           title={note.title}
