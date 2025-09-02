@@ -63,7 +63,8 @@ export default function NoteApp() {
       ];
 
 
-      data && setNotes(data.sort((a,b) => a.orderIndex - b.orderIndex));
+      data &&  setNotes(data);
+      
       activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
       
 
