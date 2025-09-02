@@ -60,7 +60,7 @@ export default function NoteApp() {
         (activeFolder === 4) ? await fetchWithBrowserAPI(API_URL + "/done"): await fetchWithBrowserAPI(API_URL + "/pending");
 
 
-      data && setNotes(data.sort((a,b) => a.orderIndex - b.orderIndex));
+      data && setNotes([...data].sort((a,b) => a.orderIndex - b.orderIndex));
       activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
       
 
@@ -143,7 +143,7 @@ export default function NoteApp() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      data&&data.sort((a,b) => a.orderIndex - b.orderIndex);
+      data&&[...data].sort((a,b) => a.orderIndex - b.orderIndex);
       const updatedNotes = [...notes, data];
       setNotes(updatedNotes);
       arrangeGrid(updatedNotes);
@@ -164,7 +164,7 @@ export default function NoteApp() {
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
-        updatedNotes&&updatedNotes.sort((a,b) => a.orderIndex - b.orderIndex);
+        updatedNotes&&[...updatedNotes].sort((a,b) => a.orderIndex - b.orderIndex);
         arrangeGrid(updatedNotes);
         setMsg(`Note deleted successfully.`);
         return updatedNotes;
