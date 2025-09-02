@@ -30,20 +30,6 @@ export default function NoteApp() {
   const API_URL2 = `${window.location.origin}/api/folders`;
 
 
-
-  const fetchWithBrowserAPI = async (url, options = {}) => {
-    const response = await fetch(url, {
-      headers: { "Content-Type": "application/json", ...options.headers },
-      credentials: "include",
-      ...options,
-    });
-    if (!response.ok) {
-      setError(`HTTP error! status: ${response.status}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  };
-
 // Initial fetch of notes and folders
   useEffect(() => {
 
@@ -77,6 +63,26 @@ export default function NoteApp() {
   }, [targetNoteId]);
   //
 
+// Clear error and message after 10 seconds
+
+  useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
+
+
+  ////FUNCTIONS///////////////////////////////////////////
+// Generic function for fetch
+   const fetchWithBrowserAPI = async (url, options = {}) => {
+    const response = await fetch(url, {
+      headers: { "Content-Type": "application/json", ...options.headers },
+      credentials: "include",
+      ...options,
+    });
+    if (!response.ok) {
+      setError(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  };
+// Fetch notes function
   const fetchNotes = async (activeFolder) => {
     setLoading(true);
     try {
@@ -144,7 +150,7 @@ export default function NoteApp() {
     }
   });
 
-    // If there's an incomplete row (just one note left), just add it as a row of one 
+    // /////If there's an incomplete row (just one note left), just add it as a row of one 
     if (row.length === 1) {
       updatedGrid.push([...row]);
     }
@@ -228,20 +234,6 @@ export default function NoteApp() {
   };
 
 
-
-  //Open and close modal
-  const switchModalState = (note) => {
-    if (!note) {
-      setIsModalOpen(false);
-      setSelectedNote(null);
-      return;
-    }
-    setSelectedNote(note);
-    setIsModalOpen(true);
-    // return;
-
-  };
-//
 // helper: swap orderIndex in notes array & return sorted clone
 const swapOrderLocally = (notesArr, aId, bId) => {
   const next = notesArr.map(n => ({ ...n }));
@@ -252,7 +244,7 @@ const swapOrderLocally = (notesArr, aId, bId) => {
   next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
   return next;
 };
-
+//
 const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
   if (!sourceNoteId || targetNoteId == null) return;
 
@@ -297,11 +289,19 @@ const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
   })();
 };
 
- 
+ //Open and close modal
+  const switchModalState = (note) => {
+    if (!note) {
+      setIsModalOpen(false);
+      setSelectedNote(null);
+      return;
+    }
+    setSelectedNote(note);
+    setIsModalOpen(true);
+    // return;
 
-  // Clear error and message after 10 seconds
-
-  useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
+  };
+//
 
 
 
