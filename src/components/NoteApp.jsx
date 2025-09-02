@@ -287,7 +287,8 @@ const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify([sourceNoteId, targetNoteId]),
+        body: JSON.stringify({ sourceId: sourceNoteId, targetId: targetNoteId })
+
       });
 
       setNotes(prev => {
