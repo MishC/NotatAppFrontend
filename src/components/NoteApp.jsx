@@ -56,11 +56,14 @@ export default function NoteApp() {
     setLoading(true);
     try {
 
-      const data =
-        (ParseInt(activeFolder) === 4) ? await fetchWithBrowserAPI(API_URL + "/done"): await fetchWithBrowserAPI(API_URL + "/pending");
+      const data = [
+        ...(parseInt(activeFolder) === 4
+          ? await fetchWithBrowserAPI(API_URL + "/done")
+          : await fetchWithBrowserAPI(API_URL + "/pending"))
+      ];
 
 
-      data && setNotes([...data].sort((a,b) => a.orderIndex - b.orderIndex));
+      data && setNotes(data.sort((a,b) => a.orderIndex - b.orderIndex));
       activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
       
 
