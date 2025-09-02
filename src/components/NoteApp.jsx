@@ -277,9 +277,11 @@ const swapNotes = async (sourceId, targetId) => {
 
   // 2) persist on backend
   try {
-    await fetchWithBrowserAPI(`${API_URL}/swap`, {
+    await fetch(`${API_URL}/swap`, {
       method: "POST",
-      body: JSON.stringify({ SourceId: sourceId, TargetId:targetId }),
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ SourceId: sourceId, TargetId: targetId }),
     });
   } catch (err) {
     // 3) on failure, revert by swapping back
