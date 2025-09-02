@@ -57,7 +57,7 @@ export default function NoteApp() {
     try {
 
       const data = [
-        ...(parseInt(activeFolder) === 4
+        ...(Number(activeFolder) === 4
           ? await fetchWithBrowserAPI(API_URL + "/done")
           : await fetchWithBrowserAPI(API_URL + "/pending"))
       ];
