@@ -44,6 +44,7 @@ export default function NoteApp() {
     return response.json();
   };
 
+
   useEffect(() => {
 
     fetchNotes(activeFolder);
@@ -154,9 +155,8 @@ export default function NoteApp() {
   const handleDeleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
-      fetch(`${API_URL}/${id}`, {
+      fetchWithBrowserAPI(`${API_URL}/${id}`, options= {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
       })
         .catch(error => { setError("Error deleting a note."); console.error("Error deleting:", error) });
 
@@ -176,10 +176,8 @@ export default function NoteApp() {
   const updateNote = async (noteId, updatedFields) => {
     // updatedFields = { title, content, folderId }
     try {
-      const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
+      const response = await fetchWithBrowserAPI(`${API_URL}/${updatedFields.folderId}/${noteId}`, options={
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           ...selectedNote,
           ...updatedFields,
@@ -247,7 +245,9 @@ export default function NoteApp() {
         console.warn(`Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
         return prevGrid;
       }
-
+      
+      fetchWithBrowserAPI(API_URL+"/swap",options={method: "POST", body: JSON.stringify({ sourceNoteId, targetNoteId })})
+        .catch(error => { setError("Error swapping notes."); console.error("Error swapping notes:", error) });
       let newGrid = prevGrid.map(row => row.map(note => ({ ...note })));
 
       let sourcePos = null;
@@ -365,7 +365,7 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
     .flatMap((row, rowIndex) =>
       row.map((note, colIndex) => (
         <Card
-          key={`${rowIndex}-${colIndex}`}
+          key={note.id}
           note={note}
           rowIndex={rowIndex}
           colIndex={colIndex}
