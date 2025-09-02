@@ -71,17 +71,25 @@ export default function NoteApp() {
   ////FUNCTIONS///////////////////////////////////////////
 // Generic function for fetch
    const fetchWithBrowserAPI = async (url, options = {}) => {
-    const response = await fetch(url, {
-      headers: { "Content-Type": "application/json", ...options.headers },
-      credentials: "include",
-      ...options,
-    });
-    if (!response.ok) {
-      setError(`HTTP error! status: ${response.status}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  };
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json", ...options.headers },
+    credentials: "include",
+    ...options,
+  });
+
+  if (!res.ok) {
+    setError(`HTTP error! status: ${res.status}`);
+    throw new Error(`HTTP error! status: ${res.status}`);
+  }
+
+  // No content? just return null
+  if (res.status === 204) return null;
+
+  // Some servers don’t set content-length; be defensive
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+};
+
 // Fetch notes function
   const fetchNotes = async (activeFolder) => {
     setLoading(true);
@@ -185,8 +193,10 @@ export default function NoteApp() {
   const handleDeleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
-      fetchWithBrowserAPI(`${API_URL}/${id}`, options= {
+      fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       })
         .catch(error => { setError("Error deleting a note."); console.error("Error deleting:", error) });
 
@@ -206,8 +216,10 @@ export default function NoteApp() {
   const updateNote = async (noteId, updatedFields) => {
     // updatedFields = { title, content, folderId }
     try {
-      const response = await fetchWithBrowserAPI(`${API_URL}/${updatedFields.folderId}/${noteId}`, options={
+      const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           ...selectedNote,
           ...updatedFields,
@@ -271,7 +283,7 @@ const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
   // 2) Persist swap on server, then update notes + rebuild grid from notes
   (async () => {
     try {
-      await fetchWithBrowserAPI(API_URL + "/swap", {
+      await fetchWithBrowserAPI(API_URL + "/swap", options={
         method: "POST",
         body: JSON.stringify([sourceNoteId,targetNoteId ]),
       });
