@@ -273,7 +273,7 @@ const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
     try {
       await fetchWithBrowserAPI(API_URL + "/swap", {
         method: "POST",
-        body: JSON.stringify({ sourceId: sourceNoteId, targetId: targetNoteId }),
+        body: JSON.stringify([sourceNoteId,targetNoteId ]),
       });
 
       setNotes(prev => {
