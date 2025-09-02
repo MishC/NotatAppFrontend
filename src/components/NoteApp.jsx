@@ -44,14 +44,38 @@ export default function NoteApp() {
     return response.json();
   };
 
-
+// Initial fetch of notes and folders
   useEffect(() => {
 
     fetchNotes(activeFolder);
     fetchFolders();
   }, []);
 
+// Refetch notes when activeFolder changes
   useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
+
+// Drag-and-Drop setup
+  useEffect(() => {
+    if (!listRef.current) return;
+    return dropTargetForElements({
+      element: listRef.current,
+      getData: () => ({ type: "note-list" }),
+      onDrop: ({ source }) => {
+        if (!source?.data?.sourceNoteId) {
+          console.warn("Source ID is missing in onDrop.");
+          return;
+        }
+        if (!targetNoteId) {
+          setError("Target ID is missing. Please hover over a valid slot.");
+          return;
+        }
+        setTimeout(() => {
+          swapNotes(source.data.sourceNoteId, targetNoteId);
+        }, 50);
+      },
+    });
+  }, [targetNoteId]);
+  //
 
   const fetchNotes = async (activeFolder) => {
     setLoading(true);
@@ -203,27 +227,7 @@ export default function NoteApp() {
     }
   };
 
-  //
-  useEffect(() => {
-    if (!listRef.current) return;
-    return dropTargetForElements({
-      element: listRef.current,
-      getData: () => ({ type: "note-list" }),
-      onDrop: ({ source }) => {
-        if (!source?.data?.sourceNoteId) {
-          console.warn("Source ID is missing in onDrop.");
-          return;
-        }
-        if (!targetNoteId) {
-          setError("Target ID is missing. Please hover over a valid slot.");
-          return;
-        }
-        setTimeout(() => {
-          swapNotes(source.data.sourceNoteId, targetNoteId);
-        }, 50);
-      },
-    });
-  }, [targetNoteId]);
+
 
   //Open and close modal
   const switchModalState = (note) => {
@@ -237,42 +241,63 @@ export default function NoteApp() {
     // return;
 
   };
+//
+// helper: swap orderIndex in notes array & return sorted clone
+const swapOrderLocally = (notesArr, aId, bId) => {
+  const next = notesArr.map(n => ({ ...n }));
+  const A = next.find(n => n.id === aId);
+  const B = next.find(n => n.id === bId);
+  if (!A || !B) return notesArr;
+  [A.orderIndex, B.orderIndex] = [B.orderIndex, A.orderIndex];
+  next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
+  return next;
+};
 
-  // Swap logic
-  const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
-    setGridSlots((prevGrid) => {
-      if (!sourceNoteId || (targetNoteId === undefined)) {
-        console.warn(`Invalid swap attempt: ${sourceNoteId} → ${targetNoteId}`);
-        return prevGrid;
+const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
+  if (!sourceNoteId || targetNoteId == null) return;
+
+  // 1) Instant visual swap in gridSlots (uses row/col from Card)
+  setGridSlots(prevGrid => {
+    const grid = prevGrid.map(row => row.map(n => (n ? { ...n } : n)));
+
+    // find source position
+    let src = null;
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (grid[r][c]?.id === sourceNoteId) src = { row: r, col: c };
       }
-      
-      fetchWithBrowserAPI(API_URL+"/swap",options={method: "POST", body: JSON.stringify({ sourceNoteId, targetNoteId })})
-        .catch(error => { setError("Error swapping notes."); console.error("Error swapping notes:", error) });
-      let newGrid = prevGrid.map(row => row.map(note => ({ ...note })));
+    }
+    const tgt = { row: targetRow, col: targetCol };
+    if (!src || !grid[tgt.row]?.[tgt.col]) return prevGrid;
 
-      let sourcePos = null;
-      let targetPos = { row: targetRow, col: targetCol };
+    [grid[src.row][src.col], grid[tgt.row][tgt.col]] =
+      [grid[tgt.row][tgt.col], grid[src.row][src.col]];
 
-      newGrid.forEach((row, rowIndex) => {
-        row.forEach((note, colIndex) => {
-          if (note.id === sourceNoteId) {
-            sourcePos = { row: rowIndex, col: colIndex };
-          }
-        });
+    return grid;
+  });
+
+  // 2) Persist swap on server, then update notes + rebuild grid from notes
+  (async () => {
+    try {
+      await fetchWithBrowserAPI(API_URL + "/swap", {
+        method: "POST",
+        body: JSON.stringify({ sourceId: sourceNoteId, targetId: targetNoteId }),
       });
 
-      if (!sourcePos) {
-        console.warn("Source position not found!");
-        return prevGrid;
-      }
+      setNotes(prev => {
+        const next = swapOrderLocally(prev, sourceNoteId, targetNoteId);
+        arrangeGrid(next);          
+        return next;
+      });
+    } catch (e) {
+      console.error("Error swapping notes:", e);
+      setError("Error swapping notes.");
+      // optional: fetchNotes(activeFolder);
+    }
+  })();
+};
 
-      [newGrid[sourcePos.row][sourcePos.col], newGrid[targetPos.row][targetPos.col]] =
-        [newGrid[targetPos.row][targetPos.col], newGrid[sourcePos.row][sourcePos.col]];
-
-      return newGrid;
-    });
-  };
-
+ 
 
   // Clear error and message after 10 seconds
 
