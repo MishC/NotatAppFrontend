@@ -57,7 +57,7 @@ export default function NoteApp() {
     try {
 
       const data =
-        (activeFolder === Int(4)) ? await fetchWithBrowserAPI(API_URL + "/done"): await fetchWithBrowserAPI(API_URL + "/pending");
+        (ParseInt(activeFolder) === 4) ? await fetchWithBrowserAPI(API_URL + "/done"): await fetchWithBrowserAPI(API_URL + "/pending");
 
 
       data && setNotes([...data].sort((a,b) => a.orderIndex - b.orderIndex));
