@@ -56,18 +56,14 @@ export default function NoteApp() {
     setLoading(true);
     try {
 
-      const data = 
-        activeFolder === 4
-          ? await fetchWithBrowserAPI(API_URL + "/done")
-          : await fetchWithBrowserAPI(API_URL + "/pending");
+      const data =
+        (activeFolder === 4) ? await fetchWithBrowserAPI(API_URL + "/done") : await fetchWithBrowserAPI(API_URL + "/pending");
 
 
-      data &&  setNotes(data);
-      
+
+      data && setNotes(data);
       activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
-      
-
-      arrangeGrid(notes);
+      arrangeGrid(data);
 
     } catch (error) {
       console.error("Error fetching notes:", error);
@@ -146,7 +142,6 @@ export default function NoteApp() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      data&&[...data].sort((a,b) => a.orderIndex - b.orderIndex);
       const updatedNotes = [...notes, data];
       setNotes(updatedNotes);
       arrangeGrid(updatedNotes);
@@ -167,7 +162,6 @@ export default function NoteApp() {
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
-        updatedNotes&&[...updatedNotes].sort((a,b) => a.orderIndex - b.orderIndex);
         arrangeGrid(updatedNotes);
         setMsg(`Note deleted successfully.`);
         return updatedNotes;
@@ -350,7 +344,7 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
  <ul
   ref={listRef}
  className={[
-    "w-full justify-center justify-items-center",
+    "w-full justify-center justify-items-center mx-auto",
     "md:max-w-7xl mx-auto px-5",             
     "bg-white rounded-2xl border border-slate-200 shadow-sm",
     "overflow-x-hidden overflow-y-auto",
