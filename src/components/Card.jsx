@@ -29,9 +29,9 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         colIndex
       }),
       onDrop: ({ source }) => {
-        if (!source?.data?.sourceNoteId || source.data.sourceNoteId === note.id) return;
-        onDrop(source.data.sourceNoteId, note.id, rowIndex, colIndex);
-      },
+  if (!source?.data?.sourceNoteId || source.data.sourceNoteId === note.id) return;
+  onDrop(source.data.sourceNoteId, note.id);
+},
     });
 
     const dragConfig = draggable({

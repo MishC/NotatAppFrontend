@@ -257,52 +257,49 @@ const swapOrderLocally = (notesArr, aId, bId) => {
   return next;
 };
 //
-const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
-  if (!sourceNoteId || targetNoteId == null) return;
+// Swap notes function for drag-and-drop
+const swapNotes = async (sourceId, targetId) => {
+  // 1) optimistic local swap of orderIndex
+  setNotes(prev => {
+    const next = prev.map(n => ({ ...n }));
+    const a = next.find(n => n.id === sourceId);
+    const b = next.find(n => n.id === targetId);
+    if (!a || !b) return prev;
 
-  // 1) Instant visual swap in gridSlots (uses row/col from Card)
-  setGridSlots(prevGrid => {
-    const grid = prevGrid.map(row => row.map(n => (n ? { ...n } : n)));
+    const temp = a.orderIndex ?? 0;
+    a.orderIndex = b.orderIndex ?? 0;
+    b.orderIndex = temp;
 
-    // find source position
-    let src = null;
-    for (let r = 0; r < grid.length; r++) {
-      for (let c = 0; c < grid[r].length; c++) {
-        if (grid[r][c]?.id === sourceNoteId) src = { row: r, col: c };
-      }
-    }
-    const tgt = { row: targetRow, col: targetCol };
-    if (!src || !grid[tgt.row]?.[tgt.col]) return prevGrid;
-
-    [grid[src.row][src.col], grid[tgt.row][tgt.col]] =
-      [grid[tgt.row][tgt.col], grid[src.row][src.col]];
-
-    return grid;
+    next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
+    arrangeGrid(next);
+    return next;
   });
 
-  // 2) Persist swap on server, then update notes + rebuild grid from notes
-  (async () => {
-    try {
-      await fetch(API_URL + "/swap", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ sourceId: sourceNoteId, targetId: targetNoteId })
-
-      });
-
-      setNotes(prev => {
-        const next = swapOrderLocally(prev, sourceNoteId, targetNoteId);
-        arrangeGrid(next);          
-        return next;
-      });
-    } catch (e) {
-      console.error("Error swapping notes:", e);
-      setError("Error swapping notes.");
-      // optional: fetchNotes(activeFolder);
-    }
-  })();
+  // 2) persist on backend
+  try {
+    await fetchWithBrowserAPI(`${API_URL}/swap`, {
+      method: "POST",
+      body: JSON.stringify({ sourceId, targetId }),
+    });
+  } catch (err) {
+    // 3) on failure, revert by swapping back
+    setNotes(prev => {
+      const next = prev.map(n => ({ ...n }));
+      const a = next.find(n => n.id === sourceId);
+      const b = next.find(n => n.id === targetId);
+      if (a && b) {
+        const temp = a.orderIndex ?? 0;
+        a.orderIndex = b.orderIndex ?? 0;
+        b.orderIndex = temp;
+        next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
+        arrangeGrid(next);
+      }
+      setError("Swap failed on server.");
+      return next;
+    });
+  }
 };
+
 
  //Open and close modal
   const switchModalState = (note) => {
@@ -399,23 +396,21 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
         ].join(" ")
   ].join(" ")}
 >
-  {gridSlots
-    .map(row => row.filter(note => note && (!activeFolder || note.folderId === activeFolder)))
-    .filter(row => row.length > 0)
-    .flatMap((row, rowIndex) =>
-      row.map((note, colIndex) => (
-        <Card
-          key={note.id}
-          note={note}
-          rowIndex={rowIndex}
-          colIndex={colIndex}
-          onDelete={handleDeleteNote}
-          onUpdate={updateNote}
-          onDrop={swapNotes}
-          onClick={() => switchModalState(note)}
-        />
-      ))
-    )}
+{notes
+    .filter((note) => note && (activeFolder == null || note.folderId === activeFolder))
+    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)) 
+    .map((note, idx) => (
+      <Card
+        key={note.id}
+        note={note}
+        rowIndex={Math.floor(idx / 4)} 
+        colIndex={idx % 4}
+        onDelete={handleDeleteNote}
+        onUpdate={updateNote}
+        onDrop={swapNotes}
+        onClick={() => switchModalState(note)}
+      />
+    ))}
 </ul>
 
 </div>
