@@ -31,11 +31,13 @@ export default function NoteApp() {
 
 
 // Initial fetch of notes and folders
-  useEffect(() => {
-
-    fetchNotes(activeFolder);
-    fetchFolders();
-  }, []);
+ useEffect(() => {
+  async function fetchAll() {
+    await fetchNotes(activeFolder);
+    await fetchFolders();
+  }
+  fetchAll();
+}, []);
 
 // Refetch notes when activeFolder changes
   useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
