@@ -56,11 +56,10 @@ export default function NoteApp() {
     setLoading(true);
     try {
 
-      const data = [
-        ...(Number(activeFolder) === 4
+      const data = 
+        activeFolder === 4
           ? await fetchWithBrowserAPI(API_URL + "/done")
-          : await fetchWithBrowserAPI(API_URL + "/pending"))
-      ];
+          : await fetchWithBrowserAPI(API_URL + "/pending");
 
 
       data &&  setNotes(data);
