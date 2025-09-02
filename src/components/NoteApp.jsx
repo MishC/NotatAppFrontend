@@ -283,9 +283,12 @@ const swapNotes = (sourceNoteId, targetNoteId, targetRow, targetCol) => {
   // 2) Persist swap on server, then update notes + rebuild grid from notes
   (async () => {
     try {
-      await fetchWithBrowserAPI(API_URL + "/swap", options={
+      await fetch(API_URL + "/swap", {
         method: "POST",
-        body: JSON.stringify([sourceNoteId,targetNoteId ]),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ sourceId: sourceNoteId, targetId: targetNoteId })
+
       });
 
       setNotes(prev => {
