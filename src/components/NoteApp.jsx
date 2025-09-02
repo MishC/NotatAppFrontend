@@ -279,7 +279,7 @@ const swapNotes = async (sourceId, targetId) => {
   try {
     await fetchWithBrowserAPI(`${API_URL}/swap`, {
       method: "POST",
-      body: JSON.stringify({ sourceId: sourceId, targetId:targetId }),
+      body: JSON.stringify({ SourceId: sourceId, TargetId:targetId }),
     });
   } catch (err) {
     // 3) on failure, revert by swapping back
