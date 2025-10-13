@@ -322,7 +322,7 @@ export default function NoteApp() {
         </p>
         <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
       </div>
-      <div className="">
+      <div className="mb-20">
       <Noteform folders={folders} handleAddNote={handleAddNote} />
       </div>
       {error && (
