@@ -12,37 +12,37 @@ export default function NoteApp() {
   const [lengthNotes, setLengthNotes] = useState(0);
   const listRef = useRef(null);
   const [gridSlots, setGridSlots] = useState([]);
-  const [targetNoteId] = useState(null);
+  const [targetNoteId] = useState(null); // ak potrebuješ, pridaj setter
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [activeFolder, setActiveFolder] = useState(null);
   const [folderOptions, setFolderOptions] = useState([
-    { id: null, label: "All" } // Default option to show all notes
+    { id: null, label: "All" }, // Default option to show all notes
   ]);
 
-  // API Configurations
-  //const isLocalhost = window.location.origin.includes("localhost");
-  // const API_URL = isLocalhost ? "http://localhost:5001/api/notes" : "/api/notes";
-  // const API_URL2 = isLocalhost ? "http://localhost:5001/api/folders" : "/api/folders";
+  // API endpoints (rovnaké ako u teba)
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
+  // Initial fetch of notes and folders
+  useEffect(() => {
+    async function fetchAll() {
+      await fetchNotes(activeFolder);
+      await fetchFolders();
+    }
+    fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-// Initial fetch of notes and folders
- useEffect(() => {
-  async function fetchAll() {
-    await fetchNotes(activeFolder);
-    await fetchFolders();
-  }
-  fetchAll();
-}, []);
+  // Refetch notes when activeFolder changes
+  useEffect(() => {
+    fetchNotes(activeFolder);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeFolder]);
 
-// Refetch notes when activeFolder changes
-  useEffect(() => { fetchNotes(activeFolder); }, [activeFolder]);
-
-// Drag-and-Drop setup
+  // Drag-and-Drop setup (zachované)
   useEffect(() => {
     if (!listRef.current) return;
     return dropTargetForElements({
@@ -63,49 +63,52 @@ export default function NoteApp() {
       },
     });
   }, [targetNoteId]);
-  //
 
-// Clear error and message after 10 seconds
+  // Clear error and message after 10 seconds
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setError("");
+      setMsg("");
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [error, msg]);
 
-  useEffect(() => { setTimeout(() => { setError(""), setMsg("") }, 10000); }, [error.length > 1, msg.length > 1]);
+  //// FUNCTIONS ///////////////////////////////////////////
 
+  // Generic fetch
+  const fetchWithBrowserAPI = async (url, options = {}) => {
+    const res = await fetch(url, {
+      headers: { "Content-Type": "application/json", ...options.headers },
+      credentials: "include",
+      ...options,
+    });
 
-  ////FUNCTIONS///////////////////////////////////////////
-// Generic function for fetch
-   const fetchWithBrowserAPI = async (url, options = {}) => {
-  const res = await fetch(url, {
-    headers: { "Content-Type": "application/json", ...options.headers },
-    credentials: "include",
-    ...options,
-  });
+    if (!res.ok) {
+      setError(`HTTP error! status: ${res.status}`);
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    if (res.status === 204) return null;
 
-  if (!res.ok) {
-    setError(`HTTP error! status: ${res.status}`);
-    throw new Error(`HTTP error! status: ${res.status}`);
-  }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  };
 
-  // No content? just return null
-  if (res.status === 204) return null;
-
-  // Some servers don’t set content-length; be defensive
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
-};
-
-// Fetch notes function
+  // Fetch notes
   const fetchNotes = async (activeFolder) => {
     setLoading(true);
     try {
-
       const data =
-        (activeFolder === 4) ? await fetchWithBrowserAPI(API_URL + "/done") : await fetchWithBrowserAPI(API_URL + "/pending");
+        activeFolder === 4
+          ? await fetchWithBrowserAPI(API_URL + "/done")
+          : await fetchWithBrowserAPI(API_URL + "/pending");
 
-
-
-      data && setNotes(data);
-      activeFolder === null ? setLengthNotes(data.length) : setLengthNotes(data.filter(note => note.folderId === activeFolder).length);
+      if (data) setNotes(data);
+      setLengthNotes(
+        activeFolder === null
+          ? data.length
+          : data.filter((note) => note.folderId === activeFolder).length
+      );
       arrangeGrid(data);
-
     } catch (error) {
       console.error("Error fetching notes:", error);
       setError("Error fetching notes. Please try again later.");
@@ -119,10 +122,10 @@ export default function NoteApp() {
       setFolders(data);
       setFolderOptions([
         { id: null, label: "All" },
-        ...data.map(folder => ({
+        ...data.map((folder) => ({
           id: folder.id,
-          label: folder.name
-        }))
+          label: folder.name,
+        })),
       ]);
     } catch (error) {
       setError("Error fetching folders.");
@@ -130,37 +133,32 @@ export default function NoteApp() {
     }
   };
 
-  // ArrangeGrid function to create a grid layout based on note content length
+  // ArrangeGrid (zachované)
   const arrangeGrid = (notesList) => {
-  if (!Array.isArray(notesList)) {
-    setGridSlots([]);
-    return;
-  }
-
-  // clean nuull/undefined/unvalid objects
-  const clean = notesList.filter(n => n && typeof n === "object");
-
-  const updatedGrid = [];
-  let row = [];
-
-  clean.forEach((note) => {
-    const len = note?.content?.length ?? 0;
-
-    if (len > 50) {
-      // long note content
-      updatedGrid.push([{ ...note, span: 2 }]);
-      row = [];
-    } else {
-      // short note content
-      row.push({ ...note, span: 1 });
-      if (row.length === 2) {
-        updatedGrid.push([...row]);
-        row = [];
-      }
+    if (!Array.isArray(notesList)) {
+      setGridSlots([]);
+      return;
     }
-  });
+    const clean = notesList.filter((n) => n && typeof n === "object");
 
-    // /////If there's an incomplete row (just one note left), just add it as a row of one 
+    const updatedGrid = [];
+    let row = [];
+
+    clean.forEach((note) => {
+      const len = note?.content?.length ?? 0;
+
+      if (len > 50) {
+        updatedGrid.push([{ ...note, span: 2 }]);
+        row = [];
+      } else {
+        row.push({ ...note, span: 1 });
+        if (row.length === 2) {
+          updatedGrid.push([...row]);
+          row = [];
+        }
+      }
+    });
+
     if (row.length === 1) {
       updatedGrid.push([...row]);
     }
@@ -168,9 +166,8 @@ export default function NoteApp() {
     setGridSlots(updatedGrid);
   };
 
-  //HandleAddNote function to add a new note, passed to the Noteform component
+  // Add
   const handleAddNote = async (newNote) => {
-
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -192,15 +189,18 @@ export default function NoteApp() {
     }
   };
 
+  // Delete
   const handleDeleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
       fetch(`${API_URL}/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-      })
-        .catch(error => { setError("Error deleting a note."); console.error("Error deleting:", error) });
+      }).catch((error) => {
+        setError("Error deleting a note.");
+        console.error("Error deleting:", error);
+      });
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
@@ -214,28 +214,29 @@ export default function NoteApp() {
     }
   };
 
-  // Update note function in modal
+  // Update (modal)
   const updateNote = async (noteId, updatedFields) => {
-    // updatedFields = { title, content, folderId }
     try {
-      const response = await fetch(`${API_URL}/${updatedFields.folderId}/${noteId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          ...selectedNote,
-          ...updatedFields,
-          id: noteId, // C# expects an ID in the body
-          folderId: updatedFields.folderId,
-          title: updatedFields.title,
-          content: updatedFields.content,
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/${updatedFields.folderId}/${noteId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            ...selectedNote,
+            ...updatedFields,
+            id: noteId, // C# expects an ID in the body
+            folderId: updatedFields.folderId,
+            title: updatedFields.title,
+            content: updatedFields.content,
+          }),
+        }
+      );
       if (!response.ok) {
         setError(`HTTP error! status: ${response.status}`);
         return false;
       }
-      // Success: reload notes, close modal, show message
       setMsg(`Note "${updatedFields.title}" updated successfully!`);
       fetchNotes();
       setIsModalOpen(false);
@@ -247,65 +248,52 @@ export default function NoteApp() {
     }
   };
 
+  // Swap notes (DnD)
+  const swapNotes = async (sourceId, targetId) => {
+    // optimistic swap
+    setNotes((prev) => {
+      const next = prev.map((n) => ({ ...n }));
+      const a = next.find((n) => n.id === sourceId);
+      const b = next.find((n) => n.id === targetId);
+      if (!a || !b) return prev;
 
-// helper: swap orderIndex in notes array & return sorted clone
-const swapOrderLocally = (notesArr, aId, bId) => {
-  const next = notesArr.map(n => ({ ...n }));
-  const A = next.find(n => n.id === aId);
-  const B = next.find(n => n.id === bId);
-  if (!A || !B) return notesArr;
-  [A.orderIndex, B.orderIndex] = [B.orderIndex, A.orderIndex];
-  next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
-  return next;
-};
-//
-// Swap notes function for drag-and-drop
-const swapNotes = async (sourceId, targetId) => {
-  // 1) optimistic local swap of orderIndex
-  setNotes(prev => {
-    const next = prev.map(n => ({ ...n }));
-    const a = next.find(n => n.id === sourceId);
-    const b = next.find(n => n.id === targetId);
-    if (!a || !b) return prev;
+      const temp = a.orderIndex ?? 0;
+      a.orderIndex = b.orderIndex ?? 0;
+      b.orderIndex = temp;
 
-    const temp = a.orderIndex ?? 0;
-    a.orderIndex = b.orderIndex ?? 0;
-    b.orderIndex = temp;
-
-    next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
-    arrangeGrid(next);
-    return next;
-  });
-
-  // 2) persist on backend
-  try {
-    await fetch(`${API_URL}/swap`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ SourceId: sourceId, TargetId: targetId }),
-    });
-  } catch (err) {
-    // 3) on failure, revert by swapping back
-    setNotes(prev => {
-      const next = prev.map(n => ({ ...n }));
-      const a = next.find(n => n.id === sourceId);
-      const b = next.find(n => n.id === targetId);
-      if (a && b) {
-        const temp = a.orderIndex ?? 0;
-        a.orderIndex = b.orderIndex ?? 0;
-        b.orderIndex = temp;
-        next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
-        arrangeGrid(next);
-      }
-      setError("Swap failed on server.");
+      next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
+      arrangeGrid(next);
       return next;
     });
-  }
-};
 
+    // persist
+    try {
+      await fetch(`${API_URL}/swap`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ SourceId: sourceId, TargetId: targetId }),
+      });
+    } catch (err) {
+      // revert on failure
+      setNotes((prev) => {
+        const next = prev.map((n) => ({ ...n }));
+        const a = next.find((n) => n.id === sourceId);
+        const b = next.find((n) => n.id === targetId);
+        if (a && b) {
+          const temp = a.orderIndex ?? 0;
+          a.orderIndex = b.orderIndex ?? 0;
+          b.orderIndex = temp;
+          next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
+          arrangeGrid(next);
+        }
+        setError("Swap failed on server.");
+        return next;
+      });
+    }
+  };
 
- //Open and close modal
+  // Modal open/close
   const switchModalState = (note) => {
     if (!note) {
       setIsModalOpen(false);
@@ -314,23 +302,14 @@ const swapNotes = async (sourceId, targetId) => {
     }
     setSelectedNote(note);
     setIsModalOpen(true);
-    // return;
-
   };
-//
 
-
-
-///////////////////////###############################
-//////////////////  Return  ###################################
+  /////////////////////// RETURN ///////////////////////
   return (
-    <div className=" min-h-screen flex flex-col justify-center items-center 
- background: #ADA996;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996);  /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    <div className="relative min-h-screen w-full p-6 overflow-y-auto">
+      {/* Gradient background as a separate layer (namiesto raw CSS v className) */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#EAEAEA] via-[#DBDBDB] to-[#ADA996]" />
 
-
-    p-6 mx-auto w-full max-w-full overflow-y-auto">
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
         <div className="flex items-center gap-4 justify-center text-center">
           <KanbanNoteIcon className="text-blue-600 text-center" />
@@ -338,89 +317,97 @@ background: linear-gradient(to bottom, #EAEAEA, #DBDBDB, #F2F2F2, #ADA996); /* W
             Note Board
           </h1>
         </div>
-        <p className="mt-2 text-slate-500 text-lg">
+        <p className="mt-2 text-slate-600 text-lg text-center">
           Organize your notes like cards on a board.
         </p>
-
-        {/* subtle divider under header */}
         <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
       </div>
 
       <Noteform folders={folders} handleAddNote={handleAddNote} />
+
       {error && (
-        <div className="error text-red-600 bg-red-100 mt-10 p-10 rounded mb-4 text-2xl">
+        <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
           {error}
         </div>
       )}
       {msg && (
-        <div className="msg text-green-600 bg-green-100 mt-10 p-10 rounded mb-4 text-2xl">
+        <div className="msg text-emerald-700 bg-emerald-50 mt-8 p-4 rounded-xl mb-4 text-base border border-emerald-200">
           {msg}
         </div>
       )}
-      <div className="mt-6">&nbsp;</div>
+
+      <div className="mt-6" />
+
       {loading ? (
-        <p className="text-black m-auto text-8xl">Loading...</p>
-      ) : (notes.length === 0 ? (<> </>) : (
+        <p className="text-slate-800 mx-auto text-3xl text-center py-16">
+          Loading...
+        </p>
+      ) : notes.length === 0 ? (
+        <></>
+      ) : (
         <>
-     <div className="w-full max-w-full md:max-w-7xl mx-auto mt-6 px-6">
-  {/* Folder menu */}
-  <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
-    {folderOptions.map((opt) => (
-      <button
-        key={opt.id ?? "all"}
-        onClick={() => setActiveFolder(opt.id)}
-        className={[
-          "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
-          activeFolder === opt.id
-            ? "bg-white text-blue-600 shadow-md"
-            : "text-slate-600 hover:text-blue-600",
-        ].join(" ")}
-      >
-        {opt.label}
-      </button>
-    ))}
-  </div>
+          <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
+            {/* Folder menu */}
+            <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+              {folderOptions.map((opt) => (
+                <button
+                  key={opt.id ?? "all"}
+                  onClick={() => setActiveFolder(opt.id)}
+                  className={[
+                    "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+                    activeFolder === opt.id
+                      ? "bg-white text-blue-600 shadow-md"
+                      : "text-slate-700 hover:text-blue-600",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
 
-  {/* Notes grid as white paper*/}
- <ul
-  ref={listRef}
- className={[
-    "w-full justify-center justify-items-center mx-auto",
-    "md:max-w-7xl mx-auto px-5",             
-    "bg-white rounded-2xl border border-slate-200 shadow-sm",
-    "overflow-x-hidden overflow-y-auto",
-    "py-6",                                         
-    lengthNotes < 1
-      ? "flex flex-col min-h-[40vh] gap-6"
-      : [
-          "grid min-h-[40vh]",                      
-          "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4",
-          "gap-x-6 gap-y-6",                        
-                           
-        ].join(" ")
-  ].join(" ")}
->
-{notes
-    .filter((note) => note && (activeFolder == null || note.folderId === activeFolder))
-    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)) 
-    .map((note, idx) => (
-      <Card
-        key={note.id}
-        note={note}
-        rowIndex={Math.floor(idx / 4)} 
-        colIndex={idx % 4}
-        onDelete={handleDeleteNote}
-        onUpdate={updateNote}
-        onDrop={swapNotes}
-        onClick={() => switchModalState(note)}
-      />
-    ))}
-</ul>
-
-</div>
-
+            {/* Notes grid as white paper */}
+            <ul
+              ref={listRef}
+              className={[
+                "w-full justify-center justify-items-center mx-auto",
+                "bg-white rounded-b-2xl border border-slate-200 shadow-sm",
+                "overflow-x-hidden overflow-y-auto",
+                "py-6 px-5",
+                lengthNotes < 1
+                  ? "flex flex-col min-h-[40vh] gap-6"
+                  : [
+                      "grid min-h-[40vh]",
+                      // 1/2/2/2/4 stĺpce podľa breakpointov
+                      "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4",
+                      "gap-x-6 gap-y-6",
+                    ].join(" "),
+              ].join(" ")}
+            >
+              {notes
+                .filter(
+                  (note) =>
+                    note && (activeFolder == null || note.folderId === activeFolder)
+                )
+                .sort(
+                  (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
+                )
+                .map((note, idx) => (
+                  <Card
+                    key={note.id}
+                    note={note}
+                    rowIndex={Math.floor(idx / 4)}
+                    colIndex={idx % 4}
+                    onDelete={handleDeleteNote}
+                    onUpdate={updateNote}
+                    onDrop={swapNotes}
+                    onClick={() => switchModalState(note)}
+                  />
+                ))}
+            </ul>
+          </div>
         </>
-      ))}
+      )}
+
       {isModalOpen && selectedNote && (
         <Modal
           selectedNote={selectedNote}
