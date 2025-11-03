@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { useState, useEffect } from "react";
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
@@ -10,23 +9,18 @@ export default function NoteApp() {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lengthNotes, setLengthNotes] = useState(0);
-  const listRef = useRef(null);
-  const [gridSlots, setGridSlots] = useState([]);
-  const [targetNoteId] = useState(null); // ak potrebuješ, pridaj setter
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [activeFolder, setActiveFolder] = useState(null);
   const [folderOptions, setFolderOptions] = useState([
-    { id: null, label: "All" }, // Default option to show all notes
+    { id: null, label: "All" },
   ]);
 
-  // API endpoints (rovnaké ako u teba)
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
-  // Initial fetch of notes and folders
   useEffect(() => {
     async function fetchAll() {
       await fetchNotes(activeFolder);
@@ -36,35 +30,11 @@ export default function NoteApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Refetch notes when activeFolder changes
   useEffect(() => {
     fetchNotes(activeFolder);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFolder]);
 
-  // Drag-and-Drop setup (zachované)
-  useEffect(() => {
-    if (!listRef.current) return;
-    return dropTargetForElements({
-      element: listRef.current,
-      getData: () => ({ type: "note-list" }),
-      onDrop: ({ source }) => {
-        if (!source?.data?.sourceNoteId) {
-          console.warn("Source ID is missing in onDrop.");
-          return;
-        }
-        if (!targetNoteId) {
-          setError("Target ID is missing. Please hover over a valid slot.");
-          return;
-        }
-        setTimeout(() => {
-          swapNotes(source.data.sourceNoteId, targetNoteId);
-        }, 50);
-      },
-    });
-  }, [targetNoteId]);
-
-  // Clear error and message after 10 seconds
   useEffect(() => {
     const t = setTimeout(() => {
       setError("");
@@ -72,8 +42,6 @@ export default function NoteApp() {
     }, 10000);
     return () => clearTimeout(t);
   }, [error, msg]);
-
-  //// FUNCTIONS ///////////////////////////////////////////
 
   // Generic fetch
   const fetchWithBrowserAPI = async (url, options = {}) => {
@@ -108,7 +76,6 @@ export default function NoteApp() {
           ? data.length
           : data.filter((note) => note.folderId === activeFolder).length
       );
-      arrangeGrid(data);
     } catch (error) {
       console.error("Error fetching notes:", error);
       setError("Error fetching notes. Please try again later.");
@@ -133,39 +100,6 @@ export default function NoteApp() {
     }
   };
 
-  // ArrangeGrid (zachované)
-  const arrangeGrid = (notesList) => {
-    if (!Array.isArray(notesList)) {
-      setGridSlots([]);
-      return;
-    }
-    const clean = notesList.filter((n) => n && typeof n === "object");
-
-    const updatedGrid = [];
-    let row = [];
-
-    clean.forEach((note) => {
-      const len = note?.content?.length ?? 0;
-
-      if (len > 50) {
-        updatedGrid.push([{ ...note, span: 2 }]);
-        row = [];
-      } else {
-        row.push({ ...note, span: 1 });
-        if (row.length === 2) {
-          updatedGrid.push([...row]);
-          row = [];
-        }
-      }
-    });
-
-    if (row.length === 1) {
-      updatedGrid.push([...row]);
-    }
-
-    setGridSlots(updatedGrid);
-  };
-
   // Add
   const handleAddNote = async (newNote) => {
     try {
@@ -182,7 +116,7 @@ export default function NoteApp() {
       const data = await response.json();
       const updatedNotes = [...notes, data];
       setNotes(updatedNotes);
-      arrangeGrid(updatedNotes);
+      setMsg("Note added.");
     } catch (error) {
       console.error("Error adding note:", error);
       setError("Error adding note.");
@@ -204,7 +138,6 @@ export default function NoteApp() {
 
       setNotes((prevNotes) => {
         const updatedNotes = prevNotes.filter((note) => note.id !== id);
-        arrangeGrid(updatedNotes);
         setMsg(`Note deleted successfully.`);
         return updatedNotes;
       });
@@ -226,7 +159,7 @@ export default function NoteApp() {
           body: JSON.stringify({
             ...selectedNote,
             ...updatedFields,
-            id: noteId, // C# expects an ID in the body
+            id: noteId,
             folderId: updatedFields.folderId,
             title: updatedFields.title,
             content: updatedFields.content,
@@ -238,7 +171,7 @@ export default function NoteApp() {
         return false;
       }
       setMsg(`Note "${updatedFields.title}" updated successfully!`);
-      fetchNotes();
+      await fetchNotes(activeFolder);
       setIsModalOpen(false);
       setSelectedNote(null);
       return true;
@@ -248,7 +181,7 @@ export default function NoteApp() {
     }
   };
 
-  // Swap notes (DnD)
+  // Swap notes (DnD) – zostáva
   const swapNotes = async (sourceId, targetId) => {
     // optimistic swap
     setNotes((prev) => {
@@ -262,7 +195,6 @@ export default function NoteApp() {
       b.orderIndex = temp;
 
       next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
-      arrangeGrid(next);
       return next;
     });
 
@@ -285,7 +217,6 @@ export default function NoteApp() {
           a.orderIndex = b.orderIndex ?? 0;
           b.orderIndex = temp;
           next.sort((x, y) => (x.orderIndex ?? 0) - (y.orderIndex ?? 0));
-          arrangeGrid(next);
         }
         setError("Swap failed on server.");
         return next;
@@ -293,7 +224,6 @@ export default function NoteApp() {
     }
   };
 
-  // Modal open/close
   const switchModalState = (note) => {
     if (!note) {
       setIsModalOpen(false);
@@ -304,10 +234,9 @@ export default function NoteApp() {
     setIsModalOpen(true);
   };
 
-  /////////////////////// RETURN ///////////////////////
   return (
-    <div className="relative min-h-screen w-full p-6 overflow-y-auto">
-      {/* Gradient background as a separate layer (namiesto raw CSS v className) */}
+    <div className="relative min-h-screen w-full p-6">
+      {/* pozadie */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#EAEAEA] via-[#DBDBDB] to-[#ADA996]" />
 
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
@@ -322,9 +251,11 @@ export default function NoteApp() {
         </p>
         <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
       </div>
+
       <div className="mb-20">
-      <Noteform folders={folders} handleAddNote={handleAddNote} />
+        <Noteform folders={folders} handleAddNote={handleAddNote} />
       </div>
+
       {error && (
         <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
           {error}
@@ -336,8 +267,6 @@ export default function NoteApp() {
         </div>
       )}
 
-      <div className="mt-6" />
-
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">
           Loading...
@@ -345,67 +274,55 @@ export default function NoteApp() {
       ) : notes.length === 0 ? (
         <></>
       ) : (
-        <>
-          <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
-            {/* Folder menu */}
-            <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
-              {folderOptions.map((opt) => (
-                <button
-                  key={opt.id ?? "all"}
-                  onClick={() => setActiveFolder(opt.id)}
-                  className={[
-                    "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
-                    activeFolder === opt.id
-                      ? "bg-white text-blue-600 shadow-md"
-                      : "text-slate-700 hover:text-blue-600",
-                  ].join(" ")}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Notes grid as white paper */}
-            <ul
-              ref={listRef}
-              className={[
-                "w-full justify-center justify-items-center mx-auto",
-                "bg-white rounded-b-2xl border border-slate-200 shadow-sm",
-                "overflow-x-hidden overflow-y-auto",
-                "py-6 px-5",
-                lengthNotes < 1
-                  ? "flex flex-col min-h-[40vh] gap-6"
-                  : [
-                      "grid min-h-[40vh]",
-                      // 1/2/2/2/4 stĺpce podľa breakpointov
-                      "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4",
-                      "gap-x-6 gap-y-6",
-                    ].join(" "),
-              ].join(" ")}
-            >
-              {notes
-                .filter(
-                  (note) =>
-                    note && (activeFolder == null || note.folderId === activeFolder)
-                )
-                .sort(
-                  (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
-                )
-                .map((note, idx) => (
-                  <Card
-                    key={note.id}
-                    note={note}
-                    rowIndex={Math.floor(idx / 4)}
-                    colIndex={idx % 4}
-                    onDelete={handleDeleteNote}
-                    onUpdate={updateNote}
-                    onDrop={swapNotes}
-                    onClick={() => switchModalState(note)}
-                  />
-                ))}
-            </ul>
+        <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
+          {/* Folder menu */}
+          <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+            {folderOptions.map((opt) => (
+              <button
+                key={opt.id ?? "all"}
+                onClick={() => setActiveFolder(opt.id)}
+                className={[
+                  "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+                  activeFolder === opt.id
+                    ? "bg-white text-blue-600 shadow-md"
+                    : "text-slate-700 hover:text-blue-600",
+                ].join(" ")}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-        </>
+
+          {/* Masonry: žiadne prekrytie, výška rastie automaticky */}
+          <ul
+            className={[
+              "w-full mx-auto bg-white rounded-b-2xl border border-slate-2 00 shadow-sm",
+              "py-6 px-5",
+              // multi-column layout
+              "columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
+              "gap-6", // medzera medzi kolónami
+            ].join(" ")}
+          >
+            {notes
+              .filter(
+                (note) =>
+                  note && (activeFolder == null || note.folderId === activeFolder)
+              )
+              .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+              .map((note, idx) => (
+                <Card
+                  key={note.id}
+                  note={note}
+                  rowIndex={Math.floor(idx / 4)}
+                  colIndex={idx % 4}
+                  onDelete={handleDeleteNote}
+                  onUpdate={updateNote}
+                  onDrop={swapNotes}
+                  onClick={() => switchModalState(note)}
+                />
+              ))}
+          </ul>
+        </div>
       )}
 
       {isModalOpen && selectedNote && (

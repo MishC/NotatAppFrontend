@@ -2,10 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import HamburgerIcon from "./HamburgerIcon";
-import { getRandomColor, getColorById } from "../utils/colors"; 
-
-
-
+import { getColorById } from "../utils/colors";
 
 export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, onClick }) {
   const noteRef = useRef(null);
@@ -13,9 +10,6 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   const [folderId, setFolderId] = useState(note.folderId || "");
   const [showMenu, setShowMenu] = useState(false);
   const cardColor = useMemo(() => getColorById(note.id), [note.id]);
-
-
-
 
   useEffect(() => {
     if (!noteRef.current) return;
@@ -29,9 +23,9 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         colIndex
       }),
       onDrop: ({ source }) => {
-  if (!source?.data?.sourceNoteId || source.data.sourceNoteId === note.id) return;
-  onDrop(source.data.sourceNoteId, note.id);
-},
+        if (!source?.data?.sourceNoteId || source.data.sourceNoteId === note.id) return;
+        onDrop(source.data.sourceNoteId, note.id);
+      },
     });
 
     const dragConfig = draggable({
@@ -53,28 +47,22 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   return (
     <li
       ref={noteRef}
-      key={note.id}
       onClick={onClick}
       className={[
+        // dôležité pre masonry:
+        "break-inside-avoid inline-block w-full mb-6",
         // card shell
         "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
-     
         "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
-      
-        // grid span
-        note.span === 2 ? "sm:col-span-2" : "",
-        // interactions
-         "min-w-[204px] m-2 p-4 sm:p-5",
+        "min-w-[204px] m-0 p-4 sm:p-5", // m-0 kvôli inline-block a column gap
         cardColor,
-
-         isDragging
+        isDragging
           ? "opacity-75 scale-[0.98] ring-2 ring-blue-400/40"
           : "cursor-grab hover:-translate-y-0.5",
         "focus-within:ring-2 focus-within:ring-blue-400/40",
       ].join(" ")}
     >
-      {/* Header row: Title and action menu */}
-      <div className="flex items-start gap-2 mb-3 min-w-0 align-middle py-auto">
+      <div className="flex items-start gap-2 mb-3 min-w-0">
         <h4
           className="flex-1 min-w-0 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate"
           title={note.title}
@@ -82,8 +70,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           {note.title}
         </h4>
 
-        {/* Dropdown menu */}
-         <div className="relative">
+        <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -116,7 +103,8 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                     setShowMenu(false);
                   }}
                 >
-                  <span className="text-xl mr-2" aria-label="Check" role="img">✓ </span>Mark complete
+                  <span className="text-xl mr-2" aria-label="Check" role="img">✓ </span>
+                  Mark complete
                 </button>
               </li>
               <li>
@@ -124,23 +112,25 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
                   role="menuitem"
                   className="w-full text-left px-4 py-2 hover:bg-slate-100 text-blue-600"
                   onClick={() => {
-                    onClick(note); // edit/modal
+                    onClick(note);
                     setShowMenu(false);
-                    }}
-                  >
-                    <span className="text-xs/8 mr-2" aria-label="Edit" role="img">🖉</span> Edit
-                  </button>
-                  </li>
-                  <li>
-                  <button
-                    role="menuitem"
-                    className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
-                    onClick={() => {
+                  }}
+                >
+                  <span className="text-xs/8 mr-2" aria-label="Edit" role="img">🖉</span>
+                  Edit
+                </button>
+              </li>
+              <li>
+                <button
+                  role="menuitem"
+                  className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
+                  onClick={() => {
                     onDelete(note.id, note.title);
                     setShowMenu(false);
                   }}
                 >
-                 <span className="text-xl mr-2" aria-label="Delete" role="img">×</span>  Delete
+                  <span className="text-xl mr-2" aria-label="Delete" role="img">×</span>
+                  Delete
                 </button>
               </li>
             </ul>
@@ -148,7 +138,6 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         </div>
       </div>
 
-      {/* Content */}
       {note.content && note.content.length > 1 && (
         <p
           className={[
@@ -156,13 +145,12 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
             "bg-slate-50 border border-slate-200 rounded-xl",
             "p-4 break-words",
             "group-hover:bg-slate-50",
-            "text-left"
+            "text-left",
           ].join(" ")}
         >
           {note.content}
         </p>
       )}
     </li>
-
   );
 }
