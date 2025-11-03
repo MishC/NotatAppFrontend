@@ -296,7 +296,7 @@ export default function NoteApp() {
           {/* Masonry: žiadne prekrytie, výška rastie automaticky */}
           <ul
             className={[
-              "w-full mx-auto bg-white rounded-b-2xl border border-slate-2 00 shadow-sm",
+              "w-full mx-auto bg-white rounded-b-2xl border border-slate-200 shadow-sm",
               "py-6 px-5",
               // multi-column layout
               "columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
