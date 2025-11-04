@@ -1,5 +1,5 @@
-import React from "react";
 import NoteApp from "./components/NoteApp";
+
 import "./App.css";
 
 function App() {
