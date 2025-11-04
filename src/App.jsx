@@ -1,5 +1,5 @@
 import NoteApp from "./components/NoteApp";
-import {Router,Routes, Route} from "react-router-dom";
+import {Router,Routes, Route, Redirect} from "react-router-dom";
 
 import "./App.css";
 
