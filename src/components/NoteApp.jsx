@@ -311,7 +311,8 @@ export default function NoteApp() {
               "py-6 px-5",
               // multi-column layout
               "columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
-              //    "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
+              // grid-layout
+                "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
 
               "gap-6", 
             ].join(" ")}
