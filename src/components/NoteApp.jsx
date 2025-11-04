@@ -1,4 +1,6 @@
-import { useState, useEffect,navigate } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
@@ -20,6 +22,7 @@ export default function NoteApp() {
 
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchAll() {
