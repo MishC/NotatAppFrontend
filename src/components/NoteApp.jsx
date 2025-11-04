@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router';
 
 import Card from "./Card";
 import Modal from "./Modal";
@@ -19,7 +18,6 @@ export default function NoteApp() {
   const [folderOptions, setFolderOptions] = useState([
     { id: null, label: "All" },
   ]);
-   const navigate = useNavigate();
 
 
   const API_URL = `${window.location.origin}/api/notes`;
@@ -238,15 +236,10 @@ export default function NoteApp() {
     setIsModalOpen(true);
   };
 
-  //change url
-   const handleFolderClick = (opt) => {
+  const handleFolderClick = (opt) => {
 
     setActiveFolder(opt.id);
-   if (opt.id === null) {
-    navigate("/");
-  } else {
-    navigate("/" + encodeURIComponent((opt.label || "").toLowerCase()));
-  }
+   
   };
 
   return (
