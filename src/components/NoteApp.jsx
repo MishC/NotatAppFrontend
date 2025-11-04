@@ -242,7 +242,7 @@ export default function NoteApp() {
     const currentUrl = window.location.href;
 
     setActiveFolder(opt.id);
-    if (opt.id == null) navigate("currentUrl + /all");
+    if (opt.id == null) navigate(currentUrl + "/all");
     else navigate(currentUrl +"/" + encodeURIComponent(opt.label.toLowerCase()));
   };
 
