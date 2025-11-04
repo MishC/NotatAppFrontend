@@ -239,9 +239,11 @@ export default function NoteApp() {
 
   //change url
    const handleFolderClick = (opt={id,label}) => {
+    const currentUrl = window.location.href;
+
     setActiveFolder(opt.id);
-    if (opt.id == null) navigate("/all");
-    else navigate("/" + encodeURIComponent(opt.label.toLowerCase()));
+    if (opt.id == null) navigate("currentUrl + /all");
+    else navigate(currentUrl +"/" + encodeURIComponent(opt.label.toLowerCase()));
   };
 
   return (
