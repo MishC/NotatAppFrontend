@@ -244,8 +244,14 @@ export default function NoteApp() {
 
   return (
     <div className="relative min-h-screen w-full p-6">
-      {/* backgroud */}
-      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#EAEAEA] via-[#DBDBDB] to-[#ADA996]" />
+      {/* background */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(circle at 7.5% 24%, rgb(237, 161, 193) 0%, rgb(250, 178, 172) 25.5%, rgb(190, 228, 210) 62.3%, rgb(215, 248, 247) 93.8%)",
+        }}
+      />
 
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
         <div className="flex items-center gap-4 justify-center text-center">
@@ -276,14 +282,12 @@ export default function NoteApp() {
       )}
 
       {loading ? (
-        <p className="text-slate-800 mx-auto text-3xl text-center py-16">
-          Loading...
-        </p>
+        <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : notes.length === 0 ? (
         <></>
       ) : (
         <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
-          {/* Folder menu */}
+          {/* Folder menu */}}
           <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
             {folderOptions.map((opt) => (
 
