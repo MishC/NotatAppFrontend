@@ -293,14 +293,14 @@ export default function NoteApp() {
             ))}
           </div>
 
-          {/* Masonry: žiadne prekrytie, výška rastie automaticky */}
+         
           <ul
             className={[
               "w-full mx-auto bg-white rounded-b-2xl",
               "py-6 px-5",
               // multi-column layout
               "columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
-              "gap-6", // medzera medzi kolónami
+              "gap-6", 
             ].join(" ")}
           >
             {notes
