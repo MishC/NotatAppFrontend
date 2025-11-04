@@ -248,8 +248,7 @@ export default function NoteApp() {
       <div
         className="fixed inset-0 -z-10"
         style={{
-          background:
-            "radial-gradient(circle at 7.5% 24%, rgb(237, 161, 193) 0%, rgb(250, 178, 172) 25.5%, rgb(190, 228, 210) 62.3%, rgb(215, 248, 247) 93.8%)",
+          background: "linear-gradient(101.9deg, rgb(253, 183, 220) 25%, rgb(240, 213, 190) 38.1%, rgb(249, 240, 206) 55.5%, rgb(253, 244, 210) 67.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 103.6%)",
         }}
       />
 
@@ -283,11 +282,12 @@ export default function NoteApp() {
 
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
-      ) : notes.length === 0 ? (
+      ) : (notes.length === 0 ? (
         <></>
       ) : (
         <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
-          {/* Folder menu */}}
+
+
           <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
             {folderOptions.map((opt) => (
 
@@ -306,10 +306,7 @@ export default function NoteApp() {
               </button>
             ))}
           </div>
-
-         
-          <ul
-            className={[
+          <ul className={[
               "w-full max-w-7xl",
               "mx-auto bg-white rounded-b-2xl",
               "py-6 px-5",
@@ -318,9 +315,8 @@ export default function NoteApp() {
               // grid-layout
                 "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
 
-              "gap-6", 
-            ].join(" ")}
-          >
+              "gap-6"].join(" ")}>
+
             {notes
               .filter(
                 (note) =>
@@ -341,7 +337,8 @@ export default function NoteApp() {
               ))}
           </ul>
         </div>
-      )}
+      ))
+      }
 
       {isModalOpen && selectedNote && (
         <Modal
@@ -352,5 +349,6 @@ export default function NoteApp() {
         />
       )}
     </div>
-  );
-}
+  )
+    };
+
