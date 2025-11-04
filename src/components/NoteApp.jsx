@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import Card from "./Card";
 import Modal from "./Modal";
@@ -20,7 +20,6 @@ export default function NoteApp() {
     { id: null, label: "All" },
   ]);
    const navigate = useNavigate();
-  const { folderName } = useParams();
 
 
   const API_URL = `${window.location.origin}/api/notes`;
@@ -246,7 +245,7 @@ export default function NoteApp() {
    if (opt.id === null) {
     navigate("/");
   } else {
-    navigate("/" + encodeURIComponent(opt.label.toLowerCase()));
+    navigate("/" + encodeURIComponent((opt.label || "").toLowerCase()));
   }
   };
 
