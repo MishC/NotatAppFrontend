@@ -59,7 +59,7 @@ export default function Noteform({ folders, handleAddNote }) {
       <div className="flex justify-center">
         <button
           onClick={addNote}
-          className="mt-10 mb-6 mx-auto bg-blue-500 hover:bg-blue-700 text-white p-5 px-10 font-bold rounded flex items-center"
+          className="mt-10 mb-6 mx-auto bg-cyan-500 hover:bg-cyan-600 text-white p-5 px-10 font-bold rounded flex items-center"
           style={{ paddingBottom: 0 }}
         >
           <span className="text-white font-bold text-2xl mb-5" aria-hidden="true" style={{ lineHeight: 1 }}>+</span>
