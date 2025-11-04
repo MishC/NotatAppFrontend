@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,navigate } from "react";
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
@@ -234,9 +234,16 @@ export default function NoteApp() {
     setIsModalOpen(true);
   };
 
+  //change url
+   const handleFolderClick = (opt={id,label}) => {
+    setActiveFolder(opt.id);
+    if (opt.id == null) navigate("/all");
+    else navigate("/" + encodeURIComponent(opt.label.toLowerCase()));
+  };
+
   return (
     <div className="relative min-h-screen w-full p-6">
-      {/* pozadie */}
+      {/* backgroud */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-[#EAEAEA] via-[#DBDBDB] to-[#ADA996]" />
 
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
@@ -278,9 +285,11 @@ export default function NoteApp() {
           {/* Folder menu */}
           <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
             {folderOptions.map((opt) => (
+
               <button
                 key={opt.id ?? "all"}
-                onClick={() => setActiveFolder(opt.id)}
+
+                onClick={() => handleFolderClick(opt)}
                 className={[
                   "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
                   activeFolder === opt.id

@@ -17,7 +17,7 @@ export default function Noteform({ folders, handleAddNote }) {
     }
     const payload = {
       ...newNote,
-      folderId: Number(newNote.folderId), // dôležité, ak backend chce int
+      folderId: Number(newNote.folderId), 
     };
     handleAddNote(payload);
     setNewNote({ title: '', content: '', folderId: '' });
