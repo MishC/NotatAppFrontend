@@ -1,11 +1,18 @@
 import NoteApp from "./components/NoteApp";
+import {Router,Routes, Route} from "react-router-dom";
 
 import "./App.css";
 
 function App() {
   return (
     <div className="App mb-[250px]">
-      <NoteApp />
+     <Router>
+      <Routes>
+        <Route path="/" element={<NoteApp />} />
+        <Redirect to='/' />
+
+     </Routes>
+     </Router>
     </div>
   );
 }
