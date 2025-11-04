@@ -238,12 +238,12 @@ export default function NoteApp() {
   };
 
   //change url
-   const handleFolderClick = (opt={id,label}) => {
+   const handleFolderClick = (opt) => {
     const currentUrl = window.location.href;
 
     setActiveFolder(opt.id);
     if (opt.id == null) navigate(currentUrl + "/all");
-    else navigate(currentUrl +"/" + encodeURIComponent(opt.label.toLowerCase()));
+    else navigate("/" + encodeURIComponent(opt.label.toLowerCase()));
   };
 
   return (
