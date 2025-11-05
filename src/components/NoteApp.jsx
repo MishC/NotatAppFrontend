@@ -314,6 +314,7 @@ export default function NoteApp() {
               //"columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
               // grid-layout
                 "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
+                
 
               "gap-6"].join(" ")}>
 
@@ -334,7 +335,13 @@ export default function NoteApp() {
                   onDrop={swapNotes}
                   onClick={() => switchModalState(note)}
                 />
-              ))}
+              ))}  
+              
+              {/*placeholder */}
+              {notes.length < 2 && (
+    <div className="invisible h-0 sm:block"></div>
+                )}
+
           </ul>
         </div>
       ))
