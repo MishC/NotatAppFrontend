@@ -248,7 +248,7 @@ export default function NoteApp() {
       <div
         className="fixed inset-0 -z-10"
         style={{
-          background: "linear-gradient(10.9deg, rgb(240, 213, 190) 38.1%, rgb(249, 240, 206) 55.5%, rgb(253, 244, 210) 67.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 103.6%)",
+          background: "linear-gradient(10.9deg, rgb(240, 213, 190) 8.1%, rgb(249, 240, 206) 16.5%, rgb(253, 244, 210) 27.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 100%)",
         }}
       />
 
