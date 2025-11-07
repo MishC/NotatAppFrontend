@@ -244,7 +244,7 @@ export default function NoteApp() {
 
   return (
     <div className="relative min-h-screen w-full p-6">
-      /* background */}
+      
         <div
           className="fixed inset-0 -z-10"
           style={{
