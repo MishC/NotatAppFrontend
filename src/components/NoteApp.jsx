@@ -244,72 +244,72 @@ export default function NoteApp() {
 
   return (
     <div className="relative min-h-screen w-full p-6">
-      {/* background */}
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background: "linear-gradient(10.9deg, rgb(240, 213, 190) 8.1%, rgb(249, 240, 206) 16.5%, rgb(253, 244, 210) 27.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 100%)",
-        }}
-      />
+      /* background */}
+        <div
+          className="fixed inset-0 -z-10"
+          style={{
+            background: "linear-gradient(10.9deg, rgb(240, 213, 190) 8.1%, rgb(249, 240, 206) 16.5%, rgb(253, 244, 210) 27.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 100%)",
+          }}
+        />
 
-      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
-        <div className="flex items-center gap-4 justify-center text-center">
-          <KanbanNoteIcon className="text-blue-600 text-center" />
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
-            Note Board
-          </h1>
-        </div>
-        <p className="mt-2 text-slate-600 text-lg text-center">
-          Organize your notes like cards on a board.
-        </p>
-        <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
-      </div>
-
-      <div className="mb-20">
-        <Noteform folders={folders} handleAddNote={handleAddNote} />
-      </div>
-
-      {error && (
-        <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
-          {error}
-        </div>
-      )}
-      {msg && (
-        <div className="msg text-emerald-700 bg-emerald-50 mt-8 p-4 rounded-xl mb-4 text-base border border-emerald-200">
-          {msg}
-        </div>
-      )}
-
-      {loading ? (
-        <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
-      ) : (notes.length === 0 ? (
-        <></>
-      ) : (
-        <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
-
-
-          <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
-            {folderOptions.map((opt) => (
-
-              <button
-                key={opt.id ?? "all"}
-
-                onClick={() => handleFolderClick(opt)}
-                className={[
-                  "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
-                  activeFolder === opt.id
-                    ? "bg-white text-blue-600 shadow-md"
-                    : "text-slate-700 hover:text-blue-600",
-                ].join(" ")}
-              >
-                {opt.label}
-              </button>
-            ))}
+        <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
+          <div className="flex items-center gap-4 justify-center text-center">
+            <KanbanNoteIcon className="text-blue-600 text-center" />
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
+          Note Board
+            </h1>
           </div>
-          <ul className={[
-              "w-full max-w-7xl",
-              "mx-auto bg-white rounded-b-2xl",
-              "py-6 px-5",
+          <p className="mt-2 text-slate-600 text-lg text-center">
+            Organize your notes like cards on a board.
+          </p>
+          <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+        </div>
+
+        <div className="mb-20">
+          <Noteform folders={folders} handleAddNote={handleAddNote} />
+        </div>
+
+        {error && (
+          <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
+            {error}
+          </div>
+        )}
+        {msg && (
+          <div className="msg text-emerald-700 bg-emerald-50 mt-8 p-4 rounded-xl mb-4 text-base border border-emerald-200">
+            {msg}
+          </div>
+        )}
+
+        {loading ? (
+          <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
+        ) : (notes.length === 0 ? (
+          <></>
+        ) : (
+          <div className="w-full md:max-w-7xl mx-auto mt-6 px-6">
+
+
+            <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+          {folderOptions.map((opt) => (
+
+            <button
+              key={opt.id ?? "all"}
+
+              onClick={() => handleFolderClick(opt)}
+              className={[
+            "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+            activeFolder === opt.id
+              ? "bg-white text-blue-600 shadow-md"
+              : "text-slate-700 hover:text-blue-600",
+              ].join(" ")}
+            >
+              {opt.label}
+            </button>
+          ))}
+            </div>
+            <ul className={[
+            "w-full max-w-7xl min-w-[60%]",
+            "mx-auto bg-white rounded-b-2xl",
+            "py-6 px-5",
               // multi-column layout
               //"columns-1 sm:columns-2 xl:columns-3 2xl:columns-4",
               // grid-layout
