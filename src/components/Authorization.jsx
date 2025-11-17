@@ -33,7 +33,8 @@ export default function Login() {
             <label><input type="radio" checked={channel==="email"} onChange={()=>setChannel("email")} /> Email code</label>
             <label><input type="radio" checked={channel==="sms"} onChange={()=>setChannel("sms")} /> SMS code</label>
           </div>
-          <button className="btn mt-4 bg-blue color-white" onClick={onStart}>Login</button>
+          <button className="btn mt-4 bg-blue-400 text-white mt-10 mb-6 mx-auto" onClick={onStart}>Login</button>
+
                     <p>New user? <Link  to="/subscribe">Subscribe</Link></p>
 
         </>
