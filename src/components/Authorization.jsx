@@ -33,14 +33,15 @@ export default function Login() {
             <label><input type="radio" checked={channel==="email"} onChange={()=>setChannel("email")} /> Email code</label>
             <label><input type="radio" checked={channel==="sms"} onChange={()=>setChannel("sms")} /> SMS code</label>
           </div>
-          <button className="btn mt-4" onClick={onStart}>Login</button>
+          <button className="btn mt-4 bg-blue color-white" onClick={onStart}>Login</button>
+                    <p>New user? <Link  to="/subscribe">Subscribe</Link></p>
+
         </>
       ) : (
         <>
           <p>We sent you a code via {channel}.</p>
           <input className="input" placeholder="Enter code" value={code} onChange={e=>setCode(e.target.value)} />
           <button className="btn mt-4" onClick={onVerify}>Verify</button>
-          <p>New user? <Link  to="/subscribe">Subscribe</Link></p>
         </>
       )}
     </div>
