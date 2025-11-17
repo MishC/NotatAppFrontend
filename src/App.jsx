@@ -8,6 +8,7 @@ function App() {
     <div className="App mb-[250px]">
         <Routes>
           <Route path="/" element={<NoteApp />} />
+          <Route path="auth" element={<Authorization/>}/>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     </div>
