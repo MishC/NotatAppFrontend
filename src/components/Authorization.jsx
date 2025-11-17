@@ -11,6 +11,7 @@ export default function Login() {
   const [channel, setChannel] = useState("email");
   const [flowId, setFlowId] = useState(null);
   const [code, setCode] = useState("");
+  const [msg,setMsg] = useState("");
 
   const onStart = async () => {
     const { flowId } = await loginStart(email, pwd, channel);
@@ -18,9 +19,24 @@ export default function Login() {
   };
 
   const onVerify = async () => {
-    const { accessToken } = await verify2fa(flowId, code, channel);
-    localStorage.setItem("accessToken", accessToken);
-    // now you can call your Note API with Authorization: Bearer ...
+    try {
+      const { accessToken } = await verify2fa(flowId, code, channel);
+
+      if (!accessToken) {
+        throw new Error("Invalid access token returned");
+      }
+
+      localStorage.setItem("accessToken", accessToken);
+      window.location.href = "/";
+    } catch (err) {
+      console.error("2FA verification failed:", err);
+      // Simple UI feedback - replace with nicer UI state if preferred
+     setMsg("Verification failed. Please check the code and try again.");
+      // Optionally clear the code to force re-entry:
+      setCode("");
+      // Optionally reset flowId to restart login:
+      setFlowId(null);
+    }
   };
 
   return (
