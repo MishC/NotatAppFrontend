@@ -11,7 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<NoteApp />} />
           <Route path="/auth" element={<Authorization/>}/>
-          <Route path="/subscribe" element={Subscribe}/>
+          <Route path="/subscribe" element={<Subscribe/>}/>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     </div>
