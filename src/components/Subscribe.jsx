@@ -1,6 +1,7 @@
 //import { useState } from "react";
 
-export default function Subscribe(){
+export default function Subscribe()
+{
 
     return (
     
