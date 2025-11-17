@@ -1,6 +1,9 @@
 // src/auth/Login.tsx
 import { useState } from "react";
 import { loginStart, verify2fa } from "../utils/auth.js";
+import { Link } from 'react-router-dom';
+
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -37,6 +40,7 @@ export default function Login() {
           <p>We sent you a code via {channel}.</p>
           <input className="input" placeholder="Enter code" value={code} onChange={e=>setCode(e.target.value)} />
           <button className="btn mt-4" onClick={onVerify}>Verify</button>
+          <p>New user? <Link  to="/subscribe">Subscribe</Link></p>
         </>
       )}
     </div>
