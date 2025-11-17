@@ -5,8 +5,8 @@ import { loginStart, verify2fa } from "../utils/auth.js";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
-  const [channel, setChannel] = useState<"email"|"sms">("email");
-  const [flowId, setFlowId] = useState<string | null>(null);
+  const [channel, setChannel] = useState("email");
+  const [flowId, setFlowId] = useState(null);
   const [code, setCode] = useState("");
 
   const onStart = async () => {
