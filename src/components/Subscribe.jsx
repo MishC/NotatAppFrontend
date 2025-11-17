@@ -1,6 +1,10 @@
-export default function Subscribe (){
+//import { useState } from "react";
 
-    return (<div className="Subscribe">
+export default function Subscribe(){
+
+    return (
+    
+    <div className="Subscribe">
 
 <form className="">
 <input type="text" placeholder="Email" className="border-1"/>
