@@ -21,11 +21,11 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow">
+    <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow my-auto border-2">
       {!flowId ? (
         <>
-          <input className="input" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
-          <input className="input" type="password" placeholder="Password" value={pwd} onChange={e=>setPwd(e.target.value)} />
+          <input className="input border-1" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+          <input className="input border-1" type="password" placeholder="Password" value={pwd} onChange={e=>setPwd(e.target.value)} />
           <div className="mt-2 flex gap-4">
             <label><input type="radio" checked={channel==="email"} onChange={()=>setChannel("email")} /> Email code</label>
             <label><input type="radio" checked={channel==="sms"} onChange={()=>setChannel("sms")} /> SMS code</label>
