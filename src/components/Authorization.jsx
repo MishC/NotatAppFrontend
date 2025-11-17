@@ -1,6 +1,6 @@
 // src/auth/Login.tsx
 import { useState } from "react";
-import { loginStart, verify2fa } from "../utils/auth.ts";
+import { loginStart, verify2fa } from "../utils/auth.js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
