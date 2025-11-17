@@ -1,5 +1,6 @@
 import NoteApp from "./components/NoteApp";
 import {  Routes, Route, Navigate } from "react-router-dom";
+import Authorization from "./components/Authorization";
 
 import "./App.css";
 
