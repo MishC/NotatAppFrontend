@@ -5,13 +5,19 @@ const API_NEW=`/api/auth/register`;
 export async function register(email, password, phoneNumber) {
   const r = await fetch(API_NEW, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify({ email, password, phoneNumber })
   });
-  if (!r.ok) throw new Error("Subscription failed");
+
+  if (!r.ok) {
+    const txt = await r.text();
+    throw new Error(txt || "Subscription failed");
+  }
+
   return r.json();
 }
+
 
 export async function loginStart(email, password, channel) {
   const r = await fetch(API_LOGIN, {
