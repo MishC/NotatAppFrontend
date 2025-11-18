@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loginStart, verify2fa } from "../utils/auth.js";
 import { Link, useNavigate } from 'react-router-dom'; 
 import "./Login.css";
@@ -12,8 +12,19 @@ export default function Login() {
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+   const [autoRunActive, setAutoRunActive] = useState(true);
+
 
   const navigate = useNavigate();
+  
+  useEffect(() => {
+   const cleanupTimer = setTimeout(() => {
+        setAutoRunActive(false);
+    }, 1000); 
+    return () => {
+        clearTimeout(cleanupTimer);
+    };
+    }, []);
 
   const onStart = async (e) => {
     e.preventDefault();
@@ -75,7 +86,9 @@ export default function Login() {
   return (
     <div className="Login">
       <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
-        
+         <h1 className={`text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
+            Sign Into Your Account
+          </h1>
         <form
           onSubmit={!flowId ? onStart : onVerify}
           // Larger form container (max-w-xl)

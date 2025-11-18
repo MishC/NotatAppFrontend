@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { register } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
@@ -11,8 +11,19 @@ export default function Subscribe() {
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const [autoRunActive, setAutoRunActive] = useState(true);
+
 
   const navigate = useNavigate();
+  
+  useEffect(() => {
+   const cleanupTimer = setTimeout(() => {
+        setAutoRunActive(false);
+    }, 1000); 
+    return () => {
+        clearTimeout(cleanupTimer);
+    };
+    }, []);
 
   const onSubscribe = async (e) => {
     e.preventDefault();
@@ -43,7 +54,7 @@ export default function Subscribe() {
   return (
     <div className="Subscribe">
       <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
-         <h1 className="text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover">
+         <h1 className={`text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
             Create Account
           </h1>
         <form
