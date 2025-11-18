@@ -40,13 +40,14 @@ export default function Subscribe() {
   };
 
   return (
-    <>
+    <div className="Subscribe">
 
-        <h1 className="text-2xl font-bold text-slate-800 text-center">
-          Create Your Account
-        </h1>
+     
 
     <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
+           <h1 className="text-2xl font-bold text-slate-800 text-center">
+          Create Your Account
+        </h1>
       <form
         onSubmit={onSubscribe}
         className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 space-y-6"
@@ -96,6 +97,6 @@ export default function Subscribe() {
         </button>
       </form>
     </div>
-    </>
+    </div>
   );
 }
