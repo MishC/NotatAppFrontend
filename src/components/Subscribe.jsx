@@ -56,7 +56,8 @@ export default function Subscribe() {
         <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
          <h1 className={`w-full md:w-auto text-[14px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-30 md:ml-30 xs:mb-5 xs:p-20 p-10  
           animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
-           Create Account
+          <span className="block lg:hidden">Sign Up</span>
+           <span className="hidden lg:inline-block">Create an Account</span>
           </h1>
         <form
           onSubmit={onSubscribe}
@@ -80,7 +81,7 @@ export default function Subscribe() {
           <input
             type="email"
             placeholder="Email Address"
-            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
+            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -96,7 +97,7 @@ export default function Subscribe() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
+            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
             value={pwd}
             onChange={(e) => setPwd(e.target.value)}
           />
