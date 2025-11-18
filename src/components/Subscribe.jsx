@@ -53,14 +53,15 @@ export default function Subscribe() {
 
   return (
     <div className="Subscribe">
-      <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
-         <h1 className={`text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
-            Create Account
+        <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
+         <h1 className={`w-full md:w-auto text-[14px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-30 md:ml-30 xs:mb-5 xs:p-20 p-10  
+          animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
+           Create Account
           </h1>
         <form
           onSubmit={onSubscribe}
           // Larger form container (max-w-xl)
-          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6"
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 md:mr-20"
         >
        
           {err && (

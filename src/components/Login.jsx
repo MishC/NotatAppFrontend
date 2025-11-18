@@ -85,16 +85,16 @@ export default function Login() {
 
   return (
     <div className="Login">
-      <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
-         <h1 className={`text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
-            Sign Into Your Account
+           <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
+         <h1 className={`w-full md:w-auto text-[12px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-20 md:ml-30 xs:mb-5 p-10  
+          animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
+           <span className="block lg:hidden">Sign In</span>
+           <span className="hidden lg:inline-block">Sign Into Your Account</span>
           </h1>
         <form
           onSubmit={!flowId ? onStart : onVerify}
-          // Larger form container (max-w-xl)
-          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6"
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-lg md:mr-30"
         >
-          {/* Heading set to text-2xl */}
          
 
           {err && (
@@ -104,7 +104,7 @@ export default function Login() {
           )}
 
           {msg && (
-            <div className="text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+            <div className="text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-lg">
               {msg}
             </div>
           )}
@@ -116,14 +116,14 @@ export default function Login() {
               <input
                 type="email"
                 placeholder="Email Address"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
+                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
+                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
                 value={pwd}
                 onChange={e => setPwd(e.target.value)}
               />
