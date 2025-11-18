@@ -45,7 +45,7 @@ export default function Subscribe() {
         onSubmit={onSubscribe}
         className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 space-y-6"
       >
-        <h1 className="text-3xl font-bold text-slate-800 text-center">
+        <h1 className="text-2xl font-bold text-slate-800 text-center">
           Create Your Account
         </h1>
 
