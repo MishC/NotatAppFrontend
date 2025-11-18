@@ -1,7 +1,7 @@
-// src/auth/Login.tsx
 import { useState } from "react";
 import { loginStart, verify2fa } from "../utils/auth.js";
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom'; 
+import "./Login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,13 +10,13 @@ export default function Login() {
   const [flowId, setFlowId] = useState(null);
   const [code, setCode] = useState("");
   const [msg, setMsg] = useState("");
-  const [err, setErr] = useState(""); // Add error state for consistency
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const onStart = async (e) => {
-    e.preventDefault(); // Prevent form submission/page reload
+    e.preventDefault();
     setErr("");
     setMsg("");
     setLoading(true);
@@ -39,7 +39,7 @@ export default function Login() {
   };
 
   const onVerify = async (e) => {
-    e.preventDefault(); // Prevent form submission/page reload
+    e.preventDefault();
     setErr("");
     setMsg("");
     setLoading(true);
@@ -60,15 +60,13 @@ export default function Login() {
       localStorage.setItem("accessToken", accessToken);
       setMsg("Login successful! Redirecting...");
       
-      // Navigate to homepage after successful verification
       setTimeout(() => {
         navigate("/");
       }, 500);
 
     } catch (error) {
       setErr(error.message || "Verification failed. Please check the code and try again.");
-      setCode(""); // Clear the code to force re-entry
-      // Optionally, you might want to reset flowId here if you want the user to restart
+      setCode("");
     } finally {
       setLoading(false);
     }
@@ -77,13 +75,14 @@ export default function Login() {
   return (
     <div className="Login">
       <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
+        
         <form
-          onSubmit={!flowId ? onStart : onVerify} // Use form submission for consistency and accessibility
-          className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 space-y-6"
+          onSubmit={!flowId ? onStart : onVerify}
+          // Larger form container (max-w-xl)
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6"
         >
-          <h1 className="text-2xl font-bold text-slate-800 text-center">
-            Sign In to Your Account
-          </h1>
+          {/* Heading set to text-2xl */}
+         
 
           {err && (
             <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
@@ -100,37 +99,52 @@ export default function Login() {
           {!flowId ? (
             // --- Login Start Form ---
             <>
+              {/* Larger Input Fields (p-4) */}
               <input
                 type="email"
-                placeholder="Email"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base" // p-4 for bigger size
+                placeholder="Email Address"
+                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base" // p-4 for bigger size
+                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
                 value={pwd}
                 onChange={e => setPwd(e.target.value)}
               />
               
-              <div className="flex gap-6 pt-2 pb-4">
-                <p className="text-slate-600 font-medium">Verification Channel:</p>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input type="radio" name="channel" checked={channel === "email"} onChange={() => setChannel("email")} className="form-radio text-blue-600" />
-                  <span className="text-slate-700">Email code</span>
+              <div className="flex gap-8 pt-2 pb-4 items-center">
+                <p className="text-slate-600 font-medium whitespace-nowrap">Verification Channel:</p>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="channel" 
+                    checked={channel === "email"} 
+                    onChange={() => setChannel("email")} 
+                    // Classes for bigger radio button
+                    className="form-radio text-blue-600 w-5 h-5" 
+                  />
+                  <span className="text-slate-700">Email</span>
                 </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input type="radio" name="channel" checked={channel === "sms"} onChange={() => setChannel("sms")} className="form-radio text-blue-600" />
-                  <span className="text-slate-700">SMS code</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="channel" 
+                    checked={channel === "sms"} 
+                    onChange={() => setChannel("sms")} 
+                    // Classes for bigger radio button
+                    className="form-radio text-blue-600 w-5 h-5" 
+                  />
+                  <span className="text-slate-700">SMS</span>
                 </label>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-3 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
               >
                 {loading ? "Processing..." : "Login"}
               </button>
@@ -148,15 +162,15 @@ export default function Login() {
               <input
                 type="text"
                 placeholder="Enter 6-digit code"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base text-center tracking-widest"
+                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-2xl text-center tracking-widest font-mono"
                 value={code}
                 onChange={e => setCode(e.target.value)}
-                maxLength={6} // Typically 2FA codes are 6 digits
+                maxLength={6}
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-3 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
               >
                 {loading ? "Verifying..." : "Verify Code"}
               </button>

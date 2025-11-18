@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS pre efekt pomalého magentového lúča (4s) */
+
+.animated-color-hover {
+  /* Predvolená farba textu: Čierna (alebo veľmi tmavá) */
+  color: #1f2937; 
+  transition: color 0.5s ease;
+  
+  /* Gradient: Čierna -> Magenta -> Čierna */
+  background: linear-gradient(
+    90deg,
+    #1f2937 0%,         /* Pevná tmavá farba na začiatku */
+    #ff0000,            /* Žiarivá Magenta */
+    #1f2937 100%        /* Pevná tmavá farba na konci */
+  );
+  
+  background-size: 400% auto; 
+  background-clip: text;
+  -webkit-background-clip: text;
+  
+  /* PREDVOLENÁ POZÍCIA: Začína lúč schovaný vpravo (mimo zorného poľa) */
+  background-position: 100% 50%; 
+  animation: none;
+}
+
+/* Pri hoveri */
+.animated-color-hover:hover {
+  /* Nastaví text na priehľadný, aby sa zobrazil gradient na pozadí */
+  color: transparent; 
+  /* Spustí animáciu, ktorá prebehne z 100% do -300% (prechod sprava doľava) */
+  animation: magenta-reverse-sweep-anim 5s linear 1 forwards; 
+}
+
+/* NOVÉ Keyframes pre animáciu posúvania magentového lúča sprava doľava */
+@keyframes magenta-reverse-sweep-anim {
+  0% {
+    /* Začína lúč schovaný vpravo */
+    background-position: 100% 50%;
+  }
+  100% {
+    /* Končí lúč schovaný vľavo */
+    background-position: -300% 50%;
+  }
+}

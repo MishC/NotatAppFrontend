@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { register } from "../utils/auth";
-import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
+
 
 export default function Subscribe() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export default function Subscribe() {
   const navigate = useNavigate();
 
   const onSubscribe = async (e) => {
-    e.preventDefault(); // prevent page reload
+    e.preventDefault();
     setErr("");
     setMsg("");
     setLoading(true);
@@ -29,12 +30,11 @@ export default function Subscribe() {
       const res = await register(email, pwd, phone);
       setMsg("Registration successful! 🎉 Redirecting to login...");
 
-      // small delay so user sees success
       setTimeout(() => {
-        navigate("/auth"); // Assuming '/auth' is the login route
+        navigate("/auth");
       }, 1500);
     } catch (error) {
-      setErr(error.message || "Subscription failed. Please try again.");
+      setErr(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -43,16 +43,15 @@ export default function Subscribe() {
   return (
     <div className="Subscribe">
       <div className="w-full min-h-screen flex items-center justify-center bg-slate-100 p-6">
+         <h1 className="text-2xl font-bold text-slate-800 text-center my-auto mr-60 animated-color-hover">
+            Create Account
+          </h1>
         <form
           onSubmit={onSubscribe}
-          className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 space-y-6"
+          // Larger form container (max-w-xl)
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6"
         >
-          {/* Nicer Title Placement */}
-          <h1 className="text-3xl font-extrabold text-slate-800 text-center mb-6">
-            Create Your Account
-          </h1>
-      
-          
+       
           {err && (
             <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
               {err}
@@ -65,7 +64,7 @@ export default function Subscribe() {
             </div>
           )}
 
-          {/* Bigger Input Fields (p-4) */}
+          {/* Larger Input Fields (p-4) */}
           <input
             type="email"
             placeholder="Email Address"
@@ -76,7 +75,7 @@ export default function Subscribe() {
 
           <input
             type="tel"
-            placeholder="Phone Number (e.g., +1 555-123-4567)"
+            placeholder="Phone Number"
             className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -84,7 +83,7 @@ export default function Subscribe() {
 
           <input
             type="password"
-            placeholder="Choose a Secure Password"
+            placeholder="Password"
             className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
             value={pwd}
             onChange={(e) => setPwd(e.target.value)}
@@ -93,7 +92,7 @@ export default function Subscribe() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-3 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
           >
             {loading ? "Processing..." : "Subscribe"}
           </button>
