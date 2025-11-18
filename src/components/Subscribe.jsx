@@ -51,9 +51,7 @@ export default function Subscribe() {
           <h1 className="text-3xl font-extrabold text-slate-800 text-center mb-6">
             Create Your Account
           </h1>
-          <p className="text-center text-slate-600 mb-6">
-            Join us to get started with our services.
-          </p>
+      
           
           {err && (
             <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
