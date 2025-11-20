@@ -81,7 +81,7 @@ export default function Subscribe() {
           <input
             type="email"
             placeholder="Email Address"
-            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
+            className="w-full p-4   rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -89,7 +89,7 @@ export default function Subscribe() {
           <input
             type="tel"
             placeholder="Phone Number"
-            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-base"
+            className="w-full p-4  rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
@@ -97,7 +97,7 @@ export default function Subscribe() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
+            className="w-full p-4  rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
             value={pwd}
             onChange={(e) => setPwd(e.target.value)}
           />
@@ -105,7 +105,7 @@ export default function Subscribe() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
           >
             {loading ? "Processing..." : "Subscribe"}
           </button>

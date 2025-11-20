@@ -128,7 +128,7 @@ export default function Login() {
                 onChange={e => setPwd(e.target.value)}
               />
               
-              <div className="flex gap-8 pt-2 pb-4 items-center">
+              <div className="flex gap-8 pt-3 pb-1 items-center">
                 <p className="text-slate-600 font-medium whitespace-nowrap">Verification Channel:</p>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input 
@@ -139,7 +139,7 @@ export default function Login() {
                     // Classes for bigger radio button
                     className="form-radio text-blue-600 w-5 h-5" 
                   />
-                  <span className="text-slate-700">Email</span>
+                  <span className="text-slate-700 text-xl">Email</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input 
@@ -150,14 +150,14 @@ export default function Login() {
                     // Classes for bigger radio button
                     className="form-radio text-blue-600 w-5 h-5" 
                   />
-                  <span className="text-slate-700">SMS</span>
+                  <span className="text-slate-700 text-xl">SMS</span>
                 </label>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
               >
                 {loading ? "Processing..." : "Login"}
               </button>
