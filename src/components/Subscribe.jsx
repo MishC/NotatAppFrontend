@@ -39,7 +39,7 @@ export default function Subscribe() {
       }
 
       const res = await register(email, pwd, phone);
-      setMsg("Registration successful! 🎉 Redirecting to login...");
+      setMsg("Registration successful! Redirecting to login...");
 
       setTimeout(() => {
         navigate("/auth");
