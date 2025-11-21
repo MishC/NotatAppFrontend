@@ -1,6 +1,7 @@
 // src/NoteApp.jsx
 import { useState, useEffect, useMemo } from "react";
 import { createNotesApi } from "../utils/notesApi";
+import Header from "./Header";
 
 import Card from "./Card";
 import Modal from "./Modal";
@@ -43,6 +44,7 @@ export default function NoteApp() {
         setSelectedNote,
         setIsModalOpen,
         activeFolder,
+        
       }),
     // Recreate when these change to avoid stale closures:
     [API_URL, API_URL2, notes, folders, selectedNote, activeFolder]
@@ -180,6 +182,9 @@ export default function NoteApp() {
           </ul>
         </div>
       )}
+
+    <Header userName={user.name} onLogout={handleLogout} />
+
 
       {isModalOpen && selectedNote && (
         <Modal
