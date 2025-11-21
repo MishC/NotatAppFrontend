@@ -21,7 +21,7 @@ export default function NoteApp() {
   const [folderOptions, setFolderOptions] = useState([
     { id: null, label: "All" },
   ]);
-
+const [user, setUser]=useState({});
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
@@ -182,7 +182,7 @@ export default function NoteApp() {
           </ul>
         </div>
       )}
- user? <Header userName={user.name} onLogout={handleLogout} />:<></>
+{ user? <Header userName={user.name} onLogout={handleLogout} />:<></>}
 
 
       {isModalOpen && selectedNote && (
