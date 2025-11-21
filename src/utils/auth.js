@@ -1,7 +1,8 @@
+import { Navigate } from "react-router";
 const API_LOGIN = `${window.location.origin}/api/auth/login`;
 const API_OTC = `${window.location.origin}/api/auth/verify-2fa`;
 const API_NEW=`/api/auth/register`;
-
+navigate
 export async function register(email, password, phoneNumber) {
   const r = await fetch(API_NEW, {
     method: "POST",
@@ -45,7 +46,8 @@ export async function handleLogout() {
 await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
 localStorage.removeItem("accessToken");
 accessToken = null;
-window.location.href = "/login";
+navigate("/login");
+
 
 }
 
