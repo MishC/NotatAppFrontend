@@ -182,8 +182,7 @@ export default function NoteApp() {
           </ul>
         </div>
       )}
-
-    <Header userName={user.name} onLogout={handleLogout} />
+ user? <Header userName={user.name} onLogout={handleLogout} />:<></>
 
 
       {isModalOpen && selectedNote && (

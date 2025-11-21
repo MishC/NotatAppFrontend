@@ -9,6 +9,7 @@ function App() {
   return (
     <div className="App mb-[250px]">
         <Routes>
+
           <Route path="/" element={<NoteApp />} />
           <Route path="/auth" element={<Login/>}/>
           <Route path="/subscribe" element={<Subscribe/>}/>
