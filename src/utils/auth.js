@@ -40,3 +40,12 @@ export async function verify2fa(flowId, code, channel) {
   if (!r.ok) throw new Error("Invalid code");
   return r.json();
 }
+
+export async function handleLogout() {
+await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+localStorage.removeItem("accessToken");
+accessToken = null;
+window.location.href = "/login";
+
+}
+
