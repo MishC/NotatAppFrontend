@@ -1,8 +1,11 @@
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router";
 const API_LOGIN = `${window.location.origin}/api/auth/login`;
 const API_OTC = `${window.location.origin}/api/auth/verify-2fa`;
 const API_NEW=`/api/auth/register`;
-navigate
+
+  const navigate = useNavigate();
+
+
 export async function register(email, password, phoneNumber) {
   const r = await fetch(API_NEW, {
     method: "POST",
