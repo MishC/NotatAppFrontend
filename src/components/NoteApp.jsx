@@ -7,6 +7,7 @@ import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
+import { handleLogout } from "../utils/auth";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);

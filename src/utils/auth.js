@@ -1,9 +1,7 @@
-import { useNavigate } from "react-router";
 const API_LOGIN = `${window.location.origin}/api/auth/login`;
 const API_OTC = `${window.location.origin}/api/auth/verify-2fa`;
 const API_NEW=`/api/auth/register`;
 
-  const navigate = useNavigate();
 
 
 export async function register(email, password, phoneNumber) {
@@ -49,8 +47,7 @@ export async function handleLogout() {
 await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
 localStorage.removeItem("accessToken");
 accessToken = null;
-navigate("/login");
-
+window.location.hreft("/login")
 
 }
 

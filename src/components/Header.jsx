@@ -19,7 +19,7 @@ export default function Header({ userName, onLogout }) {
 
       {/* Right side - User Info + Logout */}
       <div className="flex items-center gap-4">
-        <span classname="text-lg font-semibold text-white/95">
+        <span className="text-lg font-semibold text-white/95">
           {userName}
         </span>
 
