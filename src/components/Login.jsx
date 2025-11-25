@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { loginStart, verify2fa } from "../utils/auth.js";
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { setAuthedUser, setUser } from "../reducers/authSlice";
+import PasswordField from "./PasswordField.jsx";
+import AuthButton from "./auth/AuthButton.jsx";
+
+
 import "./Login.css";
 
 export default function Login() {
@@ -12,19 +18,21 @@ export default function Login() {
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-   const [autoRunActive, setAutoRunActive] = useState(true);
+  const [autoRunActive, setAutoRunActive] = useState(true);
 
 
   const navigate = useNavigate();
-  
+  const dispatch = useDispatch();
+
+
   useEffect(() => {
-   const cleanupTimer = setTimeout(() => {
-        setAutoRunActive(false);
-    }, 1000); 
+    const cleanupTimer = setTimeout(() => {
+      setAutoRunActive(false);
+    }, 1000);
     return () => {
-        clearTimeout(cleanupTimer);
+      clearTimeout(cleanupTimer);
     };
-    }, []);
+  }, []);
 
   const onStart = async (e) => {
     e.preventDefault();
@@ -69,11 +77,16 @@ export default function Login() {
       }
 
       localStorage.setItem("accessToken", accessToken);
+
+      dispatch(setAuthedUser(email));          // napr. e-mail ako "id" pre teraz
+      dispatch(setUser({ email }));            // môžeš neskôr pridať name, id z JWT
+
       setMsg("Login successful! Redirecting...");
-      
+
       setTimeout(() => {
         navigate("/");
       }, 500);
+
 
     } catch (error) {
       setErr(error.message || "Verification failed. Please check the code and try again.");
@@ -85,17 +98,17 @@ export default function Login() {
 
   return (
     <div className="Login">
-           <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
-         <h1 className={`w-full md:w-auto text-[12px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-20 md:ml-30 xs:mb-5 p-10  
-          animated-color-hover ${autoRunActive ? 'auto-run' : '' }`}>
-           <span className="block lg:hidden">Sign In</span>
-           <span className="hidden lg:inline-block">Sign Into Your Account</span>
-          </h1>
+      <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
+        <h1 className={`w-full md:w-auto text-[12px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-20 md:ml-30 xs:mb-5 p-10  
+          animated-color-hover ${autoRunActive ? 'auto-run' : ''}`}>
+          <span className="block lg:hidden">Sign In</span>
+          <span className="hidden lg:inline-block">Sign Into Your Account</span>
+        </h1>
         <form
           onSubmit={!flowId ? onStart : onVerify}
           className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-lg md:mr-30"
         >
-         
+
 
           {err && (
             <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
@@ -120,48 +133,42 @@ export default function Login() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
+              <PasswordField
                 value={pwd}
-                onChange={e => setPwd(e.target.value)}
+                onChange={(e) => setPwd(e.target.value)}
+                placeholder="Password"
               />
-              
+
               <div className="flex gap-8 pt-3 pb-1 items-center">
                 <p className="text-slate-600 font-medium whitespace-nowrap">Verification Channel:</p>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="channel" 
-                    checked={channel === "email"} 
-                    onChange={() => setChannel("email")} 
+                  <input
+                    type="radio"
+                    name="channel"
+                    checked={channel === "email"}
+                    onChange={() => setChannel("email")}
                     // Classes for bigger radio button
-                    className="form-radio text-blue-600 w-5 h-5" 
+                    className="form-radio text-blue-600 w-5 h-5"
                   />
                   <span className="text-slate-700 text-xl">Email</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="channel" 
-                    checked={channel === "sms"} 
-                    onChange={() => setChannel("sms")} 
+                  <input
+                    type="radio"
+                    name="channel"
+                    checked={channel === "sms"}
+                    onChange={() => setChannel("sms")}
                     // Classes for bigger radio button
-                    className="form-radio text-blue-600 w-5 h-5" 
+                    className="form-radio text-blue-600 w-5 h-5"
                   />
                   <span className="text-slate-700 text-xl">SMS</span>
                 </label>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
-              >
-                {loading ? "Processing..." : "Login"}
-              </button>
-              
+              <AuthButton loading={loading} label="Login" />
+
+
+
               <p className="text-center text-slate-600 pt-2">
                 New user? <Link to="/subscribe" className="text-orange-500 hover:text-orange-700 font-semibold">Create an Account</Link>
               </p>
@@ -180,13 +187,11 @@ export default function Login() {
                 onChange={e => setCode(e.target.value)}
                 maxLength={6}
               />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed mt-6"
-              >
-                {loading ? "Verifying..." : "Verify Code"}
-              </button>
+
+
+              <AuthButton loading={loading} label="Verify Code" loadingLabel="Verifying..." />
+
+
               <p className="text-center text-sm text-slate-500 cursor-pointer hover:text-orange-500" onClick={() => setFlowId(null)}>
                 Go back to login
               </p>
