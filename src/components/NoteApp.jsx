@@ -1,6 +1,10 @@
 // src/NoteApp.jsx
 import { useState, useEffect, useMemo } from "react";
 import { createNotesApi } from "../utils/notesApi";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { resetAuth } from "../reducers/authSlice";
+
 import Header from "./Header";
 
 import Card from "./Card";
@@ -22,9 +26,18 @@ export default function NoteApp() {
   const [folderOptions, setFolderOptions] = useState([
     { id: null, label: "All" },
   ]);
-const [user, setUser]=useState({});
+//
+
+  const user = useSelector((state) => state.auth.user);
+const dispatch = useDispatch();
+const navigate = useNavigate();
+
+
+  //
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
+
+  //
 
   // Build the API object; 
   const api = useMemo(
@@ -75,6 +88,15 @@ const [user, setUser]=useState({});
     return () => clearTimeout(t);
   }, [error, msg]);
 
+  //guard -> if not accesstoken navigate to login page /auth
+  useEffect(() => {
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    navigate("/auth");
+  }
+}, [navigate]);
+
+
   const switchModalState = (note) => {
     if (!note) {
       setIsModalOpen(false);
@@ -89,8 +111,26 @@ const [user, setUser]=useState({});
     setActiveFolder(opt.id);
   };
 
+  const onLogoutClick = async () => {
+    try {
+      await handleLogout();
+    } finally {
+      dispatch(resetAuth());
+      navigate("/auth");
+    }
+  };
+
+
+
   return (
     <div className="relative min-h-screen w-full p-6">
+      {user && (
+  <Header 
+    userName={user.email}  
+    onLogout={onLogoutClick}
+  />
+)}
+
       <div
         className="fixed inset-0 -z-10"
         style={{
@@ -183,7 +223,6 @@ const [user, setUser]=useState({});
           </ul>
         </div>
       )}
-{ user? <Header userName={user.name} onLogout={handleLogout} />:<></>}
 
 
       {isModalOpen && selectedNote && (
