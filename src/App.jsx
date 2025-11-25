@@ -1,20 +1,65 @@
+// src/App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
 import NoteApp from "./components/NoteApp";
-import {  Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
-import Subscribe from   "./components/Subscribe";
-
+import Subscribe from "./components/Subscribe";
 import "./App.css";
+
+// Main page navigation with valid token only
+function RequireAuth({ children }) {
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    return <Navigate to="/auth" replace />;
+  }
+  return children;
+}
+
+// Login/Subscribe if not logged in
+function AuthOnly({ children }) {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
 
 function App() {
   return (
     <div className="App mb-[250px]">
-        <Routes>
+      <Routes>
+        {/* Main */}
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <NoteApp />
+            </RequireAuth>
+          }
+        />
 
-          <Route path="/" element={<NoteApp />} />
-          <Route path="/auth" element={<Login/>}/>
-          <Route path="/subscribe" element={<Subscribe/>}/>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        {/* Login */}
+        <Route
+          path="/auth"
+          element={
+            <AuthOnly>
+              <Login />
+            </AuthOnly>
+          }
+        />
+
+        {/* Registation */}
+        <Route
+          path="/subscribe"
+          element={
+            <AuthOnly>
+              <Subscribe />
+            </AuthOnly>
+          }
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }
