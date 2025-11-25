@@ -3,7 +3,7 @@ import { register } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 
 import AuthButton from "./auth/AuthButton";
-import PasswordField from "./PasswordField";
+import PasswordField from "./auth/PasswordField";
 import "./Login.css";
 
 

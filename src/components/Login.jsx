@@ -3,7 +3,7 @@ import { loginStart, verify2fa } from "../utils/auth.js";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { setAuthedUser, setUser } from "../reducers/authSlice";
-import PasswordField from "./PasswordField.jsx";
+import PasswordField from "./auth/PasswordField.jsx";
 import AuthButton from "./auth/AuthButton.jsx";
 
 
