@@ -44,10 +44,7 @@ export async function verify2fa(flowId, code, channel) {
 }
 
 export async function handleLogout() {
-await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-localStorage.removeItem("accessToken");
-accessToken = null;
-window.location.hreft("/login")
-
+  await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  localStorage.removeItem("accessToken");
 }
 
