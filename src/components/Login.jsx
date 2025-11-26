@@ -179,7 +179,7 @@ export default function Login() {
 
 
 
-              <p className="text-center text-slate-600 pt-2">
+              <p className="text-center text-slate-600 pt-2 text-base">
                 New user? <Link to="/subscribe" className="text-orange-500 hover:text-orange-700 font-semibold">Create an Account</Link>
               </p>
             </>
