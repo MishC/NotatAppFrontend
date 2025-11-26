@@ -1,4 +1,11 @@
-// src/components/auth/AuthTitle.jsx
+/* Types
+interface AuthTitleProps {
+  smallText: string;
+  bigText: string;
+  autoRunActive: boolean;
+}
+
+*/
 export default function AuthTitle({ smallText, bigText, autoRunActive }) {
   return (
     <h1
