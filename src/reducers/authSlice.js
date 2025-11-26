@@ -1,10 +1,10 @@
-// src/store/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  authedUser: null,  // napr. id usera
-  user: null,        // detail user objekt (email, name, atď.)
-  loading: true,     // kým zistíme, či je user prihlásený (kontrola tokenu)
+  authedUser: null,
+  user: null,
+  loading: true,
+  guest: false,   
 };
 
 const authSlice = createSlice({
@@ -12,21 +12,27 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthedUser(state, action) {
-      state.authedUser = action.payload; // napr. user id alebo null
+      state.authedUser = action.payload;
     },
     setUser(state, action) {
-      state.user = action.payload; // napr. { id, email, name } alebo null
+      state.user = action.payload;
     },
     setLoading(state, action) {
       state.loading = action.payload;
+    },
+    setGuest(state, action) {     
+      state.guest = action.payload;
     },
     resetAuth(state) {
       state.authedUser = null;
       state.user = null;
       state.loading = false;
+      state.guest = false;
     },
   },
 });
 
-export const { setAuthedUser, setUser, setLoading, resetAuth } = authSlice.actions;
+export const { setAuthedUser, setUser, setLoading, resetAuth, setGuest } =
+  authSlice.actions;
+
 export default authSlice.reducer;
