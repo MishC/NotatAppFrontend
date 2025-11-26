@@ -17,7 +17,6 @@ export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [lengthNotes, setLengthNotes] = useState(0);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,11 +25,13 @@ export default function NoteApp() {
   const [folderOptions, setFolderOptions] = useState([
     { id: null, label: "All" },
   ]);
-//
+  //
 
   const user = useSelector((state) => state.auth.user);
-const dispatch = useDispatch();
-const navigate = useNavigate();
+  const guest = useSelector((state) => state.auth.guest);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
 
   //
@@ -58,7 +59,7 @@ const navigate = useNavigate();
         setSelectedNote,
         setIsModalOpen,
         activeFolder,
-        
+
       }),
     // Recreate when these change to avoid stale closures:
     [API_URL, API_URL2, notes, folders, selectedNote, activeFolder]
@@ -90,11 +91,72 @@ const navigate = useNavigate();
 
   //guard -> if not accesstoken navigate to login page /auth
   useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    navigate("/auth");
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/auth");
+    }
+  }, [navigate]);
+
+  // Guest mode: Initial load
+useEffect(() => {
+  if (guest) {
+    //  storage
+    const savedNotes = JSON.parse(
+      localStorage.getItem("noteapp_guest_notes") || "[]"
+    );
+    const savedFolders = JSON.parse(
+      localStorage.getItem("noteapp_guest_folders") || "[]"
+    );
+
+    setNotes(savedNotes);
+    setFolders(savedFolders);
+
+    setFolderOptions([
+      { id: null, label: "All" },
+      ...savedFolders.map((f) => ({ id: f.id, label: f.name })),
+    ]);
+
+    setLoading(false);
+    return;
   }
-}, [navigate]);
+
+  (async () => {
+    await api.fetchNotes(activeFolder);
+    await api.fetchFolders();
+  })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [guest]);
+//Sync of notes and folders in  local starage
+useEffect(() => {
+  if (!guest) return;
+  localStorage.setItem("noteapp_guest_notes", JSON.stringify(notes));
+}, [guest, notes]);
+
+useEffect(() => {
+  if (!guest) return;
+  localStorage.setItem("noteapp_guest_folders", JSON.stringify(folders));
+}, [guest, folders]);
+//
+
+//Guest addnote
+
+const handleAddNoteLocal = async (title, content, folderId) => {
+  const newNote = {
+    id: Date.now(),       // jednoduché id pre local mode
+    title,
+    content,
+    folderId: folderId ?? null,
+    orderIndex: notes.length,
+    createdAt: new Date().toISOString(),
+  };
+  setNotes((prev) => [...prev, newNote]);
+};
+
+const handleDeleteNoteLocal = async (title) => {
+ 
+  setNotes(prev => prev.filter(n => n.id !== id))
+};
+
 
 
   const switchModalState = (note) => {
@@ -125,11 +187,11 @@ const navigate = useNavigate();
   return (
     <div className="relative min-h-screen w-full p-6">
       {user && (
-  <Header 
-    userName={user.email}  
-    onLogout={onLogoutClick}
-  />
-)}
+        <Header
+          userName={user.email}
+          onLogout={onLogoutClick}
+        />
+      )}
 
       <div
         className="fixed inset-0 -z-10"
@@ -153,7 +215,11 @@ const navigate = useNavigate();
       </div>
 
       <div className="mb-20">
-        <Noteform folders={folders} handleAddNote={api.handleAddNote} />
+        <Noteform
+  folders={folders}
+  handleAddNote={guest ? handleAddNoteLocal : api.handleAddNote}
+/>
+
       </div>
 
       {error && (
