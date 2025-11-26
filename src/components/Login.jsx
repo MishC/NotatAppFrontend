@@ -9,9 +9,10 @@ import AuthTitle from "./auth/AuthTitle.jsx";
 import AuthAlert from "./auth/AuthAlert.jsx";
 import BaseInputField from "./auth/BaseInputField.jsx";
 import EmailIcon from "./icons/EmailIcon.jsx";
-
+import RadioOption from "./auth/RadioOption.jsx";
 
 import "./Login.css";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -120,43 +121,44 @@ export default function Login() {
             // --- Login Start Form ---
             <>
               {/* Larger Input Fields (p-4) */}
-                <BaseInputField
-                          type="email"
-                          placeholder="Email Address"
-                         value={email}
-                         onChange={(e) => setEmail(e.target.value)}
-                          rightIcon={<EmailIcon />}    
-                       />
-              <PasswordField
+              <BaseInputField
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                rightIcon={<EmailIcon />}
+              />
+              <BaseInputField
+                type={showPwd ? "text" : "password"}
+                placeholder="Password"
                 value={pwd}
                 onChange={(e) => setPwd(e.target.value)}
-                placeholder="Password"
-              />
+                rightIcon={
+                  <EyeIcon isOpen={showPwd} onClick={() => setShowPwd((v) => !v)} />
+                } />
 
               <div className="flex gap-8 pt-3 pb-1 items-center">
-                <p className="text-slate-600 font-medium whitespace-nowrap">Verification Channel:</p>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="channel"
-                    checked={channel === "email"}
-                    onChange={() => setChannel("email")}
-                    className="form-radio text-blue-600 w-5 h-5"
-                  />
-                  <span className="text-slate-700 text-xl">Email</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="channel"
-                    checked={channel === "sms"}
-                    onChange={() => setChannel("sms")}
-                    // Classes for bigger radio button
-                    className="form-radio text-blue-600 w-5 h-5"
-                  />
-                  <span className="text-slate-700 text-xl">SMS</span>
-                </label>
+                <p className="text-slate-600 font-medium whitespace-nowrap">
+                  Verification Channel:
+                </p>
+
+                <RadioOption
+                  label="Email"
+                  name="channel"
+                  value="email"
+                  checked={channel === "email"}
+                  onChange={() => setChannel("email")}
+                />
+
+                <RadioOption
+                  label="SMS"
+                  name="channel"
+                  value="sms"
+                  checked={channel === "sms"}
+                  onChange={() => setChannel("sms")}
+                />
               </div>
+
 
               <AuthButton loading={loading} label="Login" />
 
