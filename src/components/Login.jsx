@@ -5,6 +5,10 @@ import { useDispatch } from "react-redux";
 import { setAuthedUser, setUser } from "../reducers/authSlice";
 import PasswordField from "./auth/PasswordField.jsx";
 import AuthButton from "./auth/AuthButton.jsx";
+import AuthTitle from "./auth/AuthTitle.jsx";
+import AuthAlert from "./auth/AuthAlert.jsx";
+import BaseInputField from "./auth/BaseInputField.jsx";
+import EmailIcon from "./icons/EmailIcon.jsx";
 
 
 import "./Login.css";
@@ -99,40 +103,30 @@ export default function Login() {
   return (
     <div className="Login">
       <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
-        <h1 className={`w-full md:w-auto text-[12px] font-bold text-slate-800 text-center sm:p-2 md:text-left  md:mr-20 md:ml-30 xs:mb-5 p-10  
-          animated-color-hover ${autoRunActive ? 'auto-run' : ''}`}>
-          <span className="block lg:hidden">Sign In</span>
-          <span className="hidden lg:inline-block">Sign Into Your Account</span>
-        </h1>
-        <form
+
+        <AuthTitle
+          smallText="Sign In"
+          bigText="Sign Into Your Account"
+          autoRunActive={autoRunActive}
+        />        <form
           onSubmit={!flowId ? onStart : onVerify}
           className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-lg md:mr-30"
         >
 
 
-          {err && (
-            <div className="text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
-              {err}
-            </div>
-          )}
-
-          {msg && (
-            <div className="text-emerald-700 bg-emerald-50 p-3 rounded-lg border border-emerald-200 text-lg">
-              {msg}
-            </div>
-          )}
+          <AuthAlert err={err} msg={msg} />
 
           {!flowId ? (
             // --- Login Start Form ---
             <>
               {/* Larger Input Fields (p-4) */}
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-lg"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
+                <BaseInputField
+                          type="email"
+                          placeholder="Email Address"
+                         value={email}
+                         onChange={(e) => setEmail(e.target.value)}
+                          rightIcon={<EmailIcon />}    
+                       />
               <PasswordField
                 value={pwd}
                 onChange={(e) => setPwd(e.target.value)}
@@ -147,7 +141,6 @@ export default function Login() {
                     name="channel"
                     checked={channel === "email"}
                     onChange={() => setChannel("email")}
-                    // Classes for bigger radio button
                     className="form-radio text-blue-600 w-5 h-5"
                   />
                   <span className="text-slate-700 text-xl">Email</span>
@@ -179,13 +172,13 @@ export default function Login() {
               <p className="text-center text-slate-700">
                 Please enter the 6-digit code sent to you via **{channel.toUpperCase()}**.
               </p>
-              <input
+              <BaseInputField
                 type="text"
                 placeholder="Enter 6-digit code"
-                className="w-full p-4 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-2xl text-center tracking-widest font-mono"
                 value={code}
-                onChange={e => setCode(e.target.value)}
+                onChange={(e) => setCode(e.target.value)}
                 maxLength={6}
+                inputClass="text-2xl text-center tracking-widest font-mono"
               />
 
 
