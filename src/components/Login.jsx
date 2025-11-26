@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { loginStart, verify2fa } from "../utils/auth.js";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
-import { setAuthedUser, setUser } from "../reducers/authSlice";
-import PasswordField from "./auth/PasswordField.jsx";
+import { setAuthedUser, setUser, setGuest } from "../reducers/authSlice";
+
+
 import AuthButton from "./auth/AuthButton.jsx";
 import AuthTitle from "./auth/AuthTitle.jsx";
 import AuthAlert from "./auth/AuthAlert.jsx";
 import BaseInputField from "./auth/BaseInputField.jsx";
 import EmailIcon from "./icons/EmailIcon.jsx";
+import EyeIcon from "./icons/EyeIcon.jsx";
 import RadioOption from "./auth/RadioOption.jsx";
 
 import "./Login.css";
@@ -24,6 +26,8 @@ export default function Login() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [autoRunActive, setAutoRunActive] = useState(true);
+  const [showPwd, setShowPwd] = useState(false);
+
 
 
   const navigate = useNavigate();
@@ -100,6 +104,17 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  const handleGuest = () => {
+  localStorage.removeItem("accessToken");
+  // guest mode
+  dispatch(setAuthedUser(null));
+  dispatch(setUser(null));
+  dispatch(setGuest(true));
+  // save to localStorage
+  localStorage.setItem("noteapp_guestMode", "1");
+  navigate("/");
+};
 
   return (
     <div className="Login">
