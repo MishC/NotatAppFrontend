@@ -11,7 +11,7 @@ export default function AuthTitle({ smallText, bigText, autoRunActive }) {
     <h1
       className={[
         "w-full md:w-auto font-bold text-slate-800 text-center",
-        "sm:p-2 md:text-left md:mr-20 md:ml-30 p-10",
+        "sm:p-2 md:text-left md:mr-20  p-2",
         "animated-color-hover",
         autoRunActive ? "auto-run" : "",
         smallText === "Sign Up" ? "text-[14px]" : "text-[12px]",
