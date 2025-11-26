@@ -1,4 +1,4 @@
-export default function EmailIcon({ className = "w-[22px] h-[21px] text-slate-300" }) {
+export default function EmailIcon({ className = "w-[22px] h-[21px]" }) {
   return (
     <svg
       width="21"

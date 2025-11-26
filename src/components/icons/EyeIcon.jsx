@@ -1,7 +1,7 @@
 export default function EyeIcon({
   isOpen = false,
   onClick = () => {},
-  className = "w-[21px] h-[21px] text-slate-300 cursor-pointer",
+  className = "w-[21px] h-[21px]  cursor-pointer",
 }) {
   return (
     <div onClick={onClick} className="flex items-center">
