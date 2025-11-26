@@ -1,4 +1,3 @@
-// src/components/auth/AuthButton.jsx
 export default function AuthButton({ loading, label, loadingLabel = "Processing..." }) {
   return (
     <button
