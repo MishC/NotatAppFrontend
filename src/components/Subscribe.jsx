@@ -6,10 +6,9 @@ import AuthButton from "./auth/AuthButton";
 import AuthTitle from "./auth/AuthTitle";
 import AuthAlert from "./auth/AuthAlert";
 import BaseInputField from "./auth/BaseInputField";
-import PasswordField from "./auth/PasswordField";
-import EmailField from "./auth/EmailField";
 import EmailIcon from "./icons/EmailIcon";
 import EyeIcon from "./icons/EyeIcon";
+import PhoneIcon from "./icons/PhoneIcon";
 
 import "./Login.css";
 
@@ -93,6 +92,8 @@ export default function Subscribe() {
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            rightIcon={<PhoneIcon />}
+
           />
 
           <BaseInputField
