@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { registerAction } from "../actions/authActions";
+import { registerAction, enterGuestMode } from "../actions/authActions";
 import { useNavigate, Link } from "react-router-dom";
 
 import AuthButton from "./auth/AuthButton";
@@ -111,6 +111,12 @@ export default function Subscribe() {
           <p className="text-center text-slate-600 pt-2 text-base">
             Already have an account? <Link to="/auth" className="text-orange-500 hover:text-orange-700 font-semibold">Sign In</Link>
           </p>
+            <p
+                          className="text-center text-slate-600 pt-2 cursor-pointer hover:text-orange-600 font-semibold"
+                          onClick={() => enterGuestMode(dispatch, navigate)}
+                        >
+                          Enter as a guest
+                        </p>
         </form>
       </div>
     </div>

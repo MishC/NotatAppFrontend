@@ -106,15 +106,15 @@ export default function Login() {
   };
 
   const handleGuest = () => {
-  localStorage.removeItem("accessToken");
-  // guest mode
-  dispatch(setAuthedUser(null));
-  dispatch(setUser(null));
-  dispatch(setGuest(true));
-  // save to localStorage
-  localStorage.setItem("noteapp_guestMode", "1");
-  navigate("/");
-};
+    localStorage.removeItem("accessToken");
+    // guest mode
+    dispatch(setAuthedUser(null));
+    dispatch(setUser(null));
+    dispatch(setGuest(true));
+    // save to localStorage
+    localStorage.setItem("noteapp_guestMode", "1");
+    navigate("/");
+  };
 
   return (
     <div className="Login">
@@ -183,11 +183,11 @@ export default function Login() {
                 New user? <Link to="/subscribe" className="text-orange-500 hover:text-orange-700 font-semibold">Create an Account</Link>
               </p>
               <p
-  className="text-center text-slate-600 pt-2 cursor-pointer hover:text-orange-600 font-semibold"
-  onClick={() => enterGuestMode(dispatch, navigate)}
->
-  Enter as a guest
-</p>
+                className="text-center text-slate-600 pt-2 cursor-pointer hover:text-orange-600 font-semibold"
+                onClick={() => enterGuestMode(dispatch, navigate)}
+              >
+                Enter as a guest
+              </p>
 
             </>
           ) : (
