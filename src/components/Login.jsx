@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { loginStartAction, verify2faAction } from "../actions/authActions.js";
+import { loginStartAction, verify2faAction, enterGuestMode } from "../actions/authActions.js";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { setAuthedUser, setUser, setGuest } from "../reducers/authSlice";
@@ -79,7 +79,7 @@ export default function Login() {
         return;
       }
 
-      const { accessToken } = await verify2fa(flowId, code, channel);
+      const { accessToken } = await verify2faAction(flowId, code, channel);
 
       if (!accessToken) {
         throw new Error("Invalid access token returned");
@@ -182,6 +182,13 @@ export default function Login() {
               <p className="text-center text-slate-600 pt-2 text-base">
                 New user? <Link to="/subscribe" className="text-orange-500 hover:text-orange-700 font-semibold">Create an Account</Link>
               </p>
+              <p
+  className="text-center text-slate-600 pt-2 cursor-pointer hover:text-orange-600 font-semibold"
+  onClick={() => enterGuestMode(dispatch, navigate)}
+>
+  Enter as a guest
+</p>
+
             </>
           ) : (
             // --- 2FA Verification Form ---
@@ -205,6 +212,8 @@ export default function Login() {
               <p className="text-center text-sm text-slate-500 cursor-pointer hover:text-orange-500" onClick={() => setFlowId(null)}>
                 Go back to login
               </p>
+
+
             </>
           )}
         </form>

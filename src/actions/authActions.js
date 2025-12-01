@@ -72,3 +72,14 @@ export async function logoutAction({ dispatch, navigate }) {
     navigate("/auth");
   }
 }
+
+
+export function enterGuestMode(dispatch, navigate) {
+  // wipe any auth
+  localStorage.removeItem("accessToken");
+
+  dispatch(resetAuth());
+  dispatch(setGuest(true));
+
+  navigate("/");
+}
