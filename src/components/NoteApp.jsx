@@ -1,87 +1,75 @@
-// src/NoteApp.jsx
-import { useState, useEffect, useMemo } from "react";
-import { createNotesApi } from "../utils/notesApi";
+// src/components/NoteApp.jsx
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { resetAuth } from "../reducers/authSlice";
 
 import Header from "./Header";
-
 import Card from "./Card";
 import Modal from "./Modal";
 import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
-import { handleLogout } from "../utils/auth";
+
+import { logoutAction } from "../actions/authActions";
+import { resetAuth } from "../reducers/authSlice";
+
+import {
+  initNotesAndFoldersAction,
+  syncGuestAction,
+  addNoteAction,
+  deleteNoteAction,
+  updateNoteAction,
+  swapNotesAction,
+  selectFolderAction,
+  toggleModalAction,
+} from "../actions/noteActions";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
+  const [folderOptions, setFolderOptions] = useState([{ id: null, label: "All" }]);
+  const [activeFolder, setActiveFolder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [lengthNotes, setLengthNotes] = useState(0);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
-  const [activeFolder, setActiveFolder] = useState(null);
-  const [folderOptions, setFolderOptions] = useState([
-    { id: null, label: "All" },
-  ]);
-  //
 
-  const user = useSelector((state) => state.auth.user);
-  const guest = useSelector((state) => state.auth.guest);
+  const user = useSelector((s) => s.auth.user);
+  const guest = useSelector((s) => s.auth.guest);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
-  //
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
-  //
-
-  // Build the API object; 
-  const api = useMemo(
-    () =>
-      createNotesApi({
-        API_URL,
-        API_URL2,
-        notes,
-        setNotes,
-        folders,
-        setFolders,
-        setFolderOptions,
-        setLoading,
-        setLengthNotes,
-        setError,
-        setMsg,
-        selectedNote,
-        setSelectedNote,
-        setIsModalOpen,
-        activeFolder,
-
-      }),
-    // Recreate when these change to avoid stale closures:
-    [API_URL, API_URL2, notes, folders, selectedNote, activeFolder]
-  );
-
-  // Initial load
   useEffect(() => {
-    (async () => {
-      await api.fetchNotes(activeFolder);
-      await api.fetchFolders();
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const token = localStorage.getItem("accessToken");
+    if (!token && !guest) navigate("/auth");
+  }, [navigate, guest]);
 
-  // Refetch notes when active folder changes
   useEffect(() => {
-    api.fetchNotes(activeFolder);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFolder]);
+    initNotesAndFoldersAction({
+      guest,
+      API_URL,
+      API_URL2,
+      activeFolder,
+      setNotes,
+      setFolders,
+      setFolderOptions,
+      setLengthNotes,
+      setLoading,
+      setError,
+    });
+  }, [guest, activeFolder, API_URL, API_URL2]);
 
-  // Auto-clear messages
   useEffect(() => {
+    syncGuestAction({ guest, notes, folders });
+  }, [guest, notes, folders]);
+
+  useEffect(() => {
+    if (!error && !msg) return;
     const t = setTimeout(() => {
       setError("");
       setMsg("");
@@ -89,109 +77,48 @@ export default function NoteApp() {
     return () => clearTimeout(t);
   }, [error, msg]);
 
-  //guard -> if not accesstoken navigate to login page /auth
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      navigate("/auth");
-    }
-  }, [navigate]);
-
-  // Guest mode: Initial load
-useEffect(() => {
-  if (guest) {
-    //  storage
-    const savedNotes = JSON.parse(
-      localStorage.getItem("noteapp_guest_notes") || "[]"
-    );
-    const savedFolders = JSON.parse(
-      localStorage.getItem("noteapp_guest_folders") || "[]"
-    );
-
-    setNotes(savedNotes);
-    setFolders(savedFolders);
-
-    setFolderOptions([
-      { id: null, label: "All" },
-      ...savedFolders.map((f) => ({ id: f.id, label: f.name })),
-    ]);
-
-    setLoading(false);
-    return;
-  }
-
-  (async () => {
-    await api.fetchNotes(activeFolder);
-    await api.fetchFolders();
-  })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [guest]);
-//Sync of notes and folders in  local starage
-useEffect(() => {
-  if (!guest) return;
-  localStorage.setItem("noteapp_guest_notes", JSON.stringify(notes));
-}, [guest, notes]);
-
-useEffect(() => {
-  if (!guest) return;
-  localStorage.setItem("noteapp_guest_folders", JSON.stringify(folders));
-}, [guest, folders]);
-//
-
-//Guest addnote
-
-const handleAddNoteLocal = async (title, content, folderId) => {
-  const newNote = {
-    id: Date.now(),       // jednoduché id pre local mode
-    title,
-    content,
-    folderId: folderId ?? null,
-    orderIndex: notes.length,
-    createdAt: new Date().toISOString(),
-  };
-  setNotes((prev) => [...prev, newNote]);
-};
-
-const handleDeleteNoteLocal = async (title) => {
- 
-  setNotes(prev => prev.filter(n => n.id !== id))
-};
-
-
-
-  const switchModalState = (note) => {
-    if (!note) {
-      setIsModalOpen(false);
-      setSelectedNote(null);
-      return;
-    }
-    setSelectedNote(note);
-    setIsModalOpen(true);
-  };
-
-  const handleFolderClick = (opt) => {
-    setActiveFolder(opt.id);
-  };
-
   const onLogoutClick = async () => {
-    try {
-      await handleLogout();
-    } finally {
+    await logoutAction().finally(() => {
       dispatch(resetAuth());
       navigate("/auth");
-    }
+    });
   };
 
+  const switchModalState = (note) =>
+    toggleModalAction(note, setIsModalOpen, setSelectedNote);
 
+  const handleFolderClick = (opt) =>
+    selectFolderAction(opt, setActiveFolder);
+
+  const handleAddNote = (newNote) =>
+    addNoteAction({ guest, API_URL, notes, setNotes, setMsg, setError, newNote });
+
+  const handleDeleteNote = (id) =>
+    deleteNoteAction({ guest, API_URL, id, setNotes, setMsg, setError });
+
+  const handleUpdateNote = (noteId, updatedFields) =>
+    updateNoteAction({
+      guest,
+      API_URL,
+      noteId,
+      updatedFields,
+      selectedNote,
+      activeFolder,
+      setNotes,
+      setLengthNotes,
+      setLoading,
+      setError,
+      setIsModalOpen,
+      setSelectedNote,
+      setMsg,
+    });
+
+  const handleSwapNotes = (sourceId, targetId) =>
+    swapNotesAction({ guest, API_URL, sourceId, targetId, setNotes, setError });
 
   return (
     <div className="relative min-h-screen w-full p-6">
-      {user && (
-        <Header
-          userName={user.email}
-          onLogout={onLogoutClick}
-        />
-      )}
+      {user && <Header userName={user.email} onLogout={onLogoutClick} />}
 
       <div
         className="fixed inset-0 -z-10"
@@ -215,11 +142,7 @@ const handleDeleteNoteLocal = async (title) => {
       </div>
 
       <div className="mb-20">
-        <Noteform
-  folders={folders}
-  handleAddNote={guest ? handleAddNoteLocal : api.handleAddNote}
-/>
-
+        <Noteform folders={folders} handleAddNote={handleAddNote} />
       </div>
 
       {error && (
@@ -237,9 +160,7 @@ const handleDeleteNoteLocal = async (title) => {
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">
           Loading...
         </p>
-      ) : notes.length === 0 ? (
-        <></>
-      ) : (
+      ) : notes.length === 0 ? null : (
         <div className="w-full w-min-[60%] md:max-w-7xl mx-auto mt-6 px-6">
           <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
             {folderOptions.map((opt) => (
@@ -263,7 +184,6 @@ const handleDeleteNoteLocal = async (title) => {
               "w-full max-w-7xl min-w-[60%]",
               "mx-auto bg-white rounded-b-2xl",
               "py-6 px-5",
-              // grid layout
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
               "gap-6",
             ].join(" ")}
@@ -271,18 +191,21 @@ const handleDeleteNoteLocal = async (title) => {
             {notes
               .filter(
                 (note) =>
-                  note && (activeFolder == null || note.folderId === activeFolder)
+                  note &&
+                  (activeFolder == null || note.folderId === activeFolder)
               )
-              .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
+              .sort(
+                (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
+              )
               .map((note, idx) => (
                 <Card
                   key={note.id}
                   note={note}
                   rowIndex={Math.floor(idx / 4)}
                   colIndex={idx % 4}
-                  onDelete={api.handleDeleteNote}
-                  onUpdate={api.updateNote}
-                  onDrop={api.swapNotes}
+                  onDelete={handleDeleteNote}
+                  onUpdate={handleUpdateNote}
+                  onDrop={handleSwapNotes}
                   onClick={() => switchModalState(note)}
                 />
               ))}
@@ -290,12 +213,11 @@ const handleDeleteNoteLocal = async (title) => {
         </div>
       )}
 
-
       {isModalOpen && selectedNote && (
         <Modal
           selectedNote={selectedNote}
           switchModal={switchModalState}
-          updateNote={api.updateNote}
+          updateNote={handleUpdateNote}
           folders={folders}
         />
       )}

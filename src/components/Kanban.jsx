@@ -1,4 +1,3 @@
-// Kanban + sticky note icon (uses Tailwind colors)
 export default function KanbanNoteIcon({ className = "" }) {
     return (
         <svg viewBox="0 0 64 64" aria-hidden="true" className={["h-12 w-12 md:h-14 md:w-14", className].join(" ")}>

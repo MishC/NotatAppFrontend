@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
 import HamburgerIcon from "./icons/HamburgerIcon";
-import { getColorById } from "../utils/colors";
+import { getColorById } from "../helpers/colors";
 
 export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onDrop, onClick }) {
   const noteRef = useRef(null);

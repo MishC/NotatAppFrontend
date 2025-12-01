@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { register } from "../utils/auth";
+import { registerAction } from "../actions/authActions";
 import { useNavigate, Link } from "react-router-dom";
 
 import AuthButton from "./auth/AuthButton";
@@ -46,7 +46,7 @@ export default function Subscribe() {
         return;
       }
 
-      const res = await register(email, pwd, phone);
+      const res = await registerAction(email, pwd, phone);
       setMsg("Registration successful! Redirecting to login...");
 
       setTimeout(() => {

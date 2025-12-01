@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { loginStart, verify2fa } from "../utils/auth.js";
+import { loginStartAction, verify2faAction } from "../actions/authActions.js";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { setAuthedUser, setUser, setGuest } from "../reducers/authSlice";
@@ -56,7 +56,7 @@ export default function Login() {
         return;
       }
 
-      const { flowId: newFlowId } = await loginStart(email, pwd, channel);
+      const { flowId: newFlowId } = await loginStartAction(email, pwd, channel);
       setFlowId(newFlowId);
       setMsg(`A verification code has been sent via ${channel}.`);
     } catch (error) {
