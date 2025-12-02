@@ -79,6 +79,7 @@ export function enterGuestMode(dispatch, navigate) {
   localStorage.removeItem("accessToken");
 
   dispatch(resetAuth());
+  
   dispatch(setGuest(true));
 
   navigate("/");
