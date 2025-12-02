@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { registerAction, enterGuestMode } from "../actions/authActions";
 import { useNavigate, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 import AuthButton from "./auth/AuthButton";
 import AuthTitle from "./auth/AuthTitle";
@@ -23,6 +24,8 @@ export default function Subscribe() {
   const [showPwd, setShowPwd] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
     const cleanupTimer = setTimeout(() => {
@@ -49,11 +52,12 @@ export default function Subscribe() {
       const res = await registerAction(email, pwd, phone);
       setMsg("Registration successful! Redirecting to login...");
 
+    } catch (error) {
+      setErr(error.message || "Registration failed. Please try again.");
+
       setTimeout(() => {
         navigate("/auth");
       }, 1500);
-    } catch (error) {
-      setErr(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -111,12 +115,12 @@ export default function Subscribe() {
           <p className="text-center text-slate-600 pt-2 text-base">
             Already have an account? <Link to="/auth" className="text-orange-500 hover:text-orange-700 font-semibold">Sign In</Link>
           </p>
-            <p
-                          className="text-center text-slate-600 pt-2 cursor-pointer hover:text-orange-600 font-semibold"
-                          onClick={() => enterGuestMode(dispatch, navigate)}
-                        >
-                          Enter as a guest
-                        </p>
+          <p
+            className="text-center text-slate-500 pt-2 text-base cursor-pointer"
+            onClick={() => enterGuestMode(dispatch, navigate)}
+          >
+            Enter as a guest
+          </p>
         </form>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
@@ -7,7 +8,9 @@ import "./App.css";
 // Main page navigation with valid token only
 function RequireAuth({ children }) {
   const token = localStorage.getItem("accessToken");
-  if (!token) {
+  const guest = useSelector((state) => state.auth.guest);
+
+  if (!token && !guest) {
     return <Navigate to="/auth" replace />;
   }
   return children;
@@ -16,9 +19,11 @@ function RequireAuth({ children }) {
 // Login/Subscribe if not logged in
 function AuthOnly({ children }) {
   const token = localStorage.getItem("accessToken");
-  if (token) {
+  const guest = useSelector((state) => state.auth.guest);
+   if (token) {
     return <Navigate to="/" replace />;
   }
+
   return children;
 }
 
