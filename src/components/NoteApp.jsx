@@ -8,7 +8,7 @@ import Modal from "./Modal";
 import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
 
-import { logoutAction } from "../actions/authActions";
+import { logoutAction, removeGuestMode } from "../actions/authActions"; 
 import { resetAuth } from "../reducers/authSlice";
 
 import {
@@ -118,6 +118,8 @@ export default function NoteApp() {
   return (
     <div className="relative min-h-screen w-full p-6">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
+      {guest && <Header userName="Guest" onLogout={()=>removeGuestMode(dispatch, navigate)} />
+}
 
       <div
         className="fixed inset-0 -z-10"
