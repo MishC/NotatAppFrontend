@@ -84,3 +84,14 @@ export function enterGuestMode(dispatch, navigate) {
 
   navigate("/");
 }
+
+export function removeGuestMode(dispatch, navigate) {
+  // wipe any auth
+  localStorage.removeItem("accessToken");
+
+  dispatch(resetAuth());
+  
+  dispatch(setGuest(true));
+
+  navigate("/");
+}
