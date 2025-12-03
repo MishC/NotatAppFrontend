@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { validateNote, buildPayload } from "../helpers/noteHelpers";
+import { validateNote, buildPayload, createEmptyNote } from "../helpers/noteHelpers";
 
 
 export default function Noteform({ folders, handleAddNote, guest=false}) {

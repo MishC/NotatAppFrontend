@@ -91,7 +91,7 @@ export function removeGuestMode(dispatch, navigate) {
 
   dispatch(resetAuth());
   
-  dispatch(setGuest(true));
+  dispatch(setGuest(false));
 
-  navigate("/");
+  navigate("/auth");
 }

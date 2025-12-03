@@ -13,25 +13,31 @@ export default function Header({ userName = "Guest", onLogout }) {
       ].join(" ")}
     >
       {/* Left side - Date */}
-      <div className="text-lg font-medium text-white/90">
+      <div className="text-lg font-medium text-black/90">
         Today is {today}
       </div>
 
       {/* Right side - Guest + Clear Storage */}
       <div className="flex items-center gap-4">
-        <span className="text-lg font-semibold text-white/95">
+        <span className="text-lg font-semibold text-brown/95">
           {userName === "" ? "Guest" : userName}
         </span>
 
         <button
           onClick={onLogout}
           className={[
-            "text-sm",
+            "text-base",
             "px-3 py-1",
             "rounded-lg",
-            "border border-white/40",
-            "hover:bg-white/10 transition",
-            "text-white/90"
+            "border-dotted border-brown/90",
+            "hover:bg-brown/10 transition",
+            "text-black/80",
+            "cursor-pointer",
+
+           "hover:bg-white/50 hover:backdrop-blur-sm",
+                    "backdrop-blur-[1px]",
+
+
           ].join(" ")}
         >
           Clear data
