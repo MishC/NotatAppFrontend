@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-export default function Noteform({ folders, handleAddNote }) {
+export default function Noteform({ folders, handleAddNote, guest=false}) {
+  //states
   const [newNote, setNewNote] = useState({
     title: '',
     content: '',
@@ -8,21 +9,31 @@ export default function Noteform({ folders, handleAddNote }) {
   });
   const [error, setError] = useState(null);
 
+  //onClick event
   const addNote = (e) => {
     e.preventDefault();
-    if (!newNote.title.trim() || !newNote.folderId) {
-      alert("Title and folder selection are required!");
-      setError("Title and folder cannot be empty. Please fill them out.");
+    if (!newNote.title.trim() || (!guest && !newNote.folderId)) {
+      const msg = guest
+        ? "Title is required."
+        : "Title and folder selection are required!";
+      alert(msg);
+      setError(msg);
       return;
     }
-    const payload = {
+
+
+   const payload = {
       ...newNote,
-      folderId: Number(newNote.folderId), 
+      folderId: guest
+        ? null 
+        : Number(newNote.folderId),
     };
+
     handleAddNote(payload);
+
     setNewNote({ title: '', content: '', folderId: '' });
   }
-
+///////
   return (
     <div className="max-w-xl mx-auto w-full bg-white p-6 rounded-lg shadow-md my-10 mb-20">
       <input
@@ -40,21 +51,25 @@ export default function Noteform({ folders, handleAddNote }) {
         onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
         className="w-full p-4 my-2 mb-4 border-2 border-gray-300 rounded-md text-gray-800 transition-colors duration-200 focus:outline-none focus:border-blue-300"
       />
-
-      <select
-        value={newNote.folderId}
-        onChange={(e) => setNewNote({ ...newNote, folderId: e.target.value })}
-        className="w-full p-4 my-2 border-2 border-gray-300 rounded-md text-gray-800 transition-colors duration-200 focus:outline-none focus:border-blue-300"
-      >
-        <option value="" disabled className="text-gray-400">
-          Select a folder
-        </option>
-        {folders.map((folder) => (
-          <option key={folder.id} value={folder.id}>
-            {folder.name}
+      {/* Folder selection for guest and user*/}
+           {!guest && (
+        <select
+          value={newNote.folderId}
+          onChange={(e) =>
+            setNewNote({ ...newNote, folderId: e.target.value })
+          }
+          className="w-full p-4 my-2 border-2 border-gray-300 rounded-md text-gray-800 transition-colors duration-200 focus:outline-none focus:border-blue-300"
+        >
+          <option value="" disabled className="text-gray-400">
+            Select a folder
           </option>
-        ))}
-      </select>
+          {folders.map((folder) => (
+            <option key={folder.id} value={folder.id}>
+              {folder.name}
+            </option>
+          ))}
+        </select>
+      )}
 
       <div className="flex justify-center">
         <button

@@ -141,7 +141,7 @@ export default function NoteApp() {
       </div>
 
       <div className="mb-20">
-        <Noteform folders={folders} handleAddNote={handleAddNote} />
+        <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} />
       </div>
 
       {error && (
