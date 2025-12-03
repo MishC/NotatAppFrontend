@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { validateNote, buildPayload } from "../helpers/noteHelpers";
+
 
 export default function Noteform({ folders, handleAddNote, guest=false}) {
   //states
@@ -10,29 +12,22 @@ export default function Noteform({ folders, handleAddNote, guest=false}) {
   const [error, setError] = useState(null);
 
   //onClick event
-  const addNote = (e) => {
-    e.preventDefault();
-    if (!newNote.title.trim() || (!guest && !newNote.folderId)) {
-      const msg = guest
-        ? "Title is required."
-        : "Title and folder selection are required!";
-      alert(msg);
-      setError(msg);
-      return;
-    }
+ const addNote = (e) => {
+  e.preventDefault();
+  setError(null);
 
-
-   const payload = {
-      ...newNote,
-      folderId: guest
-        ? null 
-        : Number(newNote.folderId),
-    };
-
-    handleAddNote(payload);
-
-    setNewNote({ title: '', content: '', folderId: '' });
+  const validationError = validateNote(newNote, guest);
+  if (validationError) {
+    alert(validationError);
+    setError(validationError);
+    return;
   }
+
+  const payload = buildPayload(newNote, guest);
+  handleAddNote(payload);
+
+  setNewNote({ title: "", content: "", folderId: "" });
+};
 ///////
   return (
     <div className="max-w-xl mx-auto w-full bg-white p-6 rounded-lg shadow-md my-10 mb-20">
