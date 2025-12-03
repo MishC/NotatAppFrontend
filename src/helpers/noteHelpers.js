@@ -14,3 +14,12 @@ export function buildPayload(newNote, guest) {
     folderId: guest ? null : Number(newNote.folderId),
   };
 }
+
+export function createEmptyNote() {
+  return {
+    title: "",
+    content: "",
+    folderId: "",
+  };
+}
+
