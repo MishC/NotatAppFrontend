@@ -8,15 +8,11 @@ import { setAuthedUser, setUser, setGuest, resetAuth } from "../reducers/authSli
 
 // REGISTER
 export async function registerAction(email, password, phone) {
-  try {
     const res = await registerApi(email, password, phone);
     console.log(res);
     return res
-    
-  } catch (err) {
-    console.error(err);
-    setErr(err.message || "Registration failed. Please try again.");
-  }
+    //without setError to test
+
 }
 
 // LOGIN START
