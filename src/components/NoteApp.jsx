@@ -9,7 +9,7 @@ import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions"; 
-import { resetAuth } from "../reducers/authSlice";
+import { resetAuth, setGuest } from "../reducers/authSlice";
 
 import {
   initNotesAndFoldersAction,
