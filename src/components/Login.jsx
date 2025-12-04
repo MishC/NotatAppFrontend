@@ -42,6 +42,7 @@ export default function Login() {
       clearTimeout(cleanupTimer);
     };
   }, []);
+  //
 
   const onStart = async (e) => {
     e.preventDefault();
@@ -56,11 +57,10 @@ export default function Login() {
         return;
       }
 
-      const { flowId: newFlowId } = await loginStartAction(email, pwd, channel);
-      setFlowId(newFlowId);
-      setMsg(`A verification code has been sent via ${channel}.`);
+      await loginStartAction({ email, password: pwd, channel, setFlowId, setMsg, setErr });
+
     } catch (error) {
-      setErr(error.message || "Login failed. Please check your credentials.");
+      console.log(error.message || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -75,44 +75,35 @@ export default function Login() {
     try {
       if (!code) {
         setErr("Verification code is required.");
-        setLoading(false);
         return;
       }
 
-      const { accessToken } = await verify2faAction(flowId, code, channel);
+      await verify2faAction({
+        flowId,
+        code,
+        channel,
+        email,
+        setMsg,
+        setErr,
+        dispatch,
+        navigate,
+      });
 
-      if (!accessToken) {
-        throw new Error("Invalid access token returned");
-      }
-
-      localStorage.setItem("accessToken", accessToken);
-
-      dispatch(setAuthedUser(email));          // napr. e-mail ako "id" pre teraz
-      dispatch(setUser({ email }));            // môžeš neskôr pridať name, id z JWT
-
-      setMsg("Login successful! Redirecting...");
-
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
-
-
+      // verify2faAction už nastaví token, dispatchne usera a navigate
     } catch (error) {
-      setErr(error.message || "Verification failed. Please check the code and try again.");
+      console.error(error);
       setCode("");
     } finally {
       setLoading(false);
     }
   };
 
-
-
   return (
     <div className="Login">
       <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
 
         <AuthTitle
-         id="title"
+          id="title"
           smallText="Sign In"
           bigText="Sign Into Your Account"
           autoRunActive={autoRunActive}
@@ -136,7 +127,7 @@ export default function Login() {
                 rightIcon={<EmailIcon />}
               />
               <BaseInputField
-                 id="psw_login"
+                id="psw_login"
                 type={showPwd ? "text" : "password"}
                 placeholder="Password"
                 value={pwd}

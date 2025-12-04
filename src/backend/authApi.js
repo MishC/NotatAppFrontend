@@ -19,7 +19,9 @@ async function apiJson(url, options = {}) {
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
-/**end of helper function **/
+
+
+/**1st layer: calling backend endpoints**/
 
 export function registerApi(email, password, phoneNumber) {
   return apiJson(API_REGISTER, {

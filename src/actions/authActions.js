@@ -15,6 +15,7 @@ export async function registerAction(email, password, phone) {
 
 }
 
+
 // LOGIN START
 export async function loginStartAction({ email, password, channel, setFlowId, setMsg, setErr }) {
   try {
@@ -53,7 +54,9 @@ export async function verify2faAction({
     navigate("/");
   } catch (err) {
     console.error(err);
-    setErr(err.message || "Verification failed. Please check the code and try again.");
+    setErr(
+      err.message || "Verification failed. Please check the code and try again."
+    );
     throw err;
   }
 }
