@@ -33,6 +33,7 @@ export default function NoteApp() {
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [isauthenticated, setIsAuthenticated] = useState(false);
 
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
@@ -45,8 +46,14 @@ export default function NoteApp() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token && !guest) navigate("/auth");
+    const email = localStorage.getItem("email");
+    if (token && email) {
+    dispatch(setGuest(false));
+    dispatch(setAuthedUser(email));}
+    if (!token && !guest ) navigate("/auth");
   }, [navigate, guest]);
+  
+  
 
   useEffect(() => {
     initNotesAndFoldersAction({

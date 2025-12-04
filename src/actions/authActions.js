@@ -50,6 +50,9 @@ export async function verify2faAction({
     dispatch(setUser({ email }));
     dispatch(setGuest(false));
 
+    //After refresh redux will be initial state therefor ewe need setItem to local storage
+    localStorage.setItem("email", email);
+
     setMsg("Login successful! Redirecting...");
     navigate("/");
   } catch (err) {
