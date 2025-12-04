@@ -16,7 +16,7 @@ export default function Header({ userName = "Guest", onLogout }) {
       {/* Left side - Date */}
       <div className="text-base font-medium text-slate-700/90 bg-white/10 p-3 rounded-md font-dancing dancing-script-header
 ">
-        Today is {today}
+        {today}
       </div>
 
       {/* Right side - Guest + Clear Storage */}
