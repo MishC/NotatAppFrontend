@@ -20,7 +20,8 @@ function RequireAuth({ children }) {
 function AuthOnly({ children }) {
   const token = localStorage.getItem("accessToken");
   const guest = useSelector((state) => state.auth.guest);
-   if (token) {
+
+  if (token) {
     return <Navigate to="/" replace />;
   }
 
@@ -63,6 +64,7 @@ function App() {
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
+     
       </Routes>
     </div>
   );
