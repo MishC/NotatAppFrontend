@@ -68,6 +68,7 @@ export async function logoutAction({ dispatch, navigate }) {
     console.error("Logout API failed:", err);
   } finally {
     localStorage.removeItem("accessToken");
+    localStorage.clear();
     dispatch(resetAuth());
     navigate("/auth");
   }
@@ -77,9 +78,9 @@ export async function logoutAction({ dispatch, navigate }) {
 export function enterGuestMode(dispatch, navigate) {
   // wipe any auth
   localStorage.removeItem("accessToken");
+   localStorage.setItem("guest", "true");
 
   dispatch(resetAuth());
-  
   dispatch(setGuest(true));
 
   navigate("/");
@@ -87,7 +88,9 @@ export function enterGuestMode(dispatch, navigate) {
 
 export function removeGuestMode(dispatch, navigate) {
   // wipe any auth
-  localStorage.removeItem("accessToken");
+  //localStorage.removeItem("accessToken");
+  //localStorage.removeItem("guest");
+  localStorage.clear();
 
   dispatch(resetAuth());
   
