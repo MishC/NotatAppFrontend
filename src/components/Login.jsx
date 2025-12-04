@@ -112,6 +112,7 @@ export default function Login() {
       <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
 
         <AuthTitle
+         id="title"
           smallText="Sign In"
           bigText="Sign Into Your Account"
           autoRunActive={autoRunActive}
@@ -135,6 +136,7 @@ export default function Login() {
                 rightIcon={<EmailIcon />}
               />
               <BaseInputField
+                 id="psw_login"
                 type={showPwd ? "text" : "password"}
                 placeholder="Password"
                 value={pwd}
