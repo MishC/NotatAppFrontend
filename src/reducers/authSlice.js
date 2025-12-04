@@ -4,7 +4,8 @@ const initialState = {
   authedUser: null, //default
   user: null,
   loading: true,
-  guest: false,   
+  guest: localStorage.getItem("guest") === "true",
+  
 };
 
 const authSlice = createSlice({
@@ -27,7 +28,7 @@ const authSlice = createSlice({
       state.authedUser = null; //logout
       state.user = null;
       state.loading = false;
-      state.guest = false;
+     // state.guest = false;
     },
   },
 });
