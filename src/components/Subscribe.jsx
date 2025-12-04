@@ -85,6 +85,7 @@ export default function Subscribe() {
           {/* Larger Input Fields (p-4) */}
 
           <BaseInputField
+            id="email"
             type="email"
             placeholder="Email Address"
             value={email}
@@ -94,7 +95,8 @@ export default function Subscribe() {
           />
 
           <BaseInputField
-            type="tel"
+            id="phone"
+            type="phone"
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -103,6 +105,7 @@ export default function Subscribe() {
           />
 
           <BaseInputField
+            id="pwd"
             type={showPwd ? "text" : "password"}
             placeholder="Password"
             value={pwd}
