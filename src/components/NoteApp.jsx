@@ -51,7 +51,7 @@ export default function NoteApp() {
     dispatch(setGuest(false));
     dispatch(setAuthedUser(email));}
     if (!token && !guest ) navigate("/auth");
-  }, [navigate, guest]);
+  }, [navigate, dispatch, guest]);
   
   
 
