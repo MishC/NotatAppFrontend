@@ -105,16 +105,7 @@ export default function Login() {
     }
   };
 
-  const handleGuest = () => {
-    localStorage.removeItem("accessToken");
-    // guest mode
-    dispatch(setAuthedUser(null));
-    dispatch(setUser(null));
-    dispatch(setGuest(true));
-    // save to localStorage
-    localStorage.setItem("noteapp_guestMode", "1");
-    navigate("/");
-  };
+
 
   return (
     <div className="Login">
