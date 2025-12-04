@@ -3,6 +3,7 @@ const API_VERIFY_2FA = "/api/auth/verify-2fa";
 const API_REGISTER = "/api/auth/register";
 const API_LOGOUT = "/api/auth/logout";
 
+/**helper function **/
 async function apiJson(url, options = {}) {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
@@ -18,6 +19,7 @@ async function apiJson(url, options = {}) {
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
+/**end of helper function **/
 
 export function registerApi(email, password, phoneNumber) {
   return apiJson(API_REGISTER, {
