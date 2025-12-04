@@ -70,7 +70,7 @@ export default function Subscribe() {
       <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
         <AuthTitle
           smallText="Sign Up"
-          bigText="Create an Account"
+          bigText="Create Account"
           autoRunActive={autoRunActive}
         />
         <form
