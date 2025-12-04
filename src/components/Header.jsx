@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import "./Header.css";
 
 export default function Header({ userName = "Guest", onLogout }) {
   const today = format(new Date(), "PPP");
@@ -13,13 +14,14 @@ export default function Header({ userName = "Guest", onLogout }) {
       ].join(" ")}
     >
       {/* Left side - Date */}
-      <div className="text-lg font-medium text-black/90">
+      <div className="text-base font-medium text-slate-700/90 bg-white/10 p-3 rounded-md font-dancing dancing-script-header
+">
         Today is {today}
       </div>
 
       {/* Right side - Guest + Clear Storage */}
       <div className="flex items-center gap-4">
-        <span className="text-lg font-semibold text-brown/95">
+        <span className="text-lg font-semibold text-brown/95 bg-white/80 px-3 py-2 rounded-md">
           {userName === "" ? "Guest" : userName}
         </span>
 
@@ -30,18 +32,18 @@ export default function Header({ userName = "Guest", onLogout }) {
             "px-3 py-1",
             "rounded-lg",
             "border-dotted border-brown/90",
-            "hover:bg-brown/10 transition",
             "text-black/80",
             "cursor-pointer",
+            "transition",
 
-           "hover:bg-white/50 hover:backdrop-blur-sm",
-                    "backdrop-blur-[1px]",
+            "backdrop-blur-[1px]",
 
-
+            "hover:bg-white/50 hover:backdrop-blur-sm",
           ].join(" ")}
         >
           Clear data
         </button>
+
       </div>
     </header>
   );
