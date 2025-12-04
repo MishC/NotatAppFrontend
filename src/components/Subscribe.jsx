@@ -36,32 +36,34 @@ export default function Subscribe() {
     };
   }, []);
 
-  const onSubscribe = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setMsg("");
-    setLoading(true);
+//onSubmit registerAction
+ const onSubscribe = async (e) => {
+  e.preventDefault();
+  setErr("");
+  setMsg("");
+  setLoading(true);
 
-    try {
-      if (!email || !pwd || !phone) {
-        setErr("All fields are required.");
-        setLoading(false);
-        return;
-      }
-
-      const res = await registerAction(email, pwd, phone);
-      setMsg("Registration successful! Redirecting to login...");
-
-    } catch (error) {
-      setErr(error.message || "Registration failed. Please try again.");
-
-      setTimeout(() => {
-        navigate("/auth");
-      }, 1500);
-    } finally {
-      setLoading(false);
+  try {
+    if (!email || !pwd || !phone) {
+      setErr("All fields are required.");
+      return;
     }
-  };
+
+    await registerAction(email, pwd, phone);
+
+    setMsg("Registration successful! Redirecting to login...");
+
+    setTimeout(() => {
+      navigate("/auth");
+    }, 1500);
+  } catch (error) {
+    console.error(error);
+    setErr(error.message || "Registration failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="Subscribe">

@@ -7,13 +7,12 @@ import {
 import { setAuthedUser, setUser, setGuest, resetAuth } from "../reducers/authSlice";
 
 // REGISTER
-export async function registerAction({ email, password, phone, setMsg, setErr }) {
+export async function registerAction(email, password, phoneNumber){
   try {
-    await registerApi(email, password, phone);
-    setMsg("Registration successful! Redirecting to login...");
+    return registerApi(email, password, phone);
+    
   } catch (err) {
     console.error(err);
-    setErr(err.message || "Registration failed. Please try again.");
   }
 }
 
