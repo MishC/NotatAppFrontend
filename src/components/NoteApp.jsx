@@ -183,8 +183,8 @@ export default function NoteApp() {
           Loading...
         </p>
       ) : (
-        <div className="w-full w-min-[70%] md:max-w-7xl mx-auto mt-20 px-6">
-          <div className="inline-flex w-full  rounded-lg">
+        <div className="w-full w-min-[70%] md:max-w-7xl bg-white mx-auto mt-20 px-6">
+          <div className="inline-flex w-full bg-white rounded-lg">
             {folderOptions.map((opt) => (
               <button
                 key={opt.id ?? "all"}
@@ -206,7 +206,7 @@ export default function NoteApp() {
               "w-full w-min-[70%]",
               "h-min-[0px]",
               "mx-auto bg-white rounded-lg",
-              notes.length === 0 ? "p-0" : "py-6 px-5",
+               "p-0",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
               "gap-6",
             ].join(" ")}
@@ -221,6 +221,7 @@ export default function NoteApp() {
                 (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
               )
               .map((note, idx) => (
+                <div className="px-6 py-6">
                 <Card
                   key={note.id}
                   note={note}
@@ -231,6 +232,7 @@ export default function NoteApp() {
                   onDrop={handleSwapNotes}
                   onClick={() => switchModalState(note)}
                 />
+                </div>
               ))}
           </ul>
         </div>
