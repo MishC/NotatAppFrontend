@@ -48,25 +48,13 @@ export default function NoteApp() {
 useEffect(() => {
   const token = localStorage.getItem("accessToken");
   const email = localStorage.getItem("email");
-  const isGuest = localStorage.getItem("guest") === "true";
 
-  // 1) Guest mode
-  if (isGuest && !token) {
-    dispatch(setGuest(true));
-    dispatch(setAuthedUser(null));
-    dispatch(setUser(null));
-    return;
-  }
-
-  // 2) User mode
   if (token && email) {
     dispatch(setGuest(false));
     dispatch(setAuthedUser(email));
-    dispatch(setUser({ email }));
-    return;
   }
-
 }, [dispatch]);
+
 
 
   useEffect(() => {
