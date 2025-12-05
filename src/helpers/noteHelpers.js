@@ -2,9 +2,9 @@ export function validateNote(newNote, guest) {
   if (!newNote.title.trim()) {
     return "Title is required.";
   }
-  if (!guest && !newNote.folderId) {
+ /*  if (!guest && !newNote.folderId) {
     return "Title and folder selection are required!";
-  }
+  } */
   return null;
 }
 
