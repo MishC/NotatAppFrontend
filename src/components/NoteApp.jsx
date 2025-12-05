@@ -183,27 +183,36 @@ export default function NoteApp() {
           Loading...
         </p>
       ) : (
-        <div className="w-full w-min-[70%] md:max-w-7xl bg-white mx-auto mt-20 px-6">
-          <div className="flex w-full bg-white rounded-lg">
-            {folderOptions.map((opt) => (
-              <button
-                key={opt.id ?? "all"}
-                onClick={() => handleFolderClick(opt)}
-                className={[
-                  "flex-1 px-6 py-4 text-2xl font-semibold  ",
-                  activeFolder === opt.id
-                    ? "bg-white text-slate-800"
-                    : "text-slate-700 hover:text-orange-600",
-                ].join(" ")}
-              >
-                {(opt.label === "All" && guest) ? "Notes" : opt.label}
-              </button>
-            ))}
-          </div>
+        <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
+          <div className="w-[20%] flex flex-col rounded-lg">
+    {folderOptions.map((opt) => {
+      const isActive = activeFolder === opt.id;
+      const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
 
+      return (
+        <button
+          key={opt.id ?? "all"}
+          onClick={() => handleFolderClick(opt)}
+          className={[
+            " w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition relative",
+            isActive
+              ? "bg-white text-slate-900 translate-x-1 shadow-sm"
+              : "text-slate-700 hover:text-orange-600 hover:bg-white/70 -translate-x-0.5 hover:translate-x-0"
+          ].join(" ")}
+        >
+          {/* tenká lišta pre aktívny */}
+          <span
+            className={["absolute left-0 top-0 h-full w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
+            aria-hidden="true"
+          />
+          {label}
+        </button>
+      );
+    })}
+  </div>
           <ul
             className={[
-              "w-full w-min-[70%]",
+              "w-[70%]",
               "h-min-[0px]",
               "mx-auto bg-white rounded-lg",
                "p-0",
@@ -260,7 +269,7 @@ export default function NoteApp() {
       
   
      
-      <Noteform folders={folders} handleAddNote={handleAddNote} />
+      <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest}/>
         <button
           onClick={() => setShowNoteModal(false)}
           className="px-5 py-2  mb-5 text-xl rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"

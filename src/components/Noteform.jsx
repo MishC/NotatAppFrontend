@@ -47,7 +47,7 @@ export default function Noteform({ folders, handleAddNote, guest=false}) {
         className="w-full p-4 my-2 mb-4 border-2 border-gray-300 rounded-md text-gray-800 transition-colors duration-200 focus:outline-none focus:border-blue-300"
       />
       {/* Folder selection for guest and user*/}
-           {!guest && (
+           { !guest&& (
         <select
           value={newNote.folderId}
           onChange={(e) =>
@@ -65,6 +65,7 @@ export default function Noteform({ folders, handleAddNote, guest=false}) {
           ))}
         </select>
       )}
+      
 
       <div className="flex justify-center">
         <button
