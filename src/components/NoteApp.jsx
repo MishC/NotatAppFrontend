@@ -10,7 +10,7 @@ import Modal from "./Modal";
 import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
 
-import { logoutAction, removeGuestMode } from "../actions/authActions"; 
+import { logoutAction, removeGuestMode } from "../actions/authActions";
 
 import {
   initNotesAndFoldersAction,
@@ -34,6 +34,7 @@ export default function NoteApp() {
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [showNoteModal, setShowNoteModal] = useState(false);
   const [isauthenticated, setIsAuthenticated] = useState(false);
 
   const user = useSelector((s) => s.auth.user);
@@ -45,15 +46,15 @@ export default function NoteApp() {
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
-useEffect(() => {
-  const token = localStorage.getItem("accessToken");
-  const email = localStorage.getItem("email");
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const email = localStorage.getItem("email");
 
-  if (token && email) {
-    dispatch(setGuest(false));
-    dispatch(setAuthedUser(email));
-  }
-}, [dispatch]);
+    if (token && email) {
+      dispatch(setGuest(false));
+      dispatch(setAuthedUser(email));
+    }
+  }, [dispatch]);
 
 
 
@@ -86,7 +87,7 @@ useEffect(() => {
   }, [error, msg]);
 
   const onLogoutClick = async () => {
-    await logoutAction({dispatch, navigate}).finally(() => {
+    await logoutAction({ dispatch, navigate }).finally(() => {
       dispatch(resetAuth());
     });
   };
@@ -126,8 +127,8 @@ useEffect(() => {
   return (
     <div className="w-full">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
-      {guest && <Header userName="Guest" onLogout={()=>removeGuestMode(dispatch, navigate)} />
-}
+      {guest && <Header userName="Guest" onLogout={() => removeGuestMode(dispatch, navigate)} />
+      }
 
       <div
         className="fixed inset-0 -z-10"
@@ -139,21 +140,32 @@ useEffect(() => {
 
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-15">
         <div className="flex items-center gap-4 justify-center text-center">
-          <KanbanNoteIcon className="text-blue-600 text-center" />
-          <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
-            Note Board
-          </h1>
+          <button
+            type="button"
+            onClick={() => setShowNoteModal(true)}
+            className="inline-flex items-center gap-6 cursor-pointer select-none group"
+
+            aria-label="Add note"
+          >     <span className="w-12 h-12 rounded-2xl bg-blue-600 text-white text-3xl leading-none grid place-items-center shadow-lg hover:bg-blue-700 transition">+</span>
+
+            <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
+              Note Board
+            </h1>
+          </button>
+
         </div>
+
         <p className="mt-2 text-slate-600 text-lg text-center">
-          Organize your notes like cards on a board.
-        </p>
+          Add Notes        </p>
+
+
         {/* <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" /> */}
       </div>
 
-      <div className="mb-25">
+      {/* <div className="mb-25">
         <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} />
       </div>
-
+ */}
       {error && (
         <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
           {error}
@@ -169,7 +181,7 @@ useEffect(() => {
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">
           Loading...
         </p>
-      ) :  (
+      ) : (
         <div className="w-full w-min-[70%] md:max-w-7xl mx-auto mt-20 px-6">
           <div className="inline-flex w-full  rounded-lg">
             {folderOptions.map((opt) => (
@@ -183,7 +195,7 @@ useEffect(() => {
                     : "text-slate-700 hover:text-blue-600",
                 ].join(" ")}
               >
-                {(opt.label==="All"&&guest)?"Notes":opt.label}
+                {(opt.label === "All" && guest) ? "Notes" : opt.label}
               </button>
             ))}
           </div>
@@ -193,7 +205,7 @@ useEffect(() => {
               "w-full w-min-[70%]",
               "h-min-[0px]",
               "mx-auto bg-white rounded-lg",
-             notes.length===0?"p-0": "py-6 px-5",
+              notes.length === 0 ? "p-0" : "py-6 px-5",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
               "gap-6",
             ].join(" ")}
@@ -231,6 +243,32 @@ useEffect(() => {
           folders={folders}
         />
       )}
+      {showNoteModal && (
+  <div className="fixed inset-0 z-50 grid place-items-center p-4">
+    <div
+      className="absolute inset-0 bg-black/40"
+      onClick={() => setShowNoteModal(false)}
+      aria-hidden="true"
+    />
+    <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
+        <h3 className="text-2xl font-bold text-center mt-8">Add Note</h3>
+           
+
+      
+  
+     
+      <Noteform folders={folders} handleAddNote={handleAddNote} />
+        <button
+          onClick={() => setShowNoteModal(false)}
+          className="px-5 py-1  mt-2 text-xl rounded-md border border-slate-800 hover:bg-orange-400"
+        >
+          Close
+        </button>
+    </div>
+    
+  </div>
+)}
+
     </div>
   );
 }
