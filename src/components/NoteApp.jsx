@@ -88,7 +88,6 @@ useEffect(() => {
   const onLogoutClick = async () => {
     await logoutAction({dispatch, navigate}).finally(() => {
       dispatch(resetAuth());
-      navigate("/auth");
     });
   };
 

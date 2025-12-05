@@ -9,10 +9,7 @@ import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
 import "./App.css";
 
-
-
-
-function App() {
+export default function App() {
   
  const dispatch =useDispatch();
     useEffect(() => {
@@ -60,4 +57,4 @@ function App() {
   );
 }
 
-export default App;
+
