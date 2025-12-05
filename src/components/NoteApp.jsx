@@ -98,7 +98,7 @@ useEffect(() => {
   }, [error, msg]);
 
   const onLogoutClick = async () => {
-    await logoutAction().finally(() => {
+    await logoutAction({dispatch, navigate}).finally(() => {
       dispatch(resetAuth());
       navigate("/auth");
     });
