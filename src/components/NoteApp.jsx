@@ -182,7 +182,7 @@ useEffect(() => {
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">
           Loading...
         </p>
-      ) : notes.length === 0 ? null : (
+      ) :  (
         <div className="w-full w-min-[60%] md:max-w-7xl mx-auto mt-6 px-6">
           <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
             {folderOptions.map((opt) => (
@@ -203,7 +203,8 @@ useEffect(() => {
 
           <ul
             className={[
-              "w-full max-w-7xl min-w-[60%]",
+              "w-full max-w-[70%] min-w-[70%]",
+              "min-h-[20%]",
               "mx-auto bg-white rounded-b-2xl",
               "py-6 px-5",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
