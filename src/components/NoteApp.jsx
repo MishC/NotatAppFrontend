@@ -193,7 +193,7 @@ export default function NoteApp() {
                   "flex-1 px-6 py-4 text-2xl font-semibold  transition",
                   activeFolder === opt.id
                     ? "bg-white text-slate-800 shadow-md"
-                    : "text-slate-700 hover:text-blue-600",
+                    : "text-slate-700 hover:text-orange-600",
                 ].join(" ")}
               >
                 {(opt.label === "All" && guest) ? "Notes" : opt.label}
