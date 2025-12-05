@@ -10,7 +10,9 @@ export default function Header({ userName = "Guest", onLogout }) {
         "w-full",
         "flex items-center justify-between",
         "py-4 px-6",
-        "backdrop-blur-sm"
+        "mx-0 mb-25",
+        "backdrop-blur-md",
+        "bg-white/70"
       ].join(" ")}
     >
       {/* Left side - Date */}
@@ -21,7 +23,7 @@ export default function Header({ userName = "Guest", onLogout }) {
 
       {/* Right side - Guest + Clear Storage */}
       <div className="flex items-center gap-4">
-        <span className="text-lg font-semibold text-brown/95 bg-white/80 px-3 py-2 rounded-md">
+        <span className="text-lg font-semibold text-brown/95 bg-green/80   px-3 py-2 rounded-md">
           {userName === "" ? "Guest" : userName}
         </span>
 

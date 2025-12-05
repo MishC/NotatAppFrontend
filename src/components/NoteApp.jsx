@@ -124,7 +124,7 @@ useEffect(() => {
     swapNotesAction({ guest, API_URL, sourceId, targetId, setNotes, setError });
 
   return (
-    <div className="relative min-h-screen w-full p-6">
+    <div className="w-full">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
       {guest && <Header userName="Guest" onLogout={()=>removeGuestMode(dispatch, navigate)} />
 }
