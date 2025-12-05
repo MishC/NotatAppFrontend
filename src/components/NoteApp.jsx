@@ -184,7 +184,7 @@ export default function NoteApp() {
         </p>
       ) : (
         <div className="w-full w-min-[70%] md:max-w-7xl bg-white mx-auto mt-20 px-6">
-          <div className="flex-column w-full bg-white rounded-lg">
+          <div className="flex w-full bg-white rounded-lg">
             {folderOptions.map((opt) => (
               <button
                 key={opt.id ?? "all"}
