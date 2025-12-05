@@ -170,7 +170,7 @@ useEffect(() => {
           Loading...
         </p>
       ) :  (
-        <div className="w-full w-min-[70%] md:max-w-7xl mx-auto mt-6 px-6">
+        <div className="w-full w-min-[70%] md:max-w-7xl mx-auto mt-20 px-6">
           <div className="inline-flex w-full  rounded-lg">
             {folderOptions.map((opt) => (
               <button
@@ -183,7 +183,7 @@ useEffect(() => {
                     : "text-slate-700 hover:text-blue-600",
                 ].join(" ")}
               >
-                {opt.label==="All"?"Notes":opt.label}
+                {(opt.label==="All"&&guest)?"Notes":opt.label}
               </button>
             ))}
           </div>
