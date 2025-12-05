@@ -1,34 +1,24 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import {  useDispatch } from "react-redux";
+import { useEffect } from "react";
+import {hydrateAuth} from "./reducers/authSlice";
+import { RequireAuth, AuthOnly } from "./helpers/authGuard";
+
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
 import "./App.css";
 
-// Main page navigation with valid token only
-function RequireAuth({ children }) {
-  const token = localStorage.getItem("accessToken");
-  const guest = useSelector((state) => state.auth.guest);
 
-  if (!token && !guest) {
-    return <Navigate to="/auth" replace />;
-  }
-  return children;
-}
 
-// Login/Subscribe if not logged in
-function AuthOnly({ children }) {
-  const token = localStorage.getItem("accessToken");
-  const guest = useSelector((state) => state.auth.guest);
-
-  if (token) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
 
 function App() {
+  
+ const dispatch =useDispatch();
+    useEffect(() => {
+    dispatch(hydrateAuth());
+  }, [dispatch]);
+
   return (
     <div className="App mb-[250px]">
       <Routes>

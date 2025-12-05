@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { resetAuth, setGuest, setAuthedUser, setUser } from "../reducers/authSlice";
+
 
 import Header from "./Header";
 import Card from "./Card";
@@ -9,7 +11,6 @@ import Noteform from "./Noteform";
 import KanbanNoteIcon from "./Kanban";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions"; 
-import { resetAuth, setGuest, setAuthedUser} from "../reducers/authSlice";
 
 import {
   initNotesAndFoldersAction,
@@ -44,16 +45,29 @@ export default function NoteApp() {
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const email = localStorage.getItem("email");
-    if (token && email) {
+useEffect(() => {
+  const token = localStorage.getItem("accessToken");
+  const email = localStorage.getItem("email");
+  const isGuest = localStorage.getItem("guest") === "true";
+
+  // 1) Guest mode
+  if (isGuest && !token) {
+    dispatch(setGuest(true));
+    dispatch(setAuthedUser(null));
+    dispatch(setUser(null));
+    return;
+  }
+
+  // 2) User mode
+  if (token && email) {
     dispatch(setGuest(false));
-    dispatch(setAuthedUser(email));}
-    if (!token && !guest ) navigate("/auth");
-  }, [navigate, dispatch, guest]);
-  
-  
+    dispatch(setAuthedUser(email));
+    dispatch(setUser({ email }));
+    return;
+  }
+
+}, [dispatch]);
+
 
   useEffect(() => {
     initNotesAndFoldersAction({

@@ -8,7 +8,10 @@ export async function apiRequest({
 }) {
   const res = await fetch(url, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+    },
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   });
@@ -24,6 +27,7 @@ export async function apiRequest({
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
+
 
 export async function fetchFoldersApi({
   API_URL2,

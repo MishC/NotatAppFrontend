@@ -6,8 +6,11 @@ const API_LOGOUT = "/api/auth/logout";
 /**helper function **/
 async function apiJson(url, options = {}) {
   const res = await fetch(url, {
-    headers: { "Content-Type": "application/json",   "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
- ...(options.headers || {}) },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+      ...(options.headers || {}),
+    },
     credentials: "include",
     ...options,
   });
