@@ -137,20 +137,20 @@ useEffect(() => {
         }}
       />
 
-      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-10">
+      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-15">
         <div className="flex items-center gap-4 justify-center text-center">
           <KanbanNoteIcon className="text-blue-600 text-center" />
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800 text-center">
+          <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
             Note Board
           </h1>
         </div>
         <p className="mt-2 text-slate-600 text-lg text-center">
           Organize your notes like cards on a board.
         </p>
-        <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" />
+        {/* <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" /> */}
       </div>
 
-      <div className="mb-20">
+      <div className="mb-25">
         <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} />
       </div>
 
@@ -171,19 +171,19 @@ useEffect(() => {
         </p>
       ) :  (
         <div className="w-full w-min-[70%] md:max-w-7xl mx-auto mt-6 px-6">
-          <div className="inline-flex w-full rounded-t-xl border border-slate-300 bg-slate-100 p-1 shadow-inner">
+          <div className="inline-flex w-full  rounded-lg">
             {folderOptions.map((opt) => (
               <button
                 key={opt.id ?? "all"}
                 onClick={() => handleFolderClick(opt)}
                 className={[
-                  "flex-1 px-6 py-4 text-2xl font-semibold rounded-lg transition",
+                  "flex-1 px-6 py-4 text-2xl font-semibold  transition",
                   activeFolder === opt.id
-                    ? "bg-white text-blue-600 shadow-md"
+                    ? "bg-white text-slate-800 shadow-md"
                     : "text-slate-700 hover:text-blue-600",
                 ].join(" ")}
               >
-                {opt.label}
+                {opt.label==="All"?"Notes":opt.label}
               </button>
             ))}
           </div>
@@ -191,7 +191,7 @@ useEffect(() => {
           <ul
             className={[
               "w-full w-min-[70%]",
-          
+              "h-min-[0%]",
               "mx-auto bg-white rounded-b-2xl",
               "py-6 px-5",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",

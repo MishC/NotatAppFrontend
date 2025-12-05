@@ -10,13 +10,14 @@ export default function Header({ userName = "Guest", onLogout }) {
         "w-full",
         "flex items-center justify-between",
         "py-4 px-6",
-        "mx-0 mb-25",
-        "backdrop-blur-md",
-        "bg-white/70"
+        "mx-0 mb-20",
+        "backdrop-blur-lg",
+        "bg-green-100",
+        "opacity-90"
       ].join(" ")}
     >
       {/* Left side - Date */}
-      <div className="text-base font-medium text-slate-700/90 bg-white/10 p-3 rounded-md font-dancing dancing-script-header
+      <div className="text-base font-medium text-slate-700/90 bg-white/10 p-3 rounded-md font-dancing dancing-script-header 
 ">
         {today}
       </div>
@@ -30,7 +31,8 @@ export default function Header({ userName = "Guest", onLogout }) {
         <button
           onClick={onLogout}
           className={[
-            "text-base",
+            "text-lg",
+            "font-medium",
             "px-3 py-1",
             "rounded-lg",
             "border-dotted border-brown/90",
@@ -38,12 +40,14 @@ export default function Header({ userName = "Guest", onLogout }) {
             "cursor-pointer",
             "transition",
 
+
             "backdrop-blur-[1px]",
 
             "hover:bg-white/50 hover:backdrop-blur-sm",
           ].join(" ")}
         >
-           {userName === "Guest" ? "Clear Data" : "Logout"}
+           {/*userName === "Guest" ? "Clear Data" : "Logout"*/}
+           Logout
         </button>
 
       </div>
