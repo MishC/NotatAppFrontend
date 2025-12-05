@@ -214,7 +214,7 @@ export default function NoteApp() {
             className={[
               "w-[70%]",
               "h-min-[0px]",
-              "mx-auto bg-white rounded-lg",
+              "mx-auto rounded-lg",
                "p-0",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
               "gap-6",
