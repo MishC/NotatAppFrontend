@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import {  useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import {hydrateAuth} from "./reducers/authSlice";
 import { RequireAuth, AuthOnly } from "./helpers/authGuard";
