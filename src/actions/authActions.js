@@ -81,7 +81,8 @@ export async function logoutAction({ dispatch, navigate }) {
 
 export function enterGuestMode(dispatch, navigate) {
   // wipe any auth
-  localStorage.removeItem("accessToken");
+ // localStorage.removeItem("accessToken");
+   localStorage.clear();  
    localStorage.setItem("guest", "true");
 
   dispatch(resetAuth());
