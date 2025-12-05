@@ -193,7 +193,7 @@ useEffect(() => {
               "w-full w-min-[70%]",
               "h-min-[0px]",
               "mx-auto bg-white rounded-lg",
-             lengthNotes===0&&!guest?"p-0": "py-6 px-5",
+             notes.length===0?"p-0": "py-6 px-5",
               "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
               "gap-6",
             ].join(" ")}
