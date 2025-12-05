@@ -190,9 +190,9 @@ export default function NoteApp() {
                 key={opt.id ?? "all"}
                 onClick={() => handleFolderClick(opt)}
                 className={[
-                  "flex-1 px-6 py-4 text-2xl font-semibold  transition",
+                  "flex-1 px-6 py-4 text-2xl font-semibold  ",
                   activeFolder === opt.id
-                    ? "bg-white text-slate-800 shadow-md"
+                    ? "bg-white text-slate-800"
                     : "text-slate-700 hover:text-orange-600",
                 ].join(" ")}
               >

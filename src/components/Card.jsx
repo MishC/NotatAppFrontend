@@ -49,11 +49,10 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
       ref={noteRef}
       onClick={onClick}
       className={[
-        // dôležité pre masonry:
         "break-inside-avoid inline-block w-full mb-6",
         // card shell
         "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
-        "shadow-sm hover:shadow-lg transition-all duration-200 ease-out",
+        "transition-all duration-200 ease-out",
         "min-w-[204px] m-0 p-4 sm:p-5", // m-0 kvôli inline-block a column gap
         cardColor,
         isDragging
