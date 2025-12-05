@@ -146,7 +146,8 @@ export default function NoteApp() {
             className="inline-flex items-center gap-6 cursor-pointer select-none group"
 
             aria-label="Add note"
-          >     <span className="w-12 h-12 rounded-2xl bg-blue-600 text-white text-3xl leading-none grid place-items-center shadow-lg hover:bg-blue-700 transition">+</span>
+          >     <span className="w-12 h-12 rounded-2xl bg-orange-500 hover:bg-orange-700
+           text-white text-3xl leading-none grid place-items-center shadow-lg transition">+</span>
 
             <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
               Note Board
@@ -155,7 +156,7 @@ export default function NoteApp() {
 
         </div>
 
-        <p className="mt-2 text-slate-600 text-lg text-center">
+        <p className="mt-2 text-slate-600 text-xl text-center">
           Add Notes        </p>
 
 
@@ -260,7 +261,7 @@ export default function NoteApp() {
       <Noteform folders={folders} handleAddNote={handleAddNote} />
         <button
           onClick={() => setShowNoteModal(false)}
-          className="px-5 py-1  mt-2 text-xl rounded-md border border-slate-800 hover:bg-orange-400"
+          className="px-5 py-2  mb-5 text-xl rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
         >
           Close
         </button>
