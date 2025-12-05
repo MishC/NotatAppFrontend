@@ -41,7 +41,7 @@ export default function Header({ userName = "Guest", onLogout }) {
             "hover:bg-white/50 hover:backdrop-blur-sm",
           ].join(" ")}
         >
-          Clear data
+           {userName === "Guest" ? "Clear Data" : "Logout"}
         </button>
 
       </div>
