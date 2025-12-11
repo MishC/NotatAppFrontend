@@ -4,7 +4,7 @@ import {
   verify2faApi,
   logoutApi,
 } from "../backend/authApi";
-import { setAuthedUser, setUser, setGuest, resetAuth } from "../reducers/authSlice";
+import { setAuthedUser, setUser, setGuest, resetAuth, logout } from "../reducers/authSlice";
 
 // REGISTER
 export async function registerAction(email, password, phone) {
