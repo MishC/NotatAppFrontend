@@ -42,7 +42,7 @@ export async function initNotesAndFoldersAction({
     ]);
 
     setLoading(false);
-    return;
+    return true;
   }
 
   await fetchNotesApi({
@@ -204,6 +204,7 @@ export function swapNotesAction({
 ------------------------------------------ */
 export function selectFolderAction(opt, setActiveFolder) {
   setActiveFolder(opt.id);
+  return true;
 }
 
 /* -----------------------------------------
@@ -213,7 +214,7 @@ export function toggleModalAction(note, setIsModalOpen, setSelectedNote) {
   if (!note) {
     setIsModalOpen(false);
     setSelectedNote(null);
-    return;
+    return true;
   }
 
   setSelectedNote(note);
