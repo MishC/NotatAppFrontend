@@ -15,8 +15,7 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
       setError("Failed to update note!");
       return;
     }
-    // ak chceš zavrieť hneď po úspechu:
-    // switchModal(null);
+  
     setMsg("Note updated.");
   };
 
@@ -31,18 +30,10 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
 
       {/* card */}
       <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-        {/* close (rovnaká logika farieb ako v NoteFormModal) */}
-        <button
-          onClick={() => switchModal(null)}
-          className="absolute top-4 right-4 px-3 py-1 rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
-          aria-label="Close"
-        >
-          Close
-        </button>
-
+      
         <h2 className="text-2xl font-bold text-center mt-8 mb-6">Edit Note</h2>
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1 text-left">Title</label>
         <input
           type="text"
           className="w-full mb-4 px-3 py-2 border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
@@ -50,14 +41,14 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Content</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1 text-left">Content</label>
         <textarea
           className="w-full mb-4 px-3 py-2 border border-slate-300 rounded-md h-40 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
 
-        <label className="block text-sm font-medium text-slate-700 mb-1">Folder</label>
+       {/*<label className="block text-sm font-medium text-slate-700 mb-1 text-left">Folder</label> */}
         <select
           value={folderId ?? ""}
           onChange={(e) => setFolderId(Number(e.target.value))}
