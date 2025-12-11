@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function Modal({ selectedNote, switchModal, updateNote, folders = [] }) {
   const [error, setError] = useState(null);
   const [msg, setMsg] = useState(null);
+
   const [folderId, setFolderId] = useState(selectedNote.folderId ?? "");
   const [title, setTitle] = useState(selectedNote.title ?? "");
   const [content, setContent] = useState(selectedNote.content ?? "");
+
   const savingDisabled =
-    !title.trim() && !content.trim() && (folderId ?? "") === (selectedNote.folderId ?? "");
+    (!title.trim() && !content.trim() && (folderId ?? "") === (selectedNote.folderId ?? "")) ||
+    (title === selectedNote.title && content === selectedNote.content && folderId === selectedNote.folderId);
 
   const handleSave = async () => {
     const success = await updateNote(selectedNote.id, { title, content, folderId });
@@ -15,44 +18,56 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
       setError("Failed to update note!");
       return;
     }
-  
     setMsg("Note updated.");
   };
 
+  // ESC na zavretie
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && switchModal(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [switchModal]);
+
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      {/* overlay */}
+      {/* overlay (zatvára modal) */}
       <div
         className="absolute inset-0 bg-black/40"
         onClick={() => switchModal(null)}
         aria-hidden="true"
       />
 
-      {/* card */}
-      <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-      
-        <h2 className="text-2xl font-bold text-center mt-8 mb-6">Edit Note</h2>
+      {/* karta */}
+      <div className="relative w-full max-w-2xl rounded-2xl bg-white p-8 md:p-10 shadow-xl">
+        <h2 className="text-3xl font-bold text-center mt-2 mb-8">Edit Note</h2>
 
-        <label className="block text-sm font-medium text-slate-700 mb-1 text-left">Title</label>
+        {/* Title */}
         <input
           type="text"
-          className="w-full mb-4 px-3 py-2 border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+          className="w-full mb-5 px-4 py-3 text-xl rounded-lg border border-slate-300
+                     text-slate-800 placeholder-slate-400
+                     focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
         />
 
-        <label className="block text-sm font-medium text-slate-700 mb-1 text-left">Content</label>
+        {/* Content */}
         <textarea
-          className="w-full mb-4 px-3 py-2 border border-slate-300 rounded-md h-40 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          placeholder="Content"
+          className="w-full mb-5 px-4 py-3 text-xl rounded-lg border border-slate-300 h-56
+                     text-slate-800 placeholder-slate-400
+                     focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
         />
 
-       {/*<label className="block text-sm font-medium text-slate-700 mb-1 text-left">Folder</label> */}
+        {/* Folder select (bez labelu) */}
         <select
           value={folderId ?? ""}
           onChange={(e) => setFolderId(Number(e.target.value))}
-          className="w-full mb-6 px-3 py-2 border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+          className="w-full mb-8 px-4 py-3 text-lg rounded-lg border border-slate-300 text-slate-800
+                     focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
           disabled={!folders.length}
         >
           <option value="" disabled className="text-slate-400">
@@ -68,18 +83,16 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
         <div className="flex justify-end gap-3">
           <button
             onClick={() => switchModal(null)}
-            className="px-5 py-2 text-base rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
+            className="px-6 py-3 text-lg rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
           >
-            Cancel
+            Close
           </button>
           <button
             onClick={handleSave}
             disabled={savingDisabled}
             className={[
-              "px-5 py-2 text-base rounded-md text-white shadow-sm transition",
-              savingDisabled
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700",
+              "px-6 py-3 text-lg rounded-md text-white shadow-sm transition",
+              savingDisabled ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700",
             ].join(" ")}
           >
             Save
