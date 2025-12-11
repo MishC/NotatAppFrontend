@@ -66,11 +66,10 @@ export async function fetchFoldersApi({
     setFolders(folders);
 
     setFolderOptions([
-  { id: null, label: "All" },
-  ...folders.filter(f => !isDone(f)).map(f => ({ id: f.id, label: f.name })),
-  ...folders.filter(isDone).map(f => ({ id: f.id, label: f.name })),
-]);
+      { id: null, label: "All" },
+      ...folders.map((f) => ({ id: f.id, label: f.name})).filter(f=>f.label!=="Done"), ...folders.filter(f=>f.name==="Done"),
 
+    ]);
   } catch (err) {
     console.error("Error fetching folders:", err);
     setError("Error fetching folders.");
