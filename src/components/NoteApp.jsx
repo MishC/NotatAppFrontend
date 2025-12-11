@@ -177,7 +177,10 @@ export default function NoteApp() {
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
         <div className="w-[20%] flex flex-col rounded-lg">
   {folderOptions.map((opt) => {
-    const isActive = activeFolder === opt.id;
+    const isActive =
+  (activeFolder == null && opt.id == null) ||
+  String(activeFolder) === String(opt.id);
+
     const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
 
     return (
