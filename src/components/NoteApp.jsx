@@ -159,14 +159,8 @@ export default function NoteApp() {
         <p className="mt-2 text-slate-600 text-xl text-center">
           Add Notes        </p>
 
-
-        {/* <div className="mt-4 h-px w-full bg-gradient-to-r from-slate-200 via-slate-200/60 to-transparent" /> */}
       </div>
 
-      {/* <div className="mb-25">
-        <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} />
-      </div>
- */}
       {error && (
         <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
           {error}
