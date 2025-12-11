@@ -6,25 +6,38 @@ export async function apiRequest({
   setError,
   expectJson = true,
 }) {
+  const token = localStorage.getItem("accessToken");
+  const isGuest = localStorage.getItem("guest") === "true";
+
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  // Only send Authorization header if we actually have a token and are not in guest mode
+  if (token && !isGuest) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(url, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
-    },
+    headers,
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   });
-    if (response.status === 401) {
-          store.dispatch(logout());
+
+  if (res.status === 401 && !isGuest) {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("email");
+    localStorage.removeItem("guest");
 
     window.location.href = "/auth";
+
     throw new Error("Unauthorized");
-    }
+  }
 
   if (!res.ok) {
     const msg = `HTTP error! status: ${res.status}`;
-    setError?.(msg);
+    if (setError) setError(msg);
     throw new Error(msg);
   }
 
