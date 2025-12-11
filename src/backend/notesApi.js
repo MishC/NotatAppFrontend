@@ -16,8 +16,8 @@ export async function apiRequest({
     body: body ? JSON.stringify(body) : undefined,
   });
     if (response.status === 401) {
-      store.dispatch(resetAuth());
-       localStorage.removeItem("accessToken");
+          store.dispatch(logout());
+
     window.location.href = "/auth";
     throw new Error("Unauthorized");
     }
