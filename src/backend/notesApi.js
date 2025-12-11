@@ -17,6 +17,9 @@ export async function apiRequest({
   });
     if (response.status === 401) {
       store.dispatch(resetAuth());
+       localStorage.removeItem("accessToken");
+    window.location.href = "/auth";
+    throw new Error("Unauthorized");
     }
 
   if (!res.ok) {
