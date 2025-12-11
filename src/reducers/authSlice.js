@@ -65,4 +65,15 @@ export const hydrateAuth = () => (dispatch) => {
   }
 
   dispatch(resetAuth());
+};// authSlice.js
+
+export const logout = () => (dispatch) => {
+  // Clear persistent auth
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("email");
+  localStorage.removeItem("guest");
+
+  // Reset Redux state
+  dispatch(resetAuth());
 };
+
