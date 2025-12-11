@@ -5,7 +5,7 @@ export default function NoteFormModal({ setShowNoteModal, handleAddNote }) {
   const guest = useSelector((s) => s.auth.guest);
   const folders = useSelector((s) => s.notes?.folders) || []; // fallback []
 
-  const loadingFolders = folders.length === 0 && !guest; 
+  //const loadingFolders = folders.length === 0 && !guest; 
 
  
 
@@ -19,9 +19,6 @@ export default function NoteFormModal({ setShowNoteModal, handleAddNote }) {
     <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
         <h3 className="text-2xl font-bold text-center mt-8">Add Note</h3>
            
-
-      
-  
      
       <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} setShowNoteModal={setShowNoteModal}/>
         <button
