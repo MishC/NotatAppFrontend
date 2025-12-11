@@ -114,7 +114,8 @@ export function deleteNoteAction({
   if (guest) {
     setNotes((prev) => deleteNoteLocal(prev, id));
     setMsg("Note deleted (guest mode).");
-    return;
+        return Promise.resolve(true);
+
   }
 
   deleteNoteApi({

@@ -61,7 +61,7 @@ export async function fetchFoldersApi({
     });
 
     const folders = data || [];
-
+    
 
     setFolders(folders);
 
@@ -79,6 +79,7 @@ setFolderOptions([
   } catch (err) {
     console.error("Error fetching folders:", err);
     setError("Error fetching folders.");
+
   }
 }
 
