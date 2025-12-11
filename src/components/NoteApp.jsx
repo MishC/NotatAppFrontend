@@ -192,8 +192,7 @@ export default function NoteApp() {
       ].join(" ")}
       >
       <span
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-[70%] w-1 bg-orange-500"
-
+        className={["absolute left-0 top-1/2 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
         aria-hidden="true"
       />
       {label}
