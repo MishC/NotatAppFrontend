@@ -7,6 +7,8 @@ import Header from "./Header";
 import Card from "./Card";
 import Modal from "./Modal";
 import NoteFormModal from "./NoteFormModal";
+import Plus from  "./icons/Plus" ; 
+
 //import Noteform from "./Noteform";
 //import KanbanNoteIcon from "./Kanban";
 
@@ -143,19 +145,14 @@ export default function NoteApp() {
 
       <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-15">
         <div className="flex items-center gap-4 justify-center text-center">
-          <button
-            type="button"
-            onClick={() => setShowNoteModal(true)}
-            className="inline-flex items-center gap-6 cursor-pointer select-none group"
+          <Plus onClick={() => setShowNoteModal(true)} className="rounded-2xl
+           text-white text-3xl leading-none grid place-items-center shadow-lg transition"/>
 
-            aria-label="Add note"
-          >     <span className="w-12 h-12 rounded-2xl bg-orange-500 hover:bg-orange-700
-           text-white text-3xl leading-none grid place-items-center shadow-lg transition">+</span>
 
             <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
               Note Board
             </h1>
-          </button>
+        
 
         </div>
 
