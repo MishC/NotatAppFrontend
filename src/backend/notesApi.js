@@ -67,7 +67,7 @@ export async function fetchFoldersApi({
 
     setFolderOptions([
       { id: null, label: "All" },
-      ...folders.map((f) => ({ id: f.id, label: f.name})).filter(f=>f.label!=="Done"), ...folders.filter(f=>f.name==="Done"),
+      ...folders.map((f) => ({ id: f.id, label: f.name})).filter(f=>f.label!=="Done"), ...folders.filter(f=>f.name.toLowerCase()==="done"||f.id===4),
 
     ]);
   } catch (err) {
