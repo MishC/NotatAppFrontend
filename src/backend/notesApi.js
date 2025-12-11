@@ -127,14 +127,11 @@ export async function deleteNoteApi({
   if (!ok) return;
 
   try {
-    apiRequest({
+    await apiRequest({
       url: `${API_URL}/${id}`,
       method: "DELETE",
       setError,
       expectJson: false,
-    }).catch((err) => {
-      console.error("Error deleting:", err);
-      setError("Error deleting a note.");
     });
 
     setNotes((prev) => {
