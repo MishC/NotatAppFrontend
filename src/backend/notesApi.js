@@ -15,6 +15,9 @@ export async function apiRequest({
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   });
+    if (response.status === 401) {
+      store.dispatch(resetAuth());
+    }
 
   if (!res.ok) {
     const msg = `HTTP error! status: ${res.status}`;
