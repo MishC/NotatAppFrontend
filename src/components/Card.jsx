@@ -45,7 +45,8 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
   }, [note.id, rowIndex, colIndex, onDrop]);
 
   return (
-    <li
+    <li 
+      key={cardColor+note.title}
       ref={noteRef}
       onClick={onClick}
       className={[
@@ -53,7 +54,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
         // card shell
         "group flex flex-col min-w-0 rounded-2xl border border-slate-200",
         "transition-all duration-200 ease-out",
-        "min-w-[204px] m-0 p-4 sm:p-5", // m-0 kvôli inline-block a column gap
+        "min-w-[204px] m-0 p-4 sm:p-5", 
         cardColor,
         isDragging
           ? "opacity-75 scale-[0.98] ring-2 ring-blue-400/40"
@@ -92,7 +93,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
               className="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-lg shadow-lg z-10 py-1"
               onClick={(e) => e.stopPropagation()}
             >
-              <li>
+              <li key={folderId+Math.random(1,200)}>
                 <button
                   role="menuitem"
                   className="w-full text-left px-4 py-2 hover:bg-slate-100 text-green-600"
