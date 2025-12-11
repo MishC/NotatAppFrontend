@@ -191,7 +191,7 @@ export default function NoteApp() {
         "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
         isActive
         ? "bg-yellow-100/60 text-slate-900 translate-x-1"
-        : "text-slate-700 hover:text-orange-600 hover:bg-white/70 -translate-x-0.5 hover:translate-x-8",
+        : "text-slate-700 hover:text-orange-600 hover:bg-white/70 -translate-x-0.5 hover:translate-x-5",
       ].join(" ")}
       >
       <span
