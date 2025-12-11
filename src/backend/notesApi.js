@@ -122,9 +122,11 @@ export async function addNoteApi({
 
     setNotes([...(notes || []), created]);
     setMsg("Note added.");
+    return true;
   } catch (err) {
     console.error("Error adding note:", err);
     setError("Error adding note.");
+    return false;
   }
 }
 

@@ -87,7 +87,7 @@ export function addNoteAction({
   if (guest) {
     setNotes((prev) => addNoteLocal(prev, newNote));
     setMsg("Note added (guest mode).");
-    return;
+    return true;
   }
 
   addNoteApi({

@@ -5,12 +5,9 @@ import { resetAuth, setGuest, setAuthedUser, setUser } from "../reducers/authSli
 
 import Header from "./Header";
 import Card from "./Card";
-import Modal from "./Modal";
-import NoteFormModal from "./NoteFormModal";
+import Modal from "./modals/Modal";
+import NoteFormModal from "./modals/NoteFormModal";
 import Plus from  "./icons/Plus" ; 
-
-//import Noteform from "./Noteform";
-//import KanbanNoteIcon from "./Kanban";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
 

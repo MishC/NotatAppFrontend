@@ -1,11 +1,13 @@
 import { useSelector } from "react-redux";
-import Noteform from "./Noteform";
+import Noteform from "../Noteform";
 
 export default function NoteFormModal({ setShowNoteModal, handleAddNote }) {
   const guest = useSelector((s) => s.auth.guest);
   const folders = useSelector((s) => s.notes?.folders) || []; // fallback []
 
   const loadingFolders = folders.length === 0 && !guest; 
+
+ 
 
   return (
     <div className="NoteFormModal fixed inset-0 z-50 grid place-items-center p-4">
@@ -21,7 +23,7 @@ export default function NoteFormModal({ setShowNoteModal, handleAddNote }) {
       
   
      
-      <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest}/>
+      <Noteform folders={folders} handleAddNote={handleAddNote} guest={guest} setShowNoteModal={setShowNoteModal}/>
         <button
           onClick={() => setShowNoteModal(false)}
           className="px-5 py-2  mb-5 text-xl rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"

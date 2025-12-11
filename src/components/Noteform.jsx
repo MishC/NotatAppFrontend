@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { validateNote, buildPayload, createEmptyNote } from "../helpers/noteHelpers";
 
 
-export default function Noteform({ folders, handleAddNote, guest=false}) {
+export default function Noteform({ folders, handleAddNote, guest=false, setShowNoteModal}) {
   //states
   const [newNote, setNewNote] = useState({
     title: '',
@@ -24,9 +24,13 @@ export default function Noteform({ folders, handleAddNote, guest=false}) {
   }
 
   const payload = buildPayload(newNote, guest);
-  handleAddNote(payload);
+  const res= handleAddNote(payload);
 
+   if (res) {
   setNewNote({ title: "", content: "", folderId: "" });
+  setShowNoteModal(false);   
+}
+
 };
 ///////
   return (
