@@ -65,5 +65,5 @@ export const hydrateAuth = () => (dispatch) => {
   }
 
   dispatch(resetAuth());
-};// authSlice.js
+};
 
