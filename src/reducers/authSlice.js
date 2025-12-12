@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
+const initialState = { 
   authedUser: null,     
   user: null,             
   loading: false,
   guest: localStorage.getItem("guest") === "true",
 };
-
+/////////////////////////////////////////////////////////////////
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -66,14 +66,4 @@ export const hydrateAuth = () => (dispatch) => {
 
   dispatch(resetAuth());
 };// authSlice.js
-
-export const logout = () => (dispatch) => {
-  // Clear persistent auth
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("email");
-  localStorage.removeItem("guest");
-
-  // Reset Redux state
-  dispatch(resetAuth());
-};
 
