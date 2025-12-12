@@ -6,9 +6,7 @@ export default function NoteFormModal({ folders, setShowNoteModal, handleAddNote
 
   //const loadingFolders = folders.length === 0 && !guest; 
 
- 
-  console.log(folders)
-  return (
+   return (
     <div className="NoteFormModal fixed inset-0 z-50 grid place-items-center p-4">
     <div
       className="absolute inset-0 bg-black/40"

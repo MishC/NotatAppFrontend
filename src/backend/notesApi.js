@@ -1,3 +1,33 @@
+let refreshPromise = null;
+
+async function refreshAccessToken() {
+  if (refreshPromise) return refreshPromise; //single-flight
+
+  const API_BASE = import.meta.env.VITE_API_URL || window.location.origin;
+  const url = `${API_BASE}/api/auth/refresh`;
+
+  refreshPromise = (async () => {
+    const res = await fetch(url, {
+      method: "POST",
+      credentials: "include",           
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) throw new Error("refresh_failed");
+
+    const data = await res.json();      // { accessToken: "..." }
+    const accessToken = data?.accessToken;
+    if (!accessToken) throw new Error("no_access_token");
+
+    localStorage.setItem("accessToken", accessToken); //new token set up to localstorage
+    return accessToken;
+  })().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+}
+
 
 export async function apiRequest({
   url,
@@ -24,16 +54,17 @@ export async function apiRequest({
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
   });
-
-  if (res.status === 401 && !isGuest) {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("email");
-    localStorage.removeItem("guest");
-
-    window.location.href = "/auth";
-
-    throw new Error("Unauthorized");
+ if (res.status === 401 && retry) {
+    try {
+      await refreshAccessToken();
+      return apiRequest(path, { method, body, headers, retry: false }); //recurrent call
+    } catch {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/auth";
+      throw new Error("Unauthorized");
+    }
   }
+
 
   if (!res.ok) {
     const msg = `HTTP error! status: ${res.status}`;
