@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import {hydrateAuth} from "./reducers/authSlice";
+
 import { RequireAuth, AuthOnly } from "./helpers/authGuard";
 
 import NoteApp from "./components/NoteApp";
@@ -11,10 +9,7 @@ import "./App.css";
 
 export default function App() {
   
- const dispatch =useDispatch();
-    useEffect(() => {
-    dispatch(hydrateAuth());
-  }, [dispatch]);
+  
 
   return (
     <div className="App mb-[250px]">
