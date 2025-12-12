@@ -48,7 +48,6 @@ export default function NoteApp() {
   const API_URL = `${window.location.origin}/api/notes`;
   const API_URL2 = `${window.location.origin}/api/folders`;
 
-   const isActive = String(activeFolder) === "calendar";
 
 
   useEffect(() => {
