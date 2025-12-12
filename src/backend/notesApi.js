@@ -35,6 +35,7 @@ export async function apiRequest({
   body,
   setError,
   expectJson = true,
+  retry=true,
 }) {
   const token = localStorage.getItem("accessToken");
   const isGuest = localStorage.getItem("guest") === "true";
@@ -57,7 +58,12 @@ export async function apiRequest({
  if (res.status === 401 && retry) {
     try {
       await refreshAccessToken();
-      return apiRequest(path, { method, body, headers, retry: false }); //recurrent call
+      return apiRequest(url,
+  method = "GET",
+  body,
+  setError,
+  expectJson = true,
+  retry=true,); //recurrent call
     } catch {
       localStorage.removeItem("accessToken");
       window.location.href = "/auth";
