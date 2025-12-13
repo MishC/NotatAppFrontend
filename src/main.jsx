@@ -9,6 +9,7 @@ import './index.css'
 import App from './App.jsx'
 store.dispatch(hydrateAuth());
 
+store.dispatch({ type: "LOG_TEST/HELLO", payload: { time: Date.now() } });
 
 createRoot(document.getElementById('root')).render(
  <Provider store={store}>
