@@ -45,8 +45,8 @@ export default function NoteApp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const API_URL = import.meta.env.VITE_API_URL + "/api/notes"|| `${window.location.origin}/api/notes`;
-  const API_URL2 = import.meta.env.VITE_API_URL +"/api/folders"|| `${window.location.origin}/api/folders`;
+  const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
+  const API_URL2 = import.meta.env.VITE_API_URL +"/api/folders";
 
 
 
