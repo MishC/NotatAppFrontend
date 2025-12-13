@@ -42,28 +42,3 @@ export const {
 
 export default authSlice.reducer;
 
-//new f -handle guest and user on refresh 
-// we fyll in to Redux from local storage 
-
-export const hydrateAuth = () => (dispatch) => {
-  const token = localStorage.getItem("accessToken");
-  const email = localStorage.getItem("email");
-  const isGuest = localStorage.getItem("guest") === "true";
-
-  if (isGuest && !token) {
-    dispatch(setGuest(true));
-    dispatch(setAuthedUser(null));
-    dispatch(setUser(null));
-    return;
-  }
-
-  if (token && email) {
-    dispatch(setGuest(false));
-    dispatch(setAuthedUser(email));
-    dispatch(setUser({ email }));
-    return;
-  }
-
-  dispatch(resetAuth());
-};
-

@@ -1,7 +1,8 @@
 let refreshPromise = null;
 
-async function refreshAccessToken() {
-  if (refreshPromise) return refreshPromise; //single-flight
+export async function refreshAccessToken() {
+  // Single-flight: if a refresh is already in progress, reuse it
+  if (refreshPromise) return refreshPromise;
 
   const API_BASE = import.meta.env.VITE_API_URL || window.location.origin;
   const url = `${API_BASE}/api/auth/refresh`;
@@ -9,17 +10,17 @@ async function refreshAccessToken() {
   refreshPromise = (async () => {
     const res = await fetch(url, {
       method: "POST",
-      credentials: "include",           
+      credentials: "include",                 // HttpOnly cookie
       headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) throw new Error("refresh_failed");
 
-    const data = await res.json();      // { accessToken: "..." }
+    const data = await res.json();            // expects { accessToken }
     const accessToken = data?.accessToken;
     if (!accessToken) throw new Error("no_access_token");
 
-    localStorage.setItem("accessToken", accessToken); //new token set up to localstorage
+    localStorage.setItem("accessToken", accessToken);
     return accessToken;
   })().finally(() => {
     refreshPromise = null;
@@ -35,35 +36,34 @@ export async function apiRequest({
   body,
   setError,
   expectJson = true,
-  retry=true,
+  retry = true,
 }) {
   const token = localStorage.getItem("accessToken");
   const isGuest = localStorage.getItem("guest") === "true";
 
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  // Only send Authorization header if we actually have a token and are not in guest mode
-  if (token && !isGuest) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+  const headers = { "Content-Type": "application/json" };
+  if (token && !isGuest) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(url, {
     method,
     headers,
-    credentials: "include",
+    credentials: "include",                   // keep if you use refresh cookie
     body: body ? JSON.stringify(body) : undefined,
   });
- if (res.status === 401 && retry) {
+
+  // Attempt a single auto-refresh only if not guest and we had/used a token
+  if (res.status === 401 && retry && !isGuest && token) {
     try {
       await refreshAccessToken();
-      return apiRequest(url,
-  method = "GET",
-  body,
-  setError,
-  expectJson = true,
-  retry=true,); //recurrent call
+      // Retry original request once
+      return apiRequest({
+        url,
+        method,
+        body,
+        setError,
+        expectJson,
+        retry: false,
+      });
     } catch {
       localStorage.removeItem("accessToken");
       window.location.href = "/auth";
@@ -71,10 +71,9 @@ export async function apiRequest({
     }
   }
 
-
   if (!res.ok) {
     const msg = `HTTP error! status: ${res.status}`;
-    if (setError) setError(msg);
+    setError?.(msg);
     throw new Error(msg);
   }
 
@@ -83,6 +82,7 @@ export async function apiRequest({
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
+
 
 
 export async function fetchFoldersApi({
