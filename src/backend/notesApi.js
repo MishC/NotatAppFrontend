@@ -4,7 +4,7 @@ export async function refreshAccessToken() {
   // Single-flight: if a refresh is already in progress, reuse it
   if (refreshPromise) return refreshPromise;
 
-  const API_BASE = import.meta.env.VITE_API_URL || window.location.origin;
+  const API_BASE = "";
   const url = `${API_BASE}/api/auth/refresh`;
 
   refreshPromise = (async () => {
