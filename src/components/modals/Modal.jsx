@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { todayYYYYMMDD } from "../../helpers/DatesTimes";
 
 export default function Modal({ selectedNote, switchModal, updateNote, folders = [] }) {
   const [error, setError] = useState(null);
@@ -15,6 +16,9 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
     (folderId ?? "") === (selectedNote.folderId ?? "") &&
     (scheduledAt ?? "") === (selectedNote.scheduledAt ?? "");
 
+    const minDate = todayYYYYMMDD();
+
+
   const handleSave = async () => {
     const success = await updateNote(selectedNote.id, {
       title,
@@ -22,7 +26,10 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
       folderId,
       scheduledAt: scheduledAt?.trim() ? scheduledAt.trim() : null,
     });
-    console.log("UPDATE sending:", { title, content, folderId, scheduledAt });
+    if (scheduledAt && scheduledAt < minDate) {
+  setError("Deadline cannot be in the past.");
+  return;
+}
 
     if (!success) {
       setError("Failed to update note!");
@@ -93,9 +100,10 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
             <span className="mt-1 text-red-400">Deadline</span>
             <input
               type="date"
-              value={scheduledAt} // "YYYY-MM-DD" alebo ""
+              value={scheduledAt} // "YYYY-MM-DD"
               onChange={(e) => setScheduledAt(e.target.value)}
               placeholder="YEAR-MM-DD"
+              min={minDate}
               className="w-full px-4 py-3 text-lg rounded-lg border border-slate-300 text-slate-800
                          focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
