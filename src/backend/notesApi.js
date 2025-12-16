@@ -1,33 +1,4 @@
-let refreshPromise = null;
-
-export async function refreshAccessToken() {
-  // Single-flight: if a refresh is already in progress, reuse it
-  if (refreshPromise) return refreshPromise;
-
-  const API_BASE = "";
-  const url = `${API_BASE}/api/auth/refresh`;
-
-  refreshPromise = (async () => {
-    const res = await fetch(url, {
-      method: "POST",
-      credentials: "include",                 // HttpOnly cookie
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) throw new Error("refresh_failed");
-
-    const data = await res.json();            // expects { accessToken }
-    const accessToken = data?.accessToken;
-    if (!accessToken) throw new Error("no_access_token");
-
-    localStorage.setItem("accessToken", accessToken);
-    return accessToken;
-  })().finally(() => {
-    refreshPromise = null;
-  });
-
-  return refreshPromise;
-}
+import { refreshAccessToken } from "./authApi";
 
 
 export async function apiRequest({
@@ -224,20 +195,26 @@ export async function updateNoteApi({
       ...selectedNote,
       ...updatedFields,
       id: noteId,
-      folderId: updatedFields.folderId,
-      title: updatedFields.title,
-      content: updatedFields.content,
+      folderId: updatedFields.folderId ?? selectedNote.folderId ?? null,
+      title: updatedFields.title ?? selectedNote.title ?? "",
+      content: updatedFields.content ?? selectedNote.content ?? "",
+      scheduledAt:
+        typeof updatedFields.scheduledAt === "string" && updatedFields.scheduledAt.trim()
+          ? updatedFields.scheduledAt.trim()
+          : updatedFields.scheduledAt === null
+          ? null
+          : selectedNote.scheduledAt ?? null,
     };
 
     await apiRequest({
-      url: `${API_URL}/${payload.folderId}/${noteId}`,
+      url: `${API_URL}/${noteId}`,
       method: "PUT",
       body: payload,
       setError,
     });
+    console.log("PUT payload", payload);
 
-    setMsg(`Note "${updatedFields.title}" updated successfully!`);
-
+    setMsg(`Note "${payload.title}" updated successfully!`);
     await fetchNotesFn(activeFolder);
 
     setIsModalOpen(false);

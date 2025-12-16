@@ -7,7 +7,8 @@ export default function Noteform({ folders, handleAddNote, guest=false, setShowN
   const [newNote, setNewNote] = useState({
     title: '',
     content: '',
-    folderId: ''
+    folderId: '',
+    scheduledAt: '',
   });
   const [error, setError] = useState(null);
 
@@ -23,11 +24,19 @@ export default function Noteform({ folders, handleAddNote, guest=false, setShowN
     return;
   }
 
-  const payload = buildPayload(newNote, guest);
-  const res= handleAddNote(payload);
+ const payload = buildPayload(
+  {
+    ...newNote,
+    folderId: guest ? null : Number(newNote.folderId || 0),
+    scheduledAt: newNote.scheduledAt?.trim() ? newNote.scheduledAt.trim() : null,
+  },
+  guest
+);
+
+  const res=  handleAddNote(payload);
 
    if (res) {
-  setNewNote({ title: "", content: "", folderId: "" });
+  setNewNote({ title: "", content: "", folderId: "", scheduledAt:""});
   setShowNoteModal(false);   
 }
 
@@ -69,6 +78,20 @@ export default function Noteform({ folders, handleAddNote, guest=false, setShowN
           ))}
         </select>
       )}
+
+       {/* Scheduled at */}
+       
+         <div className="w-full flex mb-5 py-3 text-xl"><span className="mt-3 mr-7 text-red-400">Deadline</span>
+         <input
+          type='date'
+          value={newNote.scheduledAt}
+          onChange={(e) => setNewNote({ ...newNote, scheduledAt: e.target.value })
+}
+          placeholder="YEAR-MM-DD"
+           className="w-full mb-8 px-4 py-3 text-lg rounded-lg border border-slate-300 text-slate-800
+                     focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+        /></div>
+
       
 
       <div className="flex justify-center">
