@@ -8,6 +8,7 @@ export function validateNote(newNote, guest) {
   return null;
 }
 
+/* Guest Only */
 export function buildPayload(newNote, guest) {
   return {
     ...newNote,
@@ -20,6 +21,7 @@ export function createEmptyNote() {
     title: "",
     content: "",
     folderId: "",
+    scheduledAt: ""
   };
 }
 

@@ -27,8 +27,7 @@ export default function Noteform({ folders, handleAddNote, guest=false, setShowN
  const payload = buildPayload(
   {
     ...newNote,
-    folderId: guest ? null : Number(newNote.folderId || 0),
-    scheduledAt: newNote.scheduledAt?.trim() ? newNote.scheduledAt.trim() : null,
+  
   },
   guest
 );
