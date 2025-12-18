@@ -11,8 +11,13 @@ export function validateNote(newNote, guest) {
 /* Guest Only */
 export function buildPayload(newNote, guest) {
   return {
-    ...newNote,
-    folderId: guest ? null : Number(newNote.folderId),
+    title: (newNote.title || "").trim(),
+    content: newNote.content?.trim() || null,
+    folderId: guest
+      ? null
+      : (newNote.folderId ? Number(newNote.folderId) : null),
+    // DateOnly? only "YYYY-MM-DD" or null
+    scheduledAt: newNote.scheduledAt ? newNote.scheduledAt : null,
   };
 }
 
@@ -21,7 +26,7 @@ export function createEmptyNote() {
     title: "",
     content: "",
     folderId: "",
-    scheduledAt: ""
+    scheduledAt: null
   };
 }
 
