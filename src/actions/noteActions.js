@@ -75,7 +75,8 @@ export function syncGuestAction({ guest, notes, folders }) {
 /* -----------------------------------------
    3) ADD NOTE
 ------------------------------------------ */
-export function addNoteAction({
+
+export async function addNoteAction({
   guest,
   API_URL,
   notes,
@@ -84,21 +85,25 @@ export function addNoteAction({
   setError,
   newNote,
 }) {
-  if (guest) {
+  
+  //guest mode
+ if (guest) {
     setNotes((prev) => addNoteLocal(prev, newNote));
     setMsg("Note added (guest mode).");
     return true;
   }
+//
 
-  addNoteApi({
+  return await addNoteApi({
     API_URL,
     notes,
     setNotes,
     setMsg,
     setError,
     newNote,
-  });
+  });  //addNoteApi returns true or false
 }
+
 
 /* -----------------------------------------
    4) DELETE NOTE
