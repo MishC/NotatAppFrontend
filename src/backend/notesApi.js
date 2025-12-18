@@ -157,7 +157,7 @@ export async function deleteNoteApi({
   confirmFn = window.confirm,
 }) {
   const ok = confirmFn("Are you sure you want to delete this note?");
-  if (!ok) return;
+  if (!ok) return false;
 
   try {
     await apiRequest({
