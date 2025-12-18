@@ -123,8 +123,7 @@ export default function NoteApp() {
       setMsg,
     });
 
-  // kalendárne callbacky
-  const onOpen = (note) => switchModalState(note);
+  // callendar callbacks - will be transfered soon
 
   const onSaveDate = async (note, ymd) =>
     updateNoteAction({
