@@ -1,0 +1,48 @@
+/* let it use full parent width regardless of inline widths */
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid table {
+  width: 100% !important;
+}
+
+/* let popovers/menus overflow out of cells */
+.fc .fc-view-harness,
+.fc .fc-scroller-harness,
+.fc .fc-scroller,
+.fc .fc-daygrid-body,
+.fc .fc-daygrid-day-frame,
+.fc .fc-daygrid-day-events {
+  overflow: visible !important;
+}
+
+/* nice border shell */
+.fc {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  padding: .5rem;
+}
+body.fc-dragging-tight .fc-event.fc-mirror {
+  transform: translate(-6px, -6px) !important;
+  opacity: .95 !important;
+  pointer-events: none !important;
+  z-index: 9999 !important;
+}
+
+.fc .fc-card-menu {
+  z-index: 10000 !important;
+}
+
+table {width:100%}
+
+.fc-scroller {
+    overflow: visible !important;
+    height: auto !important;
+}
+
+.fc-daygrid-body {
+    width: 100% !important; /* Forces it to use container width instead of calculated px */
+}
+
+.fc-scrollgrid-sync-table {
+    width: 100% !important;
+}
