@@ -1,35 +1,35 @@
-import { useState, useEffect, useMemo} from "react";
+// src/components/NoteApp.jsx
+import { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { resetAuth, setGuest, setAuthedUser, setUser } from "../reducers/authSlice";
+import { resetAuth, setGuest, setAuthedUser } from "../reducers/authSlice";
+import { getColorClassById } from "../helpers/colors";
+
 
 import Header from "./Header";
-import Card from "./Card";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
-import Plus from  "./icons/Plus" ; 
+import Plus from "./icons/Plus";
+
+import Calendar from "./Calendar";
+import Unscheduled from "./Unscheduled";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
-
 import {
   initNotesAndFoldersAction,
   syncGuestAction,
   addNoteAction,
   deleteNoteAction,
   updateNoteAction,
-  swapNotesAction,
   selectFolderAction,
   toggleModalAction,
 } from "../actions/noteActions";
-
-import AllNotes from "./AllNotes";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [folderOptions, setFolderOptions] = useState([{ id: null, label: "All" }]);
   const [activeFolder, setActiveFolder] = useState(null);
-  //const [activeKey, setActiveKey] = useState("all");
 
   const [loading, setLoading] = useState(false);
   const [lengthNotes, setLengthNotes] = useState(0);
@@ -46,22 +46,19 @@ export default function NoteApp() {
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
-  const API_URL2 = import.meta.env.VITE_API_URL +"/api/folders";
+  const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
 
-
-
+  // auth preload
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const email = localStorage.getItem("email");
-
     if (token && email) {
       dispatch(setGuest(false));
       dispatch(setAuthedUser(email));
     }
   }, [dispatch]);
 
-
-
+  // data load
   useEffect(() => {
     initNotesAndFoldersAction({
       guest,
@@ -86,10 +83,11 @@ export default function NoteApp() {
     const t = setTimeout(() => {
       setError("");
       setMsg("");
-    }, 10000);
+    }, 6000);
     return () => clearTimeout(t);
   }, [error, msg]);
 
+  // actions
   const onLogoutClick = async () => {
     await logoutAction({ dispatch, navigate }).finally(() => {
       dispatch(resetAuth());
@@ -125,138 +123,167 @@ export default function NoteApp() {
       setMsg,
     });
 
-  const handleSwapNotes = (sourceId, targetId) =>
-    swapNotesAction({ guest, API_URL, sourceId, targetId, setNotes, setError });
+  // kalendárne callbacky
+  const onOpen = (note) => switchModalState(note);
 
+  const onSaveDate = async (note, ymd) =>
+    updateNoteAction({
+      guest,
+      API_URL,
+      noteId: note.id,
+      updatedFields: { ...note, scheduledAt: ymd },
+      selectedNote: note,
+      activeFolder,
+      setNotes,
+      setLengthNotes,
+      setLoading,
+      setError,
+      setIsModalOpen,
+      setSelectedNote,
+      setMsg,
+    });
+
+  const onMoveDate = onSaveDate;
+
+  // derived
+  const filteredNotes = useMemo(
+    () => notes.filter((n) => n && (activeFolder == null || n.folderId === activeFolder)),
+    [notes, activeFolder]
+  );
+
+  const noteById = useMemo(() => {
+    const m = new Map();
+    for (const n of filteredNotes) m.set(String(n.id), n);
+    return m;
+  }, [filteredNotes]);
+
+  const unscheduled = useMemo(
+    () => filteredNotes.filter((n) => !n.scheduledAt),
+    [filteredNotes]
+  );
+
+  const events = useMemo(
+    () =>
+      filteredNotes
+        .filter((n) => !!n.scheduledAt)
+        .map((n) => {
+          const colorClass = getColorClassById(n.id);
+          return {
+            id: String(n.id),
+            title: n.title,
+            start: n.scheduledAt,
+            allDay: true,
+            extendedProps: { note: { ...n, colorClass } }, // <<< color
+          };
+        }),
+    [filteredNotes]
+  );
   return (
     <div className="w-full">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
-      {guest && <Header userName="Guest" onLogout={() => removeGuestMode(dispatch, navigate)} />
-      }
+      {guest && (
+        <Header
+          userName="Guest"
+          onLogout={() => removeGuestMode(dispatch, navigate)}
+        />
+      )}
 
-      <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(10.9deg, rgb(240, 213, 190) 8.1%, rgb(249, 240, 206) 16.5%, rgb(253, 244, 210) 27.3%, rgb(222, 248, 226) 85.2%, rgb(200, 247, 242) 100%)",
-        }}
-      />
-
-      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6 mb-15">
-        <div className="flex items-center gap-4 justify-center text-center">
-          <Plus onClick={() => setShowNoteModal(true)} className="rounded-2xl
-           text-white text-3xl leading-none grid place-items-center shadow-lg transition"/>
-
-
-            <h1 className="text-5xl md:text-6xl  font-extrabold tracking-tight text-slate-800 text-center">
-              Note Board
-            </h1>
-        
-
+      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
+        <div className="flex items-center gap-4 justify-center">
+          <Plus onClick={() => setShowNoteModal(true)} className="rounded-2xl text-white text-3xl grid place-items-center shadow-lg transition" />
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800">
+            Note Board
+          </h1>
         </div>
-
-        <p className="mt-2 text-slate-600 text-xl text-center">
-          Add Notes        </p>
-
+        <p className="mt-2 text-slate-600 text-xl text-center">Calendar</p>
       </div>
 
-      {error && (
-        <div className="error text-red-700 bg-red-50 mt-8 p-4 rounded-xl mb-4 text-base border border-red-200">
-          {error}
-        </div>
-      )}
-      {msg && (
-        <div className="msg text-emerald-700 bg-emerald-50 mt-8 p-4 rounded-xl mb-4 text-base border border-emerald-200">
-          {msg}
-        </div>
-      )}
+      {error && <div className="text-red-700 bg-red-50 mt-6 p-4 rounded-xl mb-4 border border-red-200">{error}</div>}
+      {msg && <div className="text-emerald-700 bg-emerald-50 mt-6 p-4 rounded-xl mb-4 border border-emerald-200">{msg}</div>}
 
       {loading ? (
-        <p className="text-slate-800 mx-auto text-3xl text-center py-16">
-          Loading...
-        </p>
+        <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
-        <div className="w-[20%] flex flex-col rounded-lg">
-  {folderOptions.map((opt) => {
-    const isActive =
-  (activeFolder == null && opt.id == null) ||
-  String(activeFolder) === String(opt.id);
+          {/** Folders sidebar  */}
 
-    const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
+               <div className="w-[20%] flex flex-col rounded-lg">
+        {folderOptions.map((opt) => {
+          const isActive =
+            (activeFolder == null && opt.id == null) ||
+            String(activeFolder) === String(opt.id);
 
-    return (
-      <button
-      key={opt.id ?? "all"}
-      onClick={() => handleFolderClick(opt)}
-      className={[
-        "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
-        isActive
-        ? "bg-yellow-100/60 text-slate-900 translate-x-1"
-        : "text-slate-700 hover:text-orange-600 hover:bg-white/40 -translate-x-0.5 hover:translate-x-3",
-      ].join(" ")}
-      >
-      <span
-        className={["absolute left-0 top-0.1 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
-        aria-hidden="true"
-      />
-      {label}
-      </button>
-    );
-  })}
+          const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
 
-</div>
+          return (
+            <button
+              key={opt.id ?? "all"}
+              onClick={() => handleFolderClick(opt)}
+              className={[
+                "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
+                isActive
+                  ? "bg-yellow-100/60 text-slate-900 translate-x-1"
+                  : "text-slate-700 hover:text-orange-600 hover:bg-white/40 -translate-x-0.5 hover:translate-x-3",
+              ].join(" ")}
+            >
+              <span
+                className={["absolute left-0 top-0.1 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
+                aria-hidden="true"
+              />
+              {label}
+            </button>
+          );
+        })}
+
+      </div>
+ 
+      <div className="overflow-visible calendar-container center flex flex-col">
+        <Calendar
+          events={events}
+          onOpen={(note) => switchModalState(note)}
+          onComplete={(note) =>
+            handleUpdateNote(note.id, { ...note, folderId: 4 /* done */ })
+          }
+          onDelete={(note) => handleDeleteNote(note.id)}
+          onMoveDate={async (note, ymd) =>
+            handleUpdateNote(note.id, { ...note, scheduledAt: ymd })
+          }
+        />
 
 
-  {activeFolder === null && <AllNotes />}
-
-         <ul
-  className={[
-    "w-[70%]",
-    "mx-auto rounded-lg",
-    "p-0",
-    "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4",
-    "gap-6",
-  ].join(" ")}
->
-  {notes
-    .filter((note) => note && (activeFolder == null || note.folderId === activeFolder))
-    .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0))
-    .map((note, idx) => (
-      <div className="px-6 py-6" key={note.id}>
-        <Card
-          note={note}
-          rowIndex={Math.floor(idx / 4)}
-          colIndex={idx % 4}
-          onDelete={handleDeleteNote}
-          onUpdate={handleUpdateNote}
-          onDrop={handleSwapNotes}
-          onClick={() => switchModalState(note)}
+        <Unscheduled
+          notes={unscheduled}
+          onOpen={(n) => switchModalState(n)}
+          onDelete={(id) => handleDeleteNote(id)}
+          onComplete={(n) => handleUpdateNote(n.id, { ...n, folderId: 4 })}
+          onEdit={(n) => switchModalState(n)}
         />
       </div>
-    ))}
-</ul>
-
-        </div>
-      )}
-
-      {isModalOpen && selectedNote && (
-        <Modal
-          selectedNote={selectedNote}
-          switchModal={switchModalState}
-          updateNote={handleUpdateNote}
-          folders={folders}
-        />
-      )}
- 
-   {showNoteModal && (
-  <NoteFormModal folders={folders}
-    setShowNoteModal={setShowNoteModal}
-    handleAddNote={handleAddNote}
-  />
-)}
-
-
     </div>
+  )
+}
+
+{
+  isModalOpen && selectedNote && (
+    <Modal
+      selectedNote={selectedNote}
+      switchModal={(n) => switchModalState(n)}
+      updateNote={handleUpdateNote}
+      folders={folders}
+    />
+  )
+}
+
+{
+  showNoteModal && (
+    <NoteFormModal
+      folders={folders}
+      setShowNoteModal={setShowNoteModal}
+      handleAddNote={handleAddNote}
+    />
+  )
+}
+    </div >
+    
   );
 }
