@@ -29,3 +29,8 @@ export function getColorById(id) {
 }
 
 
+// src/helpers/colors.js
+export function getColorClassById(id) {
+  const i = Math.abs(Number(id)) % 8; // 0..7
+  return `note-color-${i + 1}`;
+}
