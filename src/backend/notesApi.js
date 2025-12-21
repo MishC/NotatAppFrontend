@@ -37,7 +37,10 @@ export async function apiRequest({
       });
     } catch {
       localStorage.removeItem("accessToken");
+      store.dispatch(resetAuth());
+
       window.location.href = "/auth";
+
       throw new Error("Unauthorized");
     }
   }

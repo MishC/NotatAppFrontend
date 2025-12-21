@@ -50,6 +50,9 @@ async function apiJson(url, options = {}) {
 
   if (!res.ok) {
     const txt = await res.text();
+    if (txt === "Unauthorized") {
+      store.dispatch(resetAuth());
+    }
     throw new Error(txt || `HTTP error! status: ${res.status}`);
   }
 

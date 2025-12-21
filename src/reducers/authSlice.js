@@ -40,5 +40,6 @@ export const {
   resetAuth,
 } = authSlice.actions;
 
+
 export default authSlice.reducer;
 
