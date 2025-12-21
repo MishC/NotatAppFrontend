@@ -87,6 +87,7 @@ setFolderOptions([
   } catch (err) {
     console.error("Error fetching folders:", err);
     setError("Error fetching folders.");
+    return false;
 
   }
 }
@@ -114,9 +115,11 @@ export async function fetchNotesApi({
         ? list.length
         : list.filter((n) => n.folderId === activeFolder).length
     );
+    return true;
   } catch (err) {
     console.error("Error fetching notes:", err);
     setError("Error fetching notes. Please try again later.");
+    return false;
   } finally {
     setLoading(false);
   }
@@ -171,10 +174,12 @@ export async function deleteNoteApi({
       const updated = prev.filter((n) => n.id !== id);
       setMsg("Note deleted successfully.");
       return updated;
+
     });
   } catch (err) {
     console.error("Error deleting note:", err);
     setError("Error deleting note.");
+    return false;
   }
 }
 
@@ -256,6 +261,7 @@ export async function swapNotesApi({
       body: { SourceId: sourceId, TargetId: targetId },
       setError,
     });
+    return true;
   } catch (err) {
     console.error("Swap failed:", err);
     // revert

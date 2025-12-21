@@ -1,4 +1,5 @@
 export function addNoteLocal(prevNotes, { title, content, folderId }) {
+  try {
   const newNote = {
     id: Date.now(),
     title,
@@ -7,8 +8,12 @@ export function addNoteLocal(prevNotes, { title, content, folderId }) {
     orderIndex: prevNotes.length,
     createdAt: new Date().toISOString(),
   };
-
-  return [...prevNotes, newNote];
+   
+  return [...prevNotes, newNote];}
+  catch (err) {
+    console.error("Error adding note:", err);
+    return false;
+  }
 }
 
 // DELETE 
