@@ -34,9 +34,11 @@ export default function Calendar({
     return () => ro.disconnect();
   }, []);
   return (
-    <div className="w-[90%] ml-20" ref={wrapRef} >
+    <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef} >
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
+          themeSystem="standard"
+
         initialView="dayGridMonth"
         height="auto"
         firstDay={1}

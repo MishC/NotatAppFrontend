@@ -16,10 +16,8 @@
 
 /* nice border shell */
 .fc {
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
   background: #fff;
-  padding: .5rem;
+  padding: 1rem;
 }
 body.fc-dragging-tight .fc-event.fc-mirror {
   transform: translate(-6px, -6px) !important;
@@ -45,4 +43,15 @@ table {width:100%}
 
 .fc-scrollgrid-sync-table {
     width: 100% !important;
+}
+
+.fc-daygrid-day.fc-day-today .fc-daygrid-day-frame .fc-butoon {
+  background-color: #FEF9C3; /* yellow-100 */
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: #fef3c3;
+  border-color: #917a17; /* yellow-400 */
+  color: #000;        /* yellow-900 */
+  padding: .5rem 1rem;
 }
