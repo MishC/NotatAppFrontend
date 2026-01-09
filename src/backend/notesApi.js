@@ -24,8 +24,14 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
   });
 
   if (res.status === 401 && retry && !guest && token) {
-    await refreshAccessToken();
-    return apiRequest({ url, method, body, expectJson, retry: false });
+     try {
+      await refreshAccessToken();
+      return apiRequest({ url, method, body, expectJson, retry: false });
+    } catch {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/auth";
+      throw new Error("Unauthorized");
+    }
   }
 
   if (!res.ok) {
@@ -35,7 +41,15 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
       payload?.message ||
       payload?.error ||
       `HTTP error! status: ${res.status}`;
-    throw new Error(msg);
+
+    if (res.status === 401) {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/auth";
+    }
+
+    const err = new Error(msg);
+    err.status = res.status; 
+    throw err;
   }
 
   return expectJson ? readBody(res) : null;
