@@ -113,6 +113,7 @@ export default function NoteApp() {
       noteId,
       updatedFields,
       selectedNote,
+      noteById,
       activeFolder,
       setNotes,
       setLengthNotes,
@@ -122,6 +123,8 @@ export default function NoteApp() {
       setSelectedNote,
       setMsg,
     });
+
+    
 
   // callendar callbacks - will be transfered soon
 
@@ -244,9 +247,11 @@ export default function NoteApp() {
             handleUpdateNote(note.id, { ...note, folderId: 4 /* done */ })
           }
           onDelete={(note) => handleDeleteNote(note.id)}
-          onMoveDate={async (note, ymd) =>
-            handleUpdateNote(note.id, { ...note, scheduledAt: ymd })
-          }
+          onMoveDate={(note, ymd) =>
+  handleUpdateNote(note.id, { scheduledAt: ymd })
+}
+
+          
         />
 
 
