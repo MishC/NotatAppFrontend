@@ -29,8 +29,8 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
   }, []);
 
   return (
-    <div className="mt-8">
-      <h3 className="text-2xl font-bold text-slate-800 mb-4">Unscheduled</h3>
+    <div className="mt-20 ml-20 w-[90%]">
+      <h3 className="text-2xl text-slate-800 mb-20 text-left ml-8 text-blue-400 text-[1.75em]">Unscheduled</h3>
       <ul
         ref={containerRef}
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"

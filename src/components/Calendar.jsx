@@ -34,7 +34,7 @@ export default function Calendar({
     return () => ro.disconnect();
   }, []);
   return (
-    <div className="w-full" ref={wrapRef} >
+    <div className="w-[90%] ml-20" ref={wrapRef} >
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
