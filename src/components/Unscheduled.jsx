@@ -18,7 +18,7 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
         let note = null;
         try { note = JSON.parse(json); } catch {}
         return {
-          id,
+           id: String(id), 
           title: note?.title ?? el.getAttribute("data-title") ?? "",
           allDay: true,
           extendedProps: { note }, // <<< posielame celý note
@@ -45,7 +45,7 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
               data-id={String(n.id)}
             data-title={n.title}
             data-note={JSON.stringify(n)}   
-            onClick={() => onOpen(n)}
+              onClick={() => onOpen(n)}
             title={n.title}
           >
             <div className="flex items-start gap-3 mb-3">
