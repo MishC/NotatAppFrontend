@@ -19,6 +19,7 @@ export default function Calendar({
   onComplete,    // (note) => void
   onDelete,      // (note) => void
   onMoveDate,    // (note, ymd) => Promise<boolean> | boolean
+
 }) {
 
   const calRef = useRef(null);
@@ -37,7 +38,7 @@ export default function Calendar({
     <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef} >
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
-          themeSystem="standard"
+        themeSystem="standard"
 
         initialView="dayGridMonth"
         height="auto"
@@ -47,6 +48,7 @@ export default function Calendar({
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
+
         eventDragStart={() => {
           document.body.classList.add("fc-dragging-tight");
         }}
@@ -149,8 +151,27 @@ export default function Calendar({
           const fn = info.event.extendedProps?.__cleanup;
           if (typeof fn === "function") fn();
         }}
+        ////////////////////
 
-        // Move event to another day -> update scheduledAt (YYYY-MM-DD)
+        eventReceive={async (info) => {
+          const id = String(info.event.id);
+          const newDate = info.event.startStr?.slice(0, 10);
+          if (!newDate) return;
+
+          const note =
+            info.event.extendedProps?.note ??
+            noteById?.get(id);
+
+          if (!note) {
+            info.event.remove();
+            return;
+          }
+
+          const ok = await onMoveDate?.(note, newDate);
+          if (!ok) info.event.remove();
+        }}
+
+
         eventDrop={async (info) => {
           const note = info.event.extendedProps?.note;
           const newDate = info.event.startStr?.slice(0, 10);
