@@ -52,7 +52,7 @@ table {width:100%}
 .fc .fc-button-primary:disabled {
   background-color: #fef3c3;
   border-color: #e6d071; /* yellow-400 */
-  color: #000;        /* yellow-900 */
+  color: #000;       
   padding: 0.5rem 2rem;
   
 }
