@@ -32,12 +32,17 @@ export const hydrateAuth = () => (dispatch) => {
 
 
 // REGISTER
-export async function registerAction(email, password, phone) {
-    const res = await registerApi(email, password, phone);
-    console.log(res);
-    return res
-    //without setError to test
 
+export async function registerAction({ email, password, phone, setMsg, setErr }) {
+  try {
+    await registerApi(email, password, phone);
+    setMsg?.("Registration successful.");
+    return true;
+  } catch (err) {
+    console.error(err);
+    setErr?.(err.message || "Registration failed.");
+    return false;
+  }
 }
 
 
@@ -116,7 +121,6 @@ export function enterGuestMode(dispatch, navigate) {
 }
 
 export function removeGuestMode(dispatch, navigate) {
-  // wipe any auth
   //localStorage.removeItem("accessToken");
   //localStorage.removeItem("guest");
   localStorage.clear();

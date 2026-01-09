@@ -2,28 +2,23 @@ const API_LOGIN = "/api/auth/login";
 const API_VERIFY_2FA = "/api/auth/verify-2fa";
 const API_REGISTER = "/api/auth/register";
 const API_LOGOUT = "/api/auth/logout";
-const API_REFRSH = "/api/auth/refresh"
-
-/* refresh token */
+const API_REFRESH = "/api/auth/refresh";
 
 let refreshPromise = null;
 
 export async function refreshAccessToken() {
-  // Single-flight: if a refresh is already in progress, reuse it
   if (refreshPromise) return refreshPromise;
 
-  const url = `${API_REFRESH}`;
-
   refreshPromise = (async () => {
-    const res = await fetch(url, {
+    const res = await fetch(API_REFRESH, {
       method: "POST",
-      credentials: "include",                 // HttpOnly cookie
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) throw new Error("refresh_failed");
 
-    const data = await res.json();            // expects { accessToken }
+    const data = await res.json().catch(() => null);
     const accessToken = data?.accessToken;
     if (!accessToken) throw new Error("no_access_token");
 
@@ -36,33 +31,59 @@ export async function refreshAccessToken() {
   return refreshPromise;
 }
 
-/**helper function **/
-async function apiJson(url, options = {}) {
-  const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
-      ...(options.headers || {}),
-    },
-    credentials: "include",
-    ...options,
-  });
+async function readBody(res) {
+  const ct = res.headers.get("content-type") || "";
+  if (res.status === 204) return null;
 
-  if (!res.ok) {
-    const txt = await res.text();
-    if (txt === "Unauthorized") {
-      store.dispatch(resetAuth());
-    }
-    throw new Error(txt || `HTTP error! status: ${res.status}`);
+  if (ct.includes("application/json")) {
+    return res.json().catch(() => null);
   }
 
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  const txt = await res.text().catch(() => "");
+  try {
+    return txt ? JSON.parse(txt) : null;
+  } catch {
+    return txt || null;
+  }
 }
 
+function toMsg(body, status) {
+  return typeof body === "string"
+    ? body
+    : body?.message || body?.error || `HTTP error! status: ${status}`;
+}
 
-/**1st layer: calling backend endpoints**/
+/** helper **/
+async function apiJson(url, options = {}) {
+  const doFetch = (tokenOverride) => {
+    const token = tokenOverride ?? localStorage.getItem("accessToken");
+    return fetch(url, {
+      ...options,
+      credentials: "omit",
+      headers: {
+        ...(options.headers || {}),
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+  };
 
+  let res = await doFetch();
+
+  if (res.status === 401) {
+    const newToken = await refreshAccessToken(); // may throw
+    res = await doFetch(newToken);
+  }
+
+  if (!res.ok) {
+    const body = await readBody(res);
+    throw new Error(toMsg(body, res.status));
+  }
+
+  return readBody(res);
+}
+
+/** endpoints **/
 export function registerApi(email, password, phoneNumber) {
   return apiJson(API_REGISTER, {
     method: "POST",
@@ -85,8 +106,16 @@ export function verify2faApi(flowId, code, channel) {
 }
 
 export async function logoutApi() {
-  await fetch(API_LOGOUT, {
+  // logout clears refresh cookie
+  const res = await fetch(API_LOGOUT, {
     method: "POST",
     credentials: "include",
   });
+
+  if (!res.ok) {
+    const body = await readBody(res);
+    throw new Error(toMsg(body, res.status));
+  }
+
+  return true;
 }
