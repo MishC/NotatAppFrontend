@@ -152,6 +152,7 @@ export async function updateNoteAction({
   noteId,
   updatedFields,
   selectedNote,
+  noteById,          // NEW (Map)
   activeFolder,
   setNotes,
   setLengthNotes,
@@ -161,6 +162,12 @@ export async function updateNoteAction({
   setSelectedNote,
   setMsg,
 }) {
+  // find base note safely (modal note OR lookup)
+  const base =
+    selectedNote ??
+    (noteById ? noteById.get(String(noteId)) : null) ??
+    null; //if not base return null
+
   if (guest) {
     setNotes((prev) => updateNoteLocal(prev, noteId, updatedFields));
     setMsg("Note updated (guest mode).");
@@ -169,26 +176,53 @@ export async function updateNoteAction({
     return true;
   }
 
+  // if we still don't have a base note, we can only update fields that backend accepts without full object.
+  // if your backend requires full payload, bail out safely:
+  if (!base) {
+    setError("Cannot update: note not found (missing base note).");
+    return false;
+  }
+
+  // IMPORTANT: folder/title/content optional, never read selectedNote directly
   const payload = {
-    ...selectedNote,
+    ...base,
     ...updatedFields,
     id: noteId,
-    folderId: updatedFields.folderId ?? selectedNote.folderId ?? null,
-    title: updatedFields.title ?? selectedNote.title ?? "",
-    content: updatedFields.content ?? selectedNote.content ?? "",
+
+    // folderId optional:
+    // - if updatedFields.folderId exists -> use it
+    // - else use base.folderId
+    // - else null
+    folderId:
+      updatedFields.folderId !== undefined
+        ? updatedFields.folderId
+        : (base.folderId ?? null),
+
+    // title optional
+    title:
+      updatedFields.title !== undefined
+        ? updatedFields.title
+        : (base.title ?? ""),
+
+    // content optional
+    content:
+      updatedFields.content !== undefined
+        ? updatedFields.content
+        : (base.content ?? ""),
+
+    // scheduledAt optional
     scheduledAt:
-      typeof updatedFields.scheduledAt === "string" && updatedFields.scheduledAt.trim()
-        ? updatedFields.scheduledAt.trim()
-        : updatedFields.scheduledAt === null
-        ? null
-        : selectedNote.scheduledAt ?? null,
+      updatedFields.scheduledAt !== undefined
+        ? (typeof updatedFields.scheduledAt === "string"
+            ? (updatedFields.scheduledAt.trim() || null)
+            : updatedFields.scheduledAt) // can be null
+        : (base.scheduledAt ?? null),
   };
 
   try {
     await updateNoteApi({ API_URL, noteId, payload });
     setMsg(`Note "${payload.title}" updated successfully!`);
 
-    // reload notes 
     setLoading(true);
     const list = await fetchNotesApi({ API_URL, activeFolder });
     setNotes(list);
