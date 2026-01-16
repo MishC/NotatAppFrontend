@@ -70,21 +70,21 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           {note.title}
         </h4>
 
-        <div className="relative">
+        <div className="relative z-100">
           <button
             onClick={(e) => {
               e.stopPropagation();
               setShowMenu((prev) => !prev);
             }}
             className="h-10 w-10 inline-flex items-center justify-center rounded-full
-                       text-slate-700 hover:text-blue-600 hover:bg-slate-100
-                       focus:outline-none focus:ring-2 focus:ring-blue-300"
+                       text-slate-700 hover:text-blue-600 bg-blue-100 hover:bg-slate-100
+                       focus:outline-none focus:ring-2 focus:ring-blue-300 z-100"
             aria-haspopup="menu"
             aria-expanded={showMenu}
             aria-label="Actions"
             title="Actions"
           >
-            <HamburgerIcon />
+      <HamburgerIcon />
           </button>
 
           {showMenu && (
