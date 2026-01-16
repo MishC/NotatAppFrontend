@@ -1,58 +1,56 @@
-/* let it use full parent width regardless of inline widths */
+/* Full width tables */
 .fc .fc-scrollgrid,
-.fc .fc-scrollgrid table {
+.fc .fc-scrollgrid table,
+.fc .fc-scrollgrid-sync-table,
+.fc .fc-daygrid-body {
   width: 100% !important;
 }
 
-/* let popovers/menus overflow out of cells */
-.fc .fc-view-harness,
-.fc .fc-scroller-harness,
-.fc .fc-scroller,
-.fc .fc-daygrid-body,
+/* Allow menus/popovers to overflow (don't nuke ALL overflow everywhere) */
 .fc .fc-daygrid-day-frame,
 .fc .fc-daygrid-day-events {
   overflow: visible !important;
 }
 
-/* nice border shell */
+/* Shell */
 .fc {
   background: #fff;
   padding: 1rem;
 }
-body.fc-dragging-tight .fc-event.fc-mirror {
-  transform: translate(-6px, -6px) !important;
-  opacity: .95 !important;
-  pointer-events: none !important;
-  z-index: 9999 !important;
-}
 
+/* Make your menu always on top */
 .fc .fc-card-menu {
   z-index: 10000 !important;
 }
 
-table {width:100%}
-
-.fc-scroller {
-    overflow: visible !important;
-    height: auto !important;
+/* Cursor feedback during drag */
+body.fc-dragging-tight {
+  cursor: grabbing !important;
+}
+body.fc-dragging-tight * {
+  cursor: grabbing !important;
 }
 
-.fc-daygrid-body {
-    width: 100% !important; /* Forces it to use container width instead of calculated px */
+/* === Drag mirror offset (DayGrid) ===
+   FullCalendar versions differ. These catch most cases.
+*/
+body.fc-dragging-tight .fc-event-dragging,
+body.fc-dragging-tight .fc-event-mirror,
+body.fc-dragging-tight .fc-daygrid-event-harness {
+  transform: translate(-5px, -5px) !important;
+  opacity: 0.95 !important;
+  pointer-events: none !important;
+  z-index: 9999 !important;
 }
 
-.fc-scrollgrid-sync-table {
-    width: 100% !important;
-}
+.fc-drag-handle {
 
-.fc-daygrid-day.fc-day-today .fc-daygrid-day-frame .fc-butoon {
-  background-color: #FEF9C3; /* yellow-100 */
-}
-
-.fc .fc-button-primary:disabled {
-  background-color: #fef3c3;
-  border-color: #e6d071; /* yellow-400 */
-  color: #000;       
-  padding: 0.5rem 2rem;
   
+  cursor: grab;
+  user-select: none;
+}
+body.fc-dragging-tight .fc-drag-handle { cursor: grabbing; }
+body.fc-dragging-tight .fc-daygrid-event-harness {
+  margin-top: -5px !important;
+  margin-left: -5px !important;
 }

@@ -15,75 +15,74 @@ import "./Calendar.css"
  */
 export default function Calendar({
   events,
-  onOpen,        // (note) => void
-  onComplete,    // (note) => void
-  onDelete,      // (note) => void
-  onMoveDate,    // (note, ymd) => Promise<boolean> | boolean
-
+  onOpen,
+  onComplete,
+  onDelete,
+  onMoveDate,
 }) {
-
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
   useEffect(() => {
     if (!wrapRef.current || !calRef.current) return;
     const ro = new ResizeObserver(() => {
-      const api = calRef.current?.getApi?.();
-      api?.updateSize();
+      calRef.current?.getApi?.()?.updateSize?.();
     });
     ro.observe(wrapRef.current);
     return () => ro.disconnect();
   }, []);
+
   return (
-    <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef} >
+    <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
+        ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin]}
         themeSystem="standard"
-
         initialView="dayGridMonth"
         height="auto"
         firstDay={1}
         editable={true}
-        droppable={true}
-
-        
+        droppable={false}
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
 
+        /* Stop FullCalendar default click from opening anything */
         eventClick={(info) => {
-    info.jsEvent.preventDefault();
-    info.jsEvent.stopPropagation();
-    info.jsEvent.stopImmediatePropagation?.(); // extra safety
-  }}
+          info.jsEvent.preventDefault();
+          info.jsEvent.stopPropagation();
+          info.jsEvent.stopImmediatePropagation?.();
+        }}
 
         eventDragStart={() => {
           document.body.classList.add("fc-dragging-tight");
+          document.body.style.cursor = "grabbing";
         }}
         eventDragStop={() => {
           document.body.classList.remove("fc-dragging-tight");
+          document.body.style.cursor = "";
         }}
 
         eventContent={(arg) => {
           const note = arg.event.extendedProps?.note;
           const title = escapeHtml(note?.title ?? arg.event.title ?? "");
           const content = escapeHtml((note?.content ?? "").trim());
-          const colorClass = note?.colorClass ?? "note-color-1"; // fallback
+          const colorClass = note?.colorClass ?? "note-color-1";
 
-          // IMPORTANT: data-attrs so we can find things in eventDidMount
           return {
             html: `
               <div class="fc-note-card ${colorClass}" data-evt-id="${arg.event.id}">
+                <div class="fc-drag-handle" title="Drag">
                 <div class="fc-card-header" style="display:flex;gap:.5rem;align-items:flex-start;">
                   <div class="fc-note-title" style="flex:1; font-weight:600;">${title}</div>
                   <div class="fc-card-menu-wrap" style="position:relative;">
-                    <button class="fc-card-menu-btn" aria-haspopup="menu" aria-label="Actions" title="Actions" style=" cursor:pointer;
-                      width:2rem;height:2rem;border-radius:20px;border:1px solid ${colorClass};background:${colorClass}; z-index:100;
+                    <button class="fc-card-menu-btn ${colorClass}" aria-haspopup="menu" aria-label="Actions" title="Actions" style="
+                      width:2rem;height:2rem;border-radius:20px; z-index:100; cursor:pointer;
                     ">☰</button>
-                    <ul class="fc-card-menu hidden" role="menu" style="cursor:pointer;
+                    <ul class="fc-card-menu hidden" role="menu" style="
                       position:absolute;right:0;top:2.25rem;min-width:11rem;
                       background:white;border:1px solid #e2e8f0ff;border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
-                      padding:.25rem .25rem;z-index:100;
+                      padding:.25rem .25rem;z-index:100; cursor:pointer;
                     ">
                       <li role="menuitem" data-act="edit" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#1E90f4;">🖉 Edit</li>
                       <li role="menuitem" data-act="complete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#4a2;">✓ Mark complete</li>
@@ -93,6 +92,7 @@ export default function Calendar({
                 </div>
                 ${content ? `<div class="fc-note-body" style="margin-top:.375rem;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.5rem .75rem;">${content}</div>` : ""}
               </div>
+                </div>
             `,
           };
         }}
@@ -100,57 +100,41 @@ export default function Calendar({
         eventDidMount={(info) => {
           const el = info.el;
           const note = info.event.extendedProps?.note;
-          if (!note) return false;
+          if (!note) return;
 
           const wrap = el.querySelector(".fc-card-menu-wrap");
           const btn = el.querySelector(".fc-card-menu-btn");
           const menu = el.querySelector(".fc-card-menu");
           const card = el.querySelector(".fc-note-card");
-          if (el.classList.contains("fc-external")) return;
-          if (el.closest(".fc-external")) return;
-
-
-
           if (!wrap || !btn || !menu || !card) return;
 
-          // toggle menu
           const toggleMenu = (e) => {
             e.stopPropagation();
             e.preventDefault();
             menu.classList.toggle("hidden");
           };
 
-          // and
           const onCardClick = (e) => {
-            // ignore clicks inside menu wrap (button/menu)
             if (wrap.contains(e.target)) return;
-
             e.stopPropagation();
             e.preventDefault();
             menu.classList.toggle("hidden");
           };
 
-          card.addEventListener("click", onCardClick);
-          // close menu on outside click
           const onDocClick = (e) => {
-            if (!wrap.contains(e.target)) menu.classList.add("hidden");
             if (!card.contains(e.target)) menu.classList.add("hidden");
-
           };
 
-          // prevent drag when clicking menu button
           const stop = (e) => {
             e.stopPropagation();
             e.preventDefault();
           };
 
-
-
+          card.addEventListener("click", onCardClick);
           btn.addEventListener("click", toggleMenu);
           btn.addEventListener("mousedown", stop);
           btn.addEventListener("touchstart", stop, { passive: false });
 
-          // menu actions
           const onMenuClick = (e) => {
             const li = e.target.closest(".fc-menu-item");
             if (!li) return;
@@ -162,11 +146,10 @@ export default function Calendar({
             if (act === "complete") onComplete?.(note);
             if (act === "delete") onDelete?.(note);
           };
-          menu.addEventListener("click", onMenuClick);
 
+          menu.addEventListener("click", onMenuClick);
           document.addEventListener("click", onDocClick);
 
-          // cleanup when event unmounts
           info.event.setExtendedProp("__cleanup", () => {
             card.removeEventListener("click", onCardClick);
             btn.removeEventListener("click", toggleMenu);
@@ -181,26 +164,6 @@ export default function Calendar({
           const fn = info.event.extendedProps?.__cleanup;
           if (typeof fn === "function") fn();
         }}
-        ////////////////////
-
-        eventReceive={async (info) => {
-          const id = String(info.event.id);
-          const newDate = info.event.startStr?.slice(0, 10);
-          if (!newDate) return;
-
-          const note =
-            info.event.extendedProps?.note ??
-            noteById?.get(id);
-
-          if (!note) {
-            info.event.remove();
-            return;
-          }
-
-          const ok = await onMoveDate?.(note, newDate);
-          if (!ok) info.event.remove();
-        }}
-
 
         eventDrop={async (info) => {
           const note = info.event.extendedProps?.note;
@@ -213,6 +176,7 @@ export default function Calendar({
     </div>
   );
 }
+
 
 function escapeHtml(s) {
   return String(s)
