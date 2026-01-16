@@ -45,7 +45,7 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
               data-id={String(n.id)}
             data-title={n.title}
             data-note={JSON.stringify(n)}   
-              onClick={() => onOpen(n)}
+            //  onClick={() => onOpen(n)} not open edit mode
             title={n.title}
           >
             <div className="flex items-start gap-3 mb-3">
