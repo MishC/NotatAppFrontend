@@ -23,6 +23,8 @@ export default function Calendar({
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
+const dragRef = { raf: null };
+
   useEffect(() => {
     if (!wrapRef.current || !calRef.current) return;
     const ro = new ResizeObserver(() => {
@@ -31,6 +33,8 @@ export default function Calendar({
     ro.observe(wrapRef.current);
     return () => ro.disconnect();
   }, []);
+        let __dragMoveHandler =null ;
+
 
   return (
     <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef}>
@@ -42,7 +46,7 @@ export default function Calendar({
         height="auto"
         firstDay={1}
         editable={true}
-        droppable={false}
+        droppable={true}
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
@@ -54,14 +58,32 @@ export default function Calendar({
           info.jsEvent.stopImmediatePropagation?.();
         }}
 
-        eventDragStart={() => {
-          document.body.classList.add("fc-dragging-tight");
-          document.body.style.cursor = "grabbing";
-        }}
-        eventDragStop={() => {
-          document.body.classList.remove("fc-dragging-tight");
-          document.body.style.cursor = "";
-        }}
+
+eventDragStart={() => {
+  document.body.classList.add("fc-dragging-tight");
+
+  const tick = () => {
+    const el = document.querySelector(".fc-event-dragging");
+    if (el) {
+      // tu si nastav offset ako chceš
+      // napr. 0,0 alebo -5,-5
+      el.style.setProperty("transform", "translate(100px, 70px)", "important");
+    }
+    dragRef.raf = requestAnimationFrame(tick);
+  };
+
+  dragRef.raf = requestAnimationFrame(tick);
+}}
+
+eventDragStop={() => {
+  document.body.classList.remove("fc-dragging-tight");
+  if (dragRef.raf) cancelAnimationFrame(dragRef.raf);
+  dragRef.raf = null;
+
+  const el = document.querySelector(".fc-event-dragging");
+  if (el) el.style.removeProperty("transform");
+}}
+
 
         eventContent={(arg) => {
           const note = arg.event.extendedProps?.note;

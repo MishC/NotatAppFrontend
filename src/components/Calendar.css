@@ -34,23 +34,11 @@ body.fc-dragging-tight * {
 /* === Drag mirror offset (DayGrid) ===
    FullCalendar versions differ. These catch most cases.
 */
-body.fc-dragging-tight .fc-event-dragging,
-body.fc-dragging-tight .fc-event-mirror,
-body.fc-dragging-tight .fc-daygrid-event-harness {
-  transform: translate(-5px, -5px) !important;
-  opacity: 0.95 !important;
-  pointer-events: none !important;
-  z-index: 9999 !important;
-}
+
 
 .fc-drag-handle {
 
   
   cursor: grab;
   user-select: none;
-}
-body.fc-dragging-tight .fc-drag-handle { cursor: grabbing; }
-body.fc-dragging-tight .fc-daygrid-event-harness {
-  margin-top: -5px !important;
-  margin-left: -5px !important;
 }
