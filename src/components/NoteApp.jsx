@@ -113,7 +113,7 @@ export default function NoteApp() {
       noteId,
       updatedFields,
       selectedNote,
-      noteById,
+amburger      noteById,
       activeFolder,
       setNotes,
       setLengthNotes,
