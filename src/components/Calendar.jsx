@@ -45,9 +45,17 @@ export default function Calendar({
         firstDay={1}
         editable={true}
         droppable={true}
+
+        
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
+
+        eventClick={(info) => {
+    info.jsEvent.preventDefault();
+    info.jsEvent.stopPropagation();
+    info.jsEvent.stopImmediatePropagation?.(); // extra safety
+  }}
 
         eventDragStart={() => {
           document.body.classList.add("fc-dragging-tight");
@@ -69,13 +77,13 @@ export default function Calendar({
                 <div class="fc-card-header" style="display:flex;gap:.5rem;align-items:flex-start;">
                   <div class="fc-note-title" style="flex:1; font-weight:600;">${title}</div>
                   <div class="fc-card-menu-wrap" style="position:relative;">
-                    <button class="fc-card-menu-btn" aria-haspopup="menu" aria-label="Actions" title="Actions" style="
-                      width:2rem;height:2rem;border-radius:9999px;border:1px solid #e2e8f0;background:white;
+                    <button class="fc-card-menu-btn" aria-haspopup="menu" aria-label="Actions" title="Actions" style=" cursor:pointer;
+                      width:2rem;height:2rem;border-radius:20px;border:1px solid ${colorClass};background:${colorClass}; z-index:100;
                     ">☰</button>
-                    <ul class="fc-card-menu hidden" role="menu" style="
+                    <ul class="fc-card-menu hidden" role="menu" style="cursor:pointer;
                       position:absolute;right:0;top:2.25rem;min-width:11rem;
                       background:white;border:1px solid #e2e8f0ff;border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
-                      padding:.25rem .25rem;z-index:9;
+                      padding:.25rem .25rem;z-index:100;
                     ">
                       <li role="menuitem" data-act="edit" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#1E90f4;">🖉 Edit</li>
                       <li role="menuitem" data-act="complete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#4a2;">✓ Mark complete</li>
@@ -97,7 +105,13 @@ export default function Calendar({
           const wrap = el.querySelector(".fc-card-menu-wrap");
           const btn = el.querySelector(".fc-card-menu-btn");
           const menu = el.querySelector(".fc-card-menu");
-          if (!wrap || !btn || !menu) return;
+          const card = el.querySelector(".fc-note-card");
+          if (el.classList.contains("fc-external")) return;
+          if (el.closest(".fc-external")) return;
+
+
+
+          if (!wrap || !btn || !menu || !card) return;
 
           // toggle menu
           const toggleMenu = (e) => {
@@ -106,9 +120,22 @@ export default function Calendar({
             menu.classList.toggle("hidden");
           };
 
+          // and
+          const onCardClick = (e) => {
+            // ignore clicks inside menu wrap (button/menu)
+            if (wrap.contains(e.target)) return;
+
+            e.stopPropagation();
+            e.preventDefault();
+            menu.classList.toggle("hidden");
+          };
+
+          card.addEventListener("click", onCardClick);
           // close menu on outside click
           const onDocClick = (e) => {
             if (!wrap.contains(e.target)) menu.classList.add("hidden");
+            if (!card.contains(e.target)) menu.classList.add("hidden");
+
           };
 
           // prevent drag when clicking menu button
@@ -116,6 +143,8 @@ export default function Calendar({
             e.stopPropagation();
             e.preventDefault();
           };
+
+
 
           btn.addEventListener("click", toggleMenu);
           btn.addEventListener("mousedown", stop);
@@ -139,6 +168,7 @@ export default function Calendar({
 
           // cleanup when event unmounts
           info.event.setExtendedProp("__cleanup", () => {
+            card.removeEventListener("click", onCardClick);
             btn.removeEventListener("click", toggleMenu);
             btn.removeEventListener("mousedown", stop);
             btn.removeEventListener("touchstart", stop);
