@@ -12,6 +12,7 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
     if (!containerRef.current) return;
     const d = new Draggable(containerRef.current, {
       itemSelector: ".fc-external",
+cursorAt: { left: -10, top: -10 },
       eventData: (el) => {
         const id = el.getAttribute("data-id");
         const json = el.getAttribute("data-note");
@@ -47,6 +48,8 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
             data-note={JSON.stringify(n)}   
             //  onClick={() => onOpen(n)} not open edit mode
             title={n.title}
+              draggable={false}
+
           >
             <div className="flex items-start gap-3 mb-3">
               <h4 className="flex-1 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate">
