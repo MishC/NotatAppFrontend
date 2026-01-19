@@ -65,9 +65,8 @@ eventDragStart={() => {
   const tick = () => {
     const el = document.querySelector(".fc-event-dragging");
     if (el) {
-      // tu si nastav offset ako chceš
-      // napr. 0,0 alebo -5,-5
-      el.style.setProperty("transform", "translate(100px, 70px)", "important");
+     
+      el.style.setProperty("transform", "translate(50px, 80px)", "important");
     }
     dragRef.raf = requestAnimationFrame(tick);
   };
