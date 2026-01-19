@@ -42,3 +42,5 @@ body.fc-dragging-tight * {
   cursor: grab;
   user-select: none;
 }
+
+button.fc-today-button.fc-button.fc-button-primary  { background: white; border:0; color:white}
