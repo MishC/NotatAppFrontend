@@ -100,7 +100,7 @@ export default function Login() {
 
   return (
     <div className="Login">
-      <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 bg-slate-100 p-6 sm:p-2">
+      <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 p-6 sm:p-2">
 
         <AuthTitle
           id="title"
