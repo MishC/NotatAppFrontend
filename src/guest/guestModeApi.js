@@ -22,12 +22,7 @@ export function deleteNoteLocal(prevNotes, id) {
   return filtered.map((n, idx) => ({ ...n, orderIndex: idx }));
 }
 
-// UPDATE
-export function updateNoteLocal(prevNotes, id, updatedFields) {
-  return prevNotes.map((note) =>
-    note.id === id ? { ...note, ...updatedFields } : note
-  );
-}
+
 
 // SWAP (drag & drop) – swap orderIndex
 export function swapNotesLocal(prevNotes, dragId, dropId) {
@@ -45,3 +40,33 @@ export function swapNotesLocal(prevNotes, dragId, dropId) {
 
   return arr;
 }
+
+  
+//LOAD
+ export function loadGuestNotes() {
+  const LS_KEY = "noteapp_guest_notes";
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+//SAVE
+ export function saveGuestNotes(notes) {
+  const LS_KEY = "noteapp_guest_notes";
+  localStorage.setItem(LS_KEY, JSON.stringify(notes));
+
+}
+
+// UPDATE
+
+export function updateNoteLocal(prev, noteId, updatedFields) {
+  const next = prev.map(n =>
+    String(n.id) === String(noteId)
+      ? { ...n, ...updatedFields }
+      : n
+  );
+  saveGuestNotes(next);   
+  return next;
+}
+
