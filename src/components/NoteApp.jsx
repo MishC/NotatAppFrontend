@@ -124,12 +124,12 @@ export default function NoteApp() {
       setMsg,
     });
 
-    
+
 
   // callendar callbacks - will be transfered soon
 
   const onSaveDate = async (note, ymd) =>
-    
+
     updateNoteAction({
       guest,
       API_URL,
@@ -200,9 +200,10 @@ export default function NoteApp() {
         </div>
         <p className="mt-2 text-slate-600 text-xl text-center">Calendar</p>
       </div>
-
-      {error && <div className="text-red-700 bg-red-50 mt-6 p-4 rounded-xl mb-4 border border-red-200">{error}</div>}
-      {msg && <div className="text-emerald-700 bg-emerald-50 mt-6 p-4 rounded-xl mb-4 border border-emerald-200">{msg}</div>}
+      {error ? <div className="text-red-700 bg-red-50 rounded-xl border border-red-200">{error}</div> : <div className="mt-6 p-10 mb-4 
+      rounded-xl border">&nbsp;</div>}
+      {msg ? <div className="text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div> :
+        <div className="mt-6 p-10 mb-4 rounded-xl border">&nbsp;</div>}
 
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
@@ -210,85 +211,85 @@ export default function NoteApp() {
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
           {/** Folders sidebar  */}
 
-               <div className="w-[20%] flex flex-col rounded-lg">
-        {folderOptions.map((opt) => {
-          const isActive =
-            (activeFolder == null && opt.id == null) ||
-            String(activeFolder) === String(opt.id);
+          <div className="w-[20%] flex flex-col rounded-lg">
+            {folderOptions.map((opt) => {
+              const isActive =
+                (activeFolder == null && opt.id == null) ||
+                String(activeFolder) === String(opt.id);
 
-          const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
+              const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
 
-          return (
-            <button
-              key={opt.id ?? "all"}
-              onClick={() => handleFolderClick(opt)}
-              className={[
-                "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
-                isActive
-                  ? "bg-yellow-100/60 text-slate-900 translate-x-1"
-                  : "text-slate-700 hover:text-orange-600 hover:bg-white/40 -translate-x-0.5 hover:translate-x-3",
-              ].join(" ")}
-            >
-              <span
-                className={["absolute left-0 top-0.1 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
-                aria-hidden="true"
-              />
-              {label}
-            </button>
-          );
-        })}
+              return (
+                <button
+                  key={opt.id ?? "all"}
+                  onClick={() => handleFolderClick(opt)}
+                  className={[
+                    "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
+                    isActive
+                      ? "bg-yellow-100/60 text-slate-900 translate-x-1"
+                      : "text-slate-700 hover:text-orange-600 hover:bg-white/40 -translate-x-0.5 hover:translate-x-3",
+                  ].join(" ")}
+                >
+                  <span
+                    className={["absolute left-0 top-0.1 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
+                    aria-hidden="true"
+                  />
+                  {label}
+                </button>
+              );
+            })}
 
-      </div>
- 
-      <div className="overflow-visible calendar-container center flex flex-col">
-        <Calendar
-          events={events}
-          onOpen={(note) => switchModalState(note)}
-          onComplete={(note) =>
-            handleUpdateNote(note.id, { ...note, folderId: 4 /* done */ })
-          }
-          onDelete={(note) => handleDeleteNote(note.id)}
-          onMoveDate={(note, ymd) =>
-  handleUpdateNote(note.id, { scheduledAt: ymd })
-}
+          </div>
 
-          
-        />
+          <div className="overflow-visible calendar-container center flex flex-col">
+            <Calendar
+              events={events}
+              onOpen={(note) => switchModalState(note)}
+              onComplete={(note) =>
+                handleUpdateNote(note.id, { ...note, folderId: 4 /* done */ })
+              }
+              onDelete={(note) => handleDeleteNote(note.id)}
+              onMoveDate={(note, ymd) =>
+                handleUpdateNote(note.id, { scheduledAt: ymd })
+              }
 
 
-        <Unscheduled
-          notes={unscheduled}
-          onOpen={(n) => switchModalState(n)}
-          onDelete={(id) => handleDeleteNote(id)}
-          onComplete={(n) => handleUpdateNote(n.id, { ...n, folderId: 4 })}
-          onEdit={(n) => switchModalState(n)}
-        />
-      </div>
-    </div>
-  )
-}
+            />
 
-{
-  isModalOpen && selectedNote && (
-    <Modal
-      selectedNote={selectedNote}
-      switchModal={(n) => switchModalState(n)}
-      updateNote={handleUpdateNote}
-      folders={folders}
-    />
-  )
-}
 
-{
-  showNoteModal && (
-    <NoteFormModal
-      folders={folders}
-      setShowNoteModal={setShowNoteModal}
-      handleAddNote={handleAddNote}
-    />
-  )
-}
+            <Unscheduled
+              notes={unscheduled}
+              onOpen={(n) => switchModalState(n)}
+              onDelete={(id) => handleDeleteNote(id)}
+              onComplete={(n) => handleUpdateNote(n.id, { ...n, folderId: 4 })}
+              onEdit={(n) => switchModalState(n)}
+            />
+          </div>
+        </div>
+      )
+      }
+
+      {
+        isModalOpen && selectedNote && (
+          <Modal
+            selectedNote={selectedNote}
+            switchModal={(n) => switchModalState(n)}
+            updateNote={handleUpdateNote}
+            folders={folders}
+          />
+        )
+      }
+
+      {
+        showNoteModal && (
+          <NoteFormModal
+            folders={folders}
+            setShowNoteModal={setShowNoteModal}
+            handleAddNote={handleAddNote}
+          />
+        )
+      }
     </div >
-    
+
   );
 }

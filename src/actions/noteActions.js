@@ -15,6 +15,8 @@ import {
 } from "../guest/guestModeApi";
 
 import { normalizeFolderId } from "../helpers/noteHelpers";
+import { isPastYMD, todayYYYYMMDD, formatDateDDMMYYYY } from "../helpers/dateHelpers";
+
 
 const load = (k) => JSON.parse(localStorage.getItem(k) || "[]");
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
@@ -172,8 +174,24 @@ export async function updateNoteAction({
     return false;
   }
 
-  if (guest) {
-    setNotes((prev) => updateNoteLocal(prev, noteId, updatedFields));
+
+    const nextScheduledAt =
+    updatedFields.scheduledAt !== undefined
+      ? (typeof updatedFields.scheduledAt === "string"
+          ? (updatedFields.scheduledAt.trim() || null)
+          : updatedFields.scheduledAt)
+      : (base?.scheduledAt ?? null);
+
+  // Scheduleat cannot be past today
+  if (nextScheduledAt && isPastYMD(nextScheduledAt)) {
+    const formatted = formatDateDDMMYYYY(todayYYYYMMDD());
+
+    setError(`Deadline must be today or in the future. (today: ${formatted})`);
+    return false;
+  }
+  
+if (guest) {
+    setNotes((prev) => updateNoteLocal(prev, noteId, { ...updatedFields, scheduledAt: nextScheduledAt }));
     setMsg("Note updated (guest mode).");
     setIsModalOpen(false);
     setSelectedNote(null);
@@ -186,6 +204,7 @@ export async function updateNoteAction({
     setError("Cannot update: note not found (missing base note).");
     return false;
   }
+
 
   // IMPORTANT: folder/title/content optional, never read selectedNote directly
   const payload = {
@@ -215,11 +234,7 @@ export async function updateNoteAction({
 
     // scheduledAt optional
     scheduledAt:
-      updatedFields.scheduledAt !== undefined
-        ? (typeof updatedFields.scheduledAt === "string"
-          ? (updatedFields.scheduledAt.trim() || null)
-          : updatedFields.scheduledAt) // can be null
-        : (base.scheduledAt ?? null),
+      nextScheduledAt,
   };
 
   try {
@@ -239,8 +254,8 @@ export async function updateNoteAction({
     setSelectedNote(null);
     return true;
   } catch (e) {
-    console.error(e);
-    setError("Error updating note.");
+    const msg = e?.message || "";
+    setError(msg.includes("Deadline") ? msg : `Error updating note "${payload.title}".`);
     return false;
   } finally {
     setLoading(false);

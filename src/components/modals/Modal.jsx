@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { todayYYYYMMDD } from "../../helpers/DatesTimes";
+import { todayYYYYMMDD } from "../../helpers/dateHelpers";
 
 export default function Modal({ selectedNote, switchModal, updateNote, folders = [] }) {
   const [error, setError] = useState(null);
