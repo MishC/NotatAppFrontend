@@ -129,6 +129,7 @@ export default function NoteApp() {
   // callendar callbacks - will be transfered soon
 
   const onSaveDate = async (note, ymd) =>
+    
     updateNoteAction({
       guest,
       API_URL,
