@@ -14,6 +14,8 @@ import {
   swapNotesLocal,
 } from "../guest/guestModeApi";
 
+import { normalizeFolderId } from "../helpers/noteHelpers";
+
 const load = (k) => JSON.parse(localStorage.getItem(k) || "[]");
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
@@ -100,6 +102,7 @@ export async function addNoteAction({
   setError,
   newNote,
 }) {
+
   if (guest) {
     setNotes((prev) => addNoteLocal(prev, newNote));
     setMsg("Note added (guest mode).");
@@ -163,10 +166,11 @@ export async function updateNoteAction({
   setMsg,
 }) {
   // find base note safely (modal note OR lookup)
-  const base =
-    selectedNote ??
-    (noteById ? noteById.get(String(noteId)) : null) ??
-    null; //if not base return null
+  const base = selectedNote ?? noteById?.get(String(noteId));
+  if (!guest && !base) {
+    setError?.("No base note found for update.");
+    return false;
+  }
 
   if (guest) {
     setNotes((prev) => updateNoteLocal(prev, noteId, updatedFields));
@@ -193,11 +197,10 @@ export async function updateNoteAction({
     // - if updatedFields.folderId exists -> use it
     // - else use base.folderId
     // - else null
-    folderId:
-      updatedFields.folderId !== undefined
-        ? updatedFields.folderId
-        : (base.folderId ?? null),
 
+    folderId: normalizeFolderId(
+      updatedFields.folderId !== undefined ? updatedFields.folderId : base.folderId
+    ),
     // title optional
     title:
       updatedFields.title !== undefined
@@ -214,8 +217,8 @@ export async function updateNoteAction({
     scheduledAt:
       updatedFields.scheduledAt !== undefined
         ? (typeof updatedFields.scheduledAt === "string"
-            ? (updatedFields.scheduledAt.trim() || null)
-            : updatedFields.scheduledAt) // can be null
+          ? (updatedFields.scheduledAt.trim() || null)
+          : updatedFields.scheduledAt) // can be null
         : (base.scheduledAt ?? null),
   };
 
