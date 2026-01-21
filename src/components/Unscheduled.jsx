@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Draggable } from "@fullcalendar/interaction";
 import HamburgerIcon from "./icons/HamburgerIcon";
 import { getColorClassById } from "../helpers/colors";
+import { onDrag } from "../helpers/calendarHelpers";
 
 
 export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdit }) {
@@ -28,25 +29,6 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
     });
     return () => d.destroy();
   }, []);
-
-  const onDrag = (e) => {
-    const ghost = document.createElement("div");
-    ghost.textContent = e.currentTarget.getAttribute("data-title") || "";
-    ghost.style.position = "absolute";
-    ghost.style.top = "-9999px";
-    ghost.style.left = "-9999px";
-    ghost.style.padding = "8px 12px";
-    ghost.style.borderRadius = "12px";
-    ghost.style.background = "white";
-    ghost.style.border = "1px solid #e2e8f0";
-    ghost.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,.1)";
-    document.body.appendChild(ghost);
-
-
-    e.dataTransfer.setDragImage(ghost, -20, 10);
-
-    setTimeout(() => ghost.remove(), 0);
-  }
 
 
   return (
