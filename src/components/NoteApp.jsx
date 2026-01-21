@@ -78,14 +78,18 @@ export default function NoteApp() {
     syncGuestAction({ guest, notes, folders });
   }, [guest, notes, folders]);
 
-  useEffect(() => {
-    if (!error && !msg) return;
-    const t = setTimeout(() => {
-      setError("");
-      setMsg("");
-    }, 6000);
-    return () => clearTimeout(t);
-  }, [error, msg]);
+useEffect(() => {
+  if (!error) return;
+  const t = setTimeout(() => setError(""), 4000);
+  return () => clearTimeout(t);
+}, [error]);
+
+useEffect(() => {
+  if (!msg) return;
+  const t = setTimeout(() => setMsg(""), 4000);
+  return () => clearTimeout(t);
+}, [msg]);
+
 
   // actions
   const onLogoutClick = async () => {
@@ -200,10 +204,16 @@ export default function NoteApp() {
         </div>
         <p className="mt-2 text-slate-600 text-xl text-center">Calendar</p>
       </div>
-      {error ? <div className="text-red-700 bg-red-50 rounded-xl border border-red-200">{error}</div> : <div className="mt-6 p-10 mb-4 
-      rounded-xl border">&nbsp;</div>}
-      {msg ? <div className="text-emerald-700 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div> :
-        <div className="mt-6 p-10 mb-4 rounded-xl border">&nbsp;</div>}
+
+      <div className="p-5 rounded-xl">
+        {error ? (
+          <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
+        ) : msg ? (
+          <div className="text-emerald-700 p-4 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div>
+        ) : (
+          <div>&nbsp;</div>
+        )}
+      </div>
 
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
@@ -223,15 +233,13 @@ export default function NoteApp() {
                 <button
                   key={opt.id ?? "all"}
                   onClick={() => handleFolderClick(opt)}
-                  className={[
-                    "w-full text-left px-6 py-4 text-2xl font-semibold rounded-lg transition-transform duration-200 ease-out will-change-transform relative cursor-pointer",
-                    isActive
-                      ? "bg-yellow-100/60 text-slate-900 translate-x-1"
-                      : "text-slate-700 hover:text-orange-600 hover:bg-white/40 -translate-x-0.5 hover:translate-x-3",
-                  ].join(" ")}
+                  className={"w-full text-left px-6 py-4 text-2xl font-semibold relative"}
                 >
                   <span
-                    className={["absolute left-0 top-0.1 h-[70%] w-1", isActive ? "bg-orange-500" : "bg-transparent"].join(" ")}
+                    className={[
+                      "absolute left-0 top-0.5 h-[70%] w-1",
+                      isActive ? "bg-orange-500" : "bg-transparent",
+                    ].join(" ")}
                     aria-hidden="true"
                   />
                   {label}
