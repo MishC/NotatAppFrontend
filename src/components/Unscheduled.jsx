@@ -12,14 +12,14 @@ export default function Unscheduled({ notes, onOpen, onDelete, onComplete, onEdi
     if (!containerRef.current) return;
     const d = new Draggable(containerRef.current, {
       itemSelector: ".fc-external",
-cursorAt: { left: -10, top: -10 },
+      cursorAt: { left: -10, top: -10 },
       eventData: (el) => {
         const id = el.getAttribute("data-id");
         const json = el.getAttribute("data-note");
         let note = null;
-        try { note = JSON.parse(json); } catch {}
+        try { note = JSON.parse(json); } catch { }
         return {
-           id: String(id), 
+          id: String(id),
           title: note?.title ?? el.getAttribute("data-title") ?? "",
           allDay: true,
           extendedProps: { note }, // <<< posielame celý note
@@ -29,6 +29,26 @@ cursorAt: { left: -10, top: -10 },
     return () => d.destroy();
   }, []);
 
+  const onDrag = (e) => {
+    const ghost = document.createElement("div");
+    ghost.textContent = e.currentTarget.getAttribute("data-title") || "";
+    ghost.style.position = "absolute";
+    ghost.style.top = "-9999px";
+    ghost.style.left = "-9999px";
+    ghost.style.padding = "8px 12px";
+    ghost.style.borderRadius = "12px";
+    ghost.style.background = "white";
+    ghost.style.border = "1px solid #e2e8f0";
+    ghost.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,.1)";
+    document.body.appendChild(ghost);
+
+
+    e.dataTransfer.setDragImage(ghost, -20, 10);
+
+    setTimeout(() => ghost.remove(), 0);
+  }
+
+
   return (
     <div className="mt-20 ml-20 w-[90%]">
       <h3 className="text-2xl  mb-20 text-left ml-4 text-[1.75em]">Unscheduled</h3>
@@ -36,84 +56,88 @@ cursorAt: { left: -10, top: -10 },
         ref={containerRef}
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
       >
-        {notes.map((n) => { const colorClass = getColorClassById(n.id);
+        {notes.map((n) => {
+          const colorClass = getColorClassById(n.id);
           const noteWithColor = { ...n, colorClass };
           return (
-          <li
-            key={n.id}
+            <li
+              key={n.id}
               className={`fc-external group flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm p-4 
                 hover:-translate-y-0.5 transition will-change-transform cursor-grab ${colorClass}`}
               data-id={String(n.id)}
-            data-title={n.title}
-            data-note={JSON.stringify(n)}   
-            //  onClick={() => onOpen(n)} not open edit mode
-            title={n.title}
-              draggable={false}
+              data-title={n.title}
+              data-note={JSON.stringify(n)}
+              //  onClick={() => onOpen(n)} not open edit mode
+              title={n.title}
+              draggable={true}
+              onDragStart={(e) => {
+                onDrag(e)
+              }}
 
-          >
-            <div className="flex items-start gap-3 mb-3">
-              <h4 className="flex-1 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate">
-                {n.title}
-              </h4>
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <h4 className="flex-1 text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 truncate">
+                  {n.title}
+                </h4>
 
-              <div className="relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const menu = e.currentTarget.nextElementSibling;
-                    if (menu) menu.classList.toggle("hidden");
-                  }}
-                  className="h-10 w-10 inline-flex items-center justify-center rounded-full
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const menu = e.currentTarget.nextElementSibling;
+                      if (menu) menu.classList.toggle("hidden");
+                    }}
+                    className="h-10 w-10 inline-flex items-center justify-center rounded-full
                              text-slate-700 hover:text-blue-600 hover:bg-slate-100
                              focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  title="Actions"
-                  aria-label="Actions"
-                >
-                  <HamburgerIcon />
-                </button>
+                    title="Actions"
+                    aria-label="Actions"
+                  >
+                    <HamburgerIcon />
+                  </button>
 
-                <ul
-                  className="relative hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1 z-[1000] overflow-visible"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <li>
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-slate-100 text-green-600"
-                      onClick={() => onComplete(n)}
-                    >
-                      <span className="text-xl mr-2" aria-hidden>✓</span>
-                      Mark complete
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-slate-100 text-blue-600"
-                      onClick={() => onEdit(n)}
-                    >
-                      <span className="text-base mr-2" aria-hidden>🖉</span>
-                      Edit
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
-                      onClick={() => onDelete(n.id, n.title)}
-                    >
-                      <span className="text-xl mr-2" aria-hidden>×</span>
-                      Delete
-                    </button>
-                  </li>
-                </ul>
+                  <ul
+                    className="relative hidden absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1 z-[1000] overflow-visible"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <li>
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-green-600"
+                        onClick={() => onComplete(n)}
+                      >
+                        <span className="text-xl mr-2" aria-hidden>✓</span>
+                        Mark complete
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-blue-600"
+                        onClick={() => onEdit(n)}
+                      >
+                        <span className="text-base mr-2" aria-hidden>🖉</span>
+                        Edit
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-red-600"
+                        onClick={() => onDelete(n.id, n.title)}
+                      >
+                        <span className="text-xl mr-2" aria-hidden>×</span>
+                        Delete
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
 
-            {n.content?.trim() && (
-              <p className="mt-2 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-4 break-words">
-                {n.content}
-              </p>
-            )}
-          </li>
-        )
+              {n.content?.trim() && (
+                <p className="mt-2 text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-4 break-words">
+                  {n.content}
+                </p>
+              )}
+            </li>
+          )
         })}
       </ul>
     </div>
