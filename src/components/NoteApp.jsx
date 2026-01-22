@@ -78,16 +78,18 @@ export default function NoteApp() {
     syncGuestAction({ guest, notes, folders });
   }, [guest, notes, folders]);
 
+// error and msg states
+
 useEffect(() => {
   if (!error) return;
-  const t = setTimeout(() => setError(""), 4000);
-  return () => clearTimeout(t);
+  const t = setTimeout(() => setError(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+  return () => clearTimeout(t);// if error state is changed before 4 sec timeout, it will be executed -cleared timeout
 }, [error]);
 
 useEffect(() => {
   if (!msg) return;
-  const t = setTimeout(() => setMsg(""), 4000);
-  return () => clearTimeout(t);
+  const t = setTimeout(() => setMsg(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+  return () => clearTimeout(t); // if msg state is changed before 4 sec timeout, it will be executed -cleared timeout
 }, [msg]);
 
 
