@@ -42,19 +42,19 @@ export default function Calendar({
   });
 
   const openMenu = () => {
-  menu.classList.remove("hidden");
+    menu.classList.remove("hidden");
 
-  // reset
-  menu.style.left = "";
-  menu.style.right = "";
-
-  // if it would overflow, anchor to left instead
-  const rect = menu.getBoundingClientRect();
-  if (rect.right > window.innerWidth - 8) {
-    menu.style.right = "";
+    // reset
     menu.style.left = "";
-  }
-};
+    menu.style.right = "";
+
+    // if it would overflow, anchor to left instead
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) {
+      menu.style.right = "";
+      menu.style.left = "";
+    }
+  };
 
   useEffect(() => {
     if (!wrapRef.current || !calRef.current) return;
