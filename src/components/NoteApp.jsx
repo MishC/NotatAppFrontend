@@ -10,7 +10,7 @@ import Header from "./Header";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
 import Plus from "./icons/Plus";
-
+import Filters from "./Filters";
 import Calendar from "./Calendar";
 import Unscheduled from "./Unscheduled";
 
@@ -223,33 +223,12 @@ useEffect(() => {
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
           {/** Folders sidebar  */}
 
-          <div className="w-[20%] flex flex-col rounded-lg">
-            {folderOptions.map((opt) => {
-              const isActive =
-                (activeFolder == null && opt.id == null) ||
-                String(activeFolder) === String(opt.id);
-
-              const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
-
-              return (
-                <button
-                  key={opt.id ?? "all"}
-                  onClick={() => handleFolderClick(opt)}
-                  className={"w-full text-left px-6 py-4 text-2xl font-semibold relative"}
-                >
-                  <span
-                    className={[
-                      "absolute left-0 top-0.5 h-[70%] w-1",
-                      isActive ? "bg-orange-500" : "bg-transparent",
-                    ].join(" ")}
-                    aria-hidden="true"
-                  />
-                  {label}
-                </button>
-              );
-            })}
-
-          </div>
+     <Filters
+       folderOptions={folderOptions}
+       activeFolder={activeFolder}
+       guest={guest}
+       handleFolderClick={handleFolderClick}
+     />
 
           <div className="overflow-visible calendar-container center flex flex-col">
             <Calendar
