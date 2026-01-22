@@ -91,11 +91,22 @@ export function createCalendarHandlers({
 
       if (!wrap || !btn || !menu || !card) return;
 
-      const toggleMenu = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        menu.classList.toggle("hidden");
-      };
+      const harness = el.closest(".fc-daygrid-event-harness");
+
+const setOpen = (open) => {
+  menu.classList.toggle("hidden", !open);
+
+  // lift event + harness so nothing covers the dropdown
+  el.classList.toggle("fc-menu-open", open);
+  harness?.classList.toggle("fc-menu-open", open);
+};
+
+   const toggleMenu = (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+  const open = menu.classList.contains("hidden");
+  setOpen(open);
+};
 
       const onCardClick = (e) => {
         if (wrap.contains(e.target)) return;
@@ -104,9 +115,10 @@ export function createCalendarHandlers({
         menu.classList.toggle("hidden");
       };
 
-      const onDocClick = (e) => {
-        if (!card.contains(e.target)) menu.classList.add("hidden");
-      };
+const onDocClick = (e) => {
+  if (!card.contains(e.target)) setOpen(false);
+};
+
 
       const stop = (e) => {
         e.stopPropagation();

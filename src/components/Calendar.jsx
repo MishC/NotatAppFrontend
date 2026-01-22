@@ -3,6 +3,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useRef, useEffect } from "react";
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
+import { escapeHtml } from "../helpers/stringHelpers";
 
 import "./Calendar.css"
 
@@ -32,13 +33,28 @@ export default function Calendar({
   });
 
 
-const handlers = createCalendarHandlers({
-  dragFixRef,
-  onOpen,
-  onComplete,
-  onDelete,
-  onMoveDate,
-}); 
+  const handlers = createCalendarHandlers({
+    dragFixRef,
+    onOpen,
+    onComplete,
+    onDelete,
+    onMoveDate,
+  });
+
+  const openMenu = () => {
+  menu.classList.remove("hidden");
+
+  // reset
+  menu.style.left = "";
+  menu.style.right = "";
+
+  // if it would overflow, anchor to left instead
+  const rect = menu.getBoundingClientRect();
+  if (rect.right > window.innerWidth - 8) {
+    menu.style.right = "";
+    menu.style.left = "";
+  }
+};
 
   useEffect(() => {
     if (!wrapRef.current || !calRef.current) return;
@@ -60,7 +76,7 @@ const handlers = createCalendarHandlers({
         initialView="dayGridMonth"
         height="auto"
         firstDay={1}
-          {...handlers}
+        {...handlers}
 
         editable={true}
         droppable={true}
@@ -78,19 +94,22 @@ const handlers = createCalendarHandlers({
 
           return {
             html: `
-              <div class="fc-note-card ${colorClass}" data-evt-id="${arg.event.id}">
+              <div class="fc-note-card ${colorClass}" data-evt-id="${arg.event.id}" style="z-index:4">
                 <div class="fc-drag-handle" title="Drag">
                 <div class="fc-card-header" style="display:flex;gap:.5rem;align-items:flex-start;">
                   <div class="fc-note-title" style="flex:1; font-weight:600;">${title}</div>
                   <div class="fc-card-menu-wrap" style="position:relative;">
                     <button class="fc-card-menu-btn ${colorClass}" aria-haspopup="menu" aria-label="Actions" title="Actions" style="
-                      width:2rem;height:2rem;border-radius:20px; z-index:100; cursor:pointer;
+                      width:2rem;height:2rem;border-radius:20px; z-index:10; cursor:pointer;
                     ">☰</button>
-                    <ul class="fc-card-menu hidden" role="menu" style="
-                      position:relative;right:2;top:2.25rem;min-width:11rem;
-                      background:white;border:1px solid #e2e8f0ff;border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
-                      padding:.25rem .25rem;z-index:99; cursor:pointer; 
-                    ">
+                   <ul class="fc-card-menu hidden" role="menu" style="
+  position:absolute; right:0; top:2.25rem; min-width:11rem;
+  background:white; border:1px solid #e2e8f0ff; border-radius:.5rem;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
+  padding:.25rem .25rem;
+  z-index:99999; cursor:pointer; }"
+">
+
                       <li role="menuitem" data-act="edit" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#1E90f4;">🖉 Edit</li>
                       <li role="menuitem" data-act="complete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#4a2;">✓ Mark complete</li>
                       <li role="menuitem" data-act="delete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#dc2626;">× Delete</li>
@@ -107,12 +126,4 @@ const handlers = createCalendarHandlers({
       />
     </div>
   );
-}
-
-
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
 }
