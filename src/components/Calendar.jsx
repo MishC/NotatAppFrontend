@@ -4,6 +4,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { useRef, useEffect } from "react";
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
+import { isOverdue } from "../helpers/dateHelpers";
 
 import "./Calendar.css"
 
@@ -84,6 +85,12 @@ export default function Calendar({
         eventDurationEditable={false}
         events={events}
         class="calendar"
+
+        eventClassNames={(arg) => {
+    const note = arg.event.extendedProps?.note;
+    const ymd = arg.event.startStr?.slice(0,10) ?? note?.scheduledAt?.slice(0,10);
+    return isOverdue(ymd) ? ["fc-note-overdue"] : [];
+  }}
 
 
         eventContent={(arg) => {
