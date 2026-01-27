@@ -1,8 +1,11 @@
+import { todayYYYYMMDD } from "./dateHelpers";
 export function validateNote(newNote, guest) {
   if (!newNote.title.trim()) {
     return "Title is required.";
   }
-
+  if (newNote.scheduledAt < todayYYYYMMDD()) {
+    return "Scheduled date cannot be in the past.";
+  }
   return null;
 }
 export function normalizeFolderId(v) {

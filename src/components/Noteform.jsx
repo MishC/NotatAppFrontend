@@ -18,6 +18,7 @@ export default function Noteform({
   const normalizeForServer = (n) => ({
     ...n,
     scheduledAt: n.scheduledAt?.trim() ? n.scheduledAt.trim() : null,
+    
   });
 
   const onSubmit = async (e) => {
