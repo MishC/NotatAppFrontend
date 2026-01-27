@@ -1,9 +1,17 @@
 import { todayYYYYMMDD } from "./dateHelpers";
+
 export function validateNote(newNote, guest) {
   if (!newNote.title.trim()) {
     return "Title is required.";
   }
-  if (newNote.scheduledAt < todayYYYYMMDD()) {
+
+  if (newNote?.scheduledAt !== undefined) {
+    (typeof newNote.scheduledAt === "string")
+      ? (newNote.scheduledAt.trim() || null)
+      : newNote.scheduledAt
+   }
+
+  if (newNote?.scheduledAt < todayYYYYMMDD()) {
     return "Scheduled date cannot be in the past.";
   }
   return null;
@@ -19,10 +27,12 @@ export function normalizeFolderId(v) {
   }
   return null;
 };
-/* Guest Only */
 export function buildPayload(newNote, guest) {
   const folderId = normalizeFolderId(newNote.folderId);
-
+  const validationError = validateNote(newNote, guest);
+  if (validationError) {
+    throw new Error(validationError);
+  } 
   return {
     title: (newNote.title || "").trim(),
     content: newNote.content?.trim() || null,

@@ -14,7 +14,7 @@ import {
   swapNotesLocal,
 } from "../guest/guestModeApi";
 
-import { normalizeFolderId } from "../helpers/noteHelpers";
+import { normalizeFolderId, validateNote } from "../helpers/noteHelpers";
 import { isPastYMD, todayYYYYMMDD, formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 
@@ -34,6 +34,9 @@ export async function initNotesAndFoldersAction({
   setLoading,
   setError,
 }) {
+
+  setLoading(true);
+
   if (guest) {
     const savedNotes = load("noteapp_guest_notes");
     const savedFolders = load("noteapp_guest_folders");
@@ -53,9 +56,9 @@ export async function initNotesAndFoldersAction({
   }
 
   try {
+
     await Promise.all([
       (async () => {
-        setLoading(true);
         const list = await fetchNotesApi({ API_URL, activeFolder });
         setNotes(list);
         setLengthNotes(
@@ -76,6 +79,8 @@ export async function initNotesAndFoldersAction({
         ]);
       })(),
     ]);
+        setLoading(false);
+
 
     return true;
   } catch (e) {
@@ -104,13 +109,17 @@ export async function addNoteAction({
   setError,
   newNote,
 }) {
+    
+
+ const validationError = validateNote(newNote);
+
+  if (validationError) {
+    setError(validationError);
+    return false;
+  }
 
   if (guest) {
-    if (newNote.scheduledAt< todayYYYYMMDD())
-     {
-      setError(`Scheduled date cannot be in the past.`);
-      return false;
-     }
+   
     setNotes((prev) => addNoteLocal(prev, newNote));
     setMsg("Note added (guest mode).");
     return true;
