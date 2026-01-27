@@ -188,8 +188,7 @@ export async function updateNoteAction({
     return false;
   }
 
-
-    const nextScheduledAt =
+const nextScheduledAt =
     updatedFields.scheduledAt !== undefined
       ? (typeof updatedFields.scheduledAt === "string"
           ? (updatedFields.scheduledAt.trim() || null)
