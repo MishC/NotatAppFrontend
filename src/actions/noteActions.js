@@ -106,6 +106,11 @@ export async function addNoteAction({
 }) {
 
   if (guest) {
+    if (newNote.scheduledAt< todayYYYYMMDD())
+     {
+      setError(`Scheduled date cannot be in the past.`);
+      return false;
+     }
     setNotes((prev) => addNoteLocal(prev, newNote));
     setMsg("Note added (guest mode).");
     return true;
