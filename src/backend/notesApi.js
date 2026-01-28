@@ -59,9 +59,20 @@ export async function fetchFoldersApi({ API_URL2 }) {
   return (await apiRequest({ url: API_URL2 })) || [];
 }
 
+export const OVERDUE_ID = "overdue";
+
 export async function fetchNotesApi({ API_URL, activeFolder }) {
-  const url = activeFolder === 4 ? `${API_URL}/done` : `${API_URL}/pending`;
-  return (await apiRequest({ url })) || [];
+  let url;
+
+  if (activeFolder === OVERDUE_ID) url = `${API_URL}/overdues`;
+  else if (activeFolder === 4) url = `${API_URL}/done`;
+  else url = `${API_URL}/pending`;
+
+  return (await apiRequest({ url, method: "GET" })) || [];
+}
+
+export async function fetchOverdueNotesApi({ API_URL }) {
+  return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
 }
 
 export async function addNoteApi({ API_URL, newNote }) {
@@ -78,9 +89,6 @@ export async function updateNoteApi({ API_URL, noteId, payload }) {
   return true;
 }
 
-export async function fetchOverdueNotesApi({ API_URL }) {
-  return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
-}
 
 export async function swapNotesApi({ API_URL, sourceId, targetId }) {
   await apiRequest({

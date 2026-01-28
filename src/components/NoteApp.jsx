@@ -10,7 +10,7 @@ import Header from "./Header";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
 import Plus from "./icons/Plus";
-import Filters from "./Filters";
+import Sidebar from "./Sidebar";
 import Calendar from "./Calendar";
 import Unscheduled from "./Unscheduled";
 
@@ -223,7 +223,7 @@ useEffect(() => {
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
           {/** Folders sidebar  */}
 
-     <Filters
+     <Sidebar
        folderOptions={folderOptions}
        activeFolder={activeFolder}
        guest={guest}

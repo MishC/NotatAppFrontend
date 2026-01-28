@@ -1,6 +1,6 @@
-export default function Filters({folderOptions, activeFolder, guest, handleFolderClick}) {
+export default function Sidebar({folderOptions, activeFolder, guest, handleFolderClick}) {
     return (
-        <div className="Sidebar">
+        <div className="Sidebar mt-25">
 
               {/** Folders sidebar  */}
 
@@ -16,7 +16,7 @@ export default function Filters({folderOptions, activeFolder, guest, handleFolde
                 <button
                   key={opt.id ?? "all"}
                   onClick={() => handleFolderClick(opt)}
-                  className={"w-full text-left px-6 py-4 text-2xl font-semibold relative"}
+                  className={"w-full text-left px-6 py-4 text-2xl font-semibold relative cursor-pointer"}
                 >
                   <span
                     className={[

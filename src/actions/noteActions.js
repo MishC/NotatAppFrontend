@@ -5,6 +5,7 @@ import {
   swapNotesApi,
   fetchNotesApi,
   fetchFoldersApi,
+  OVERDUE_ID
 } from "../backend/notesApi";
 
 import {
@@ -30,26 +31,20 @@ export async function initNotesAndFoldersAction({
   setNotes,
   setFolders,
   setFolderOptions,
-  setLengthNotes,
   setLoading,
   setError,
 }) {
-
+  
   setLoading(true);
 
   if (guest) {
-    const savedNotes = load("noteapp_guest_notes");
-    const savedFolders = load("noteapp_guest_folders");
+    const savedNotes = load("noteapp_guest_notes") || [];
+    const savedFolders = load("noteapp_guest_folders") || [];
 
     setNotes(savedNotes);
-    setFolders(savedFolders);
-    setFolderOptions([{ id: null, label: "All" }, ...savedFolders.map(f => ({ id: f.id, label: f.name }))]);
+    setFolders(savedFolders); // now is only All folder allowed
+    setFolderOptions([{ id: null, label: "All" }]);
 
-    setLengthNotes(
-      activeFolder == null
-        ? savedNotes.length
-        : savedNotes.filter((n) => n.folderId === activeFolder).length
-    );
 
     setLoading(false);
     return true;
@@ -59,13 +54,10 @@ export async function initNotesAndFoldersAction({
 
     await Promise.all([
       (async () => {
-        const list = await fetchNotesApi({ API_URL, activeFolder });
+        
+        const list = await fetchNotesApi({ API_URL, activeFolder }); 
         setNotes(list);
-        setLengthNotes(
-          activeFolder == null
-            ? list.length
-            : list.filter((n) => n.folderId === activeFolder).length
-        );
+      
       })(),
       (async () => {
         const folders = await fetchFoldersApi({ API_URL2 });
@@ -76,6 +68,8 @@ export async function initNotesAndFoldersAction({
           { id: null, label: "All" },
           ...folders.filter(f => !isDone(f)).map(f => ({ id: f.id, label: f.name })),
           ...folders.filter(isDone).map(f => ({ id: f.id, label: f.name })),
+          { id: OVERDUE_ID, label: "Overdue" }
+
         ]);
         
       })(),
@@ -175,7 +169,6 @@ export async function updateNoteAction({
   noteById,          // NEW (Map)
   activeFolder,
   setNotes,
-  setLengthNotes,
   setLoading,
   setError,
   setIsModalOpen,
@@ -258,11 +251,6 @@ if (guest) {
     setLoading(true);
     const list = await fetchNotesApi({ API_URL, activeFolder });
     setNotes(list);
-    setLengthNotes(
-      activeFolder == null
-        ? list.length
-        : list.filter((n) => n.folderId === activeFolder).length
-    );
 
     setIsModalOpen(false);
     setSelectedNote(null);
