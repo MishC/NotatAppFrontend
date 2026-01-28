@@ -32,7 +32,6 @@ export default function NoteApp() {
   const [activeFolder, setActiveFolder] = useState(null);
 
   const [loading, setLoading] = useState(false);
-  const [lengthNotes, setLengthNotes] = useState(0);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,7 +67,6 @@ export default function NoteApp() {
       setNotes,
       setFolders,
       setFolderOptions,
-      setLengthNotes,
       setLoading,
       setError,
     });
@@ -122,7 +120,6 @@ useEffect(() => {
       noteById,
       activeFolder,
       setNotes,
-      setLengthNotes,
       setLoading,
       setError,
       setIsModalOpen,
@@ -144,7 +141,6 @@ useEffect(() => {
       selectedNote: note,
       activeFolder,
       setNotes,
-      setLengthNotes,
       setLoading,
       setError,
       setIsModalOpen,
@@ -152,13 +148,15 @@ useEffect(() => {
       setMsg,
     });
 
-  const onMoveDate = onSaveDate;
 
   // derived
-  const filteredNotes = useMemo(
-    () => notes.filter((n) => n && (activeFolder == null || n.folderId === activeFolder)),
-    [notes, activeFolder]
-  );
+
+const filteredNotes = useMemo(() => {
+  const isRealFolder = typeof activeFolder === "number";
+  if (!isRealFolder) return notes;
+  return notes.filter(n => n && n.folderId === activeFolder);
+}, [notes, activeFolder]);
+
 
   const noteById = useMemo(() => {
     const m = new Map();
