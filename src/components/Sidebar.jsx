@@ -12,11 +12,12 @@ export default function Sidebar({folderOptions, activeFolder, guest, handleFolde
 
               const label = (opt.label === "All" && guest) ? "Notes" : opt.label;
 
+
               return (
                 <button
                   key={opt.id ?? "all"}
                   onClick={() => handleFolderClick(opt)}
-                  className={"w-full text-left px-6 py-4 text-2xl font-semibold relative cursor-pointer"}
+                  className={label==="Overdue" ? "w-full text-red-500 text-left px-6 py-4 text-2xl font-semibold relative cursor-pointer" : "w-full text-left px-6 py-4 text-2xl font-semibold relative cursor-pointer"}
                 >
                   <span
                     className={[

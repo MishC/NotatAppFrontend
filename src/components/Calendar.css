@@ -88,7 +88,6 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 
 /*eventclass*/
 
-/* Make overdue look “red” */
 .fc .fc-event.fc-note-overdue {
   background: #fee2e2 !important;   /* red-100 */
   border-color: #ef4444 !important; /* red-500 */
@@ -104,3 +103,12 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
   color: black;
 
 }
+
+.fc .fc-event .fc-done-event {
+  background-color: #22c55e !important; /* green-500 */
+  border-color: #16a34a !important;
+  color: white !important;
+}
+
+
+

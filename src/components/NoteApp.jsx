@@ -76,19 +76,19 @@ export default function NoteApp() {
     syncGuestAction({ guest, notes, folders });
   }, [guest, notes, folders]);
 
-// error and msg states
+  // error and msg states
 
-useEffect(() => {
-  if (!error) return;
-  const t = setTimeout(() => setError(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
-  return () => clearTimeout(t);// if error state is changed before 4 sec timeout, it will be executed -cleared timeout
-}, [error]);
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+    return () => clearTimeout(t);// if error state is changed before 4 sec timeout, it will be executed -cleared timeout
+  }, [error]);
 
-useEffect(() => {
-  if (!msg) return;
-  const t = setTimeout(() => setMsg(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
-  return () => clearTimeout(t); // if msg state is changed before 4 sec timeout, it will be executed -cleared timeout
-}, [msg]);
+  useEffect(() => {
+    if (!msg) return;
+    const t = setTimeout(() => setMsg(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+    return () => clearTimeout(t); // if msg state is changed before 4 sec timeout, it will be executed -cleared timeout
+  }, [msg]);
 
 
   // actions
@@ -151,11 +151,11 @@ useEffect(() => {
 
   // derived
 
-const filteredNotes = useMemo(() => {
-  const isRealFolder = typeof activeFolder === "number";
-  if (!isRealFolder) return notes;
-  return notes.filter(n => n && n.folderId === activeFolder);
-}, [notes, activeFolder]);
+  const filteredNotes = useMemo(() => {
+    const isRealFolder = typeof activeFolder === "number";
+    if (!isRealFolder) return notes;
+    return notes.filter(n => n && n.folderId === activeFolder);
+  }, [notes, activeFolder]);
 
 
   const noteById = useMemo(() => {
@@ -181,6 +181,9 @@ const filteredNotes = useMemo(() => {
             start: n.scheduledAt,
             allDay: true,
             extendedProps: { note: { ...n, colorClass } }, // <<< color
+            classNames: [
+              n.folderId === 4 ? "fc-done-event" : "",
+            ],
           };
         }),
     [filteredNotes]
@@ -221,12 +224,12 @@ const filteredNotes = useMemo(() => {
         <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
           {/** Folders sidebar  */}
 
-     <Sidebar
-       folderOptions={folderOptions}
-       activeFolder={activeFolder}
-       guest={guest}
-       handleFolderClick={handleFolderClick}
-     />
+          <Sidebar
+            folderOptions={folderOptions}
+            activeFolder={activeFolder}
+            guest={guest}
+            handleFolderClick={handleFolderClick}
+          />
 
           <div className="overflow-visible calendar-container center flex flex-col">
             <Calendar
