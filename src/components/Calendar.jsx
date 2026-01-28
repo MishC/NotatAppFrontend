@@ -23,6 +23,9 @@ export default function Calendar({
   onDelete,
   onMoveDate,
 }) {
+
+  const isMobile = useMemo(() => window.innerWidth < 640, []);
+
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -73,8 +76,18 @@ export default function Calendar({
       <FullCalendar
         ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin]}
+        initialView={isMobile ? "listWeek" : "dayGridMonth"}
+  headerToolbar={{
+    left: isMobile ? "prev,next" : "prev,next today",
+    center: "title",
+    right: isMobile ? "dayGridMonth,listWeek" : "dayGridMonth,timeGridWeek,listWeek",
+  }}
+  buttonText={{
+    dayGridMonth: "Month",
+    timeGridWeek: "Week",
+    listWeek: "List",
+  }}
         themeSystem="standard"
-        initialView="dayGridMonth"
         height="auto"
         firstDay={1}
         {...handlers}

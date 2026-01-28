@@ -112,3 +112,29 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 
 
 
+@media (max-width: 640px) {
+  .fc {
+    padding: .25rem;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1rem;
+  }
+
+  .fc .fc-button {
+    padding: .25rem .5rem;
+    font-size: .75rem;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: .75rem;
+  }
+
+  .fc .fc-daygrid-event {
+    font-size: .75rem;
+  }
+
+  .fc .fc-daygrid-day-frame {
+    min-height: 70px; /* menej vysoké bunky */
+  }
+}

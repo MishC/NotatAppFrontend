@@ -221,8 +221,9 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
-        <div className=" w-[80%] flex space-between mx-auto mt-20 px-6">
+        <div className=" w-[80%] flexspace-between mx-auto mt-20 px-6">
           {/** Folders sidebar  */}
+          <div className="main flex flex-row">
 
           <Sidebar
             folderOptions={folderOptions}
@@ -254,6 +255,7 @@ export default function NoteApp() {
               onComplete={(n) => handleUpdateNote(n.id, { ...n, folderId: 4 })}
               onEdit={(n) => switchModalState(n)}
             />
+          </div>
           </div>
         </div>
       )
