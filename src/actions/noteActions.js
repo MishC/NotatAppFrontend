@@ -77,6 +77,7 @@ export async function initNotesAndFoldersAction({
           ...folders.filter(f => !isDone(f)).map(f => ({ id: f.id, label: f.name })),
           ...folders.filter(isDone).map(f => ({ id: f.id, label: f.name })),
         ]);
+        
       })(),
     ]);
         setLoading(false);

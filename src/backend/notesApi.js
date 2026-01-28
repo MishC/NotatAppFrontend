@@ -78,6 +78,10 @@ export async function updateNoteApi({ API_URL, noteId, payload }) {
   return true;
 }
 
+export async function fetchOverdueNotesApi({ API_URL }) {
+  return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
+}
+
 export async function swapNotesApi({ API_URL, sourceId, targetId }) {
   await apiRequest({
     url: `${API_URL}/swap`,
