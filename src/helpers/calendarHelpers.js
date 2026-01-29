@@ -8,11 +8,11 @@ export function createCalendarHandlers({
 }) {
   return {
     /** Stop FullCalendar default click */
-    eventClick(info) {
+  /*   eventClick(info) {
       info.jsEvent.preventDefault();
       info.jsEvent.stopPropagation();
       info.jsEvent.stopImmediatePropagation?.();
-    },
+    }, */
 
     /** INTERNAL drag start (calendar → calendar) */
     eventDragStart() {
