@@ -121,7 +121,7 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 }
 
 @media (max-width: 640px) {
-  .calendar-container { padding: 0 !important; }
+  .calendar-container { padding: 0 !important; margin:auto;}
 }
 
 

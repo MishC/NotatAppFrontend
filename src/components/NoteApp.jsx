@@ -189,7 +189,7 @@ export default function NoteApp() {
     [filteredNotes]
   );
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto m-0 p-0">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
       {guest && (
         <Header
@@ -221,10 +221,10 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
-        <div className=" main w-full sm:w-[80%] mx-auto md:mt-20 px-6  flex flex-col sm:flex-row sm:gap-4">
+        <div className=" main w-full sm:w-[80%] mx-auto md:mt-20 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
           {/** Folders sidebar  */}
 
-          <div className="w-full sm:w-[20%] sm:mt-50 justify-center text-center d-block mb-10 ml-20">
+          <div className="w-full sm:w-[20%] sm:mt-50 justify-center text-center d-block mb-10 ml-20 align-center">
 
           <Sidebar
             folderOptions={folderOptions}
@@ -234,7 +234,7 @@ export default function NoteApp() {
           />
           </div>
 
-          <div className="calendar-container center  justify-start w-full mt-10">
+          <div className="overflow-visible calendar-container center  justify-start w-full mt-10">
             <Calendar
               events={events}
               onOpen={(note) => switchModalState(note)}
@@ -245,10 +245,7 @@ export default function NoteApp() {
               onMoveDate={(note, ymd) =>
                 handleUpdateNote(note.id, { scheduledAt: ymd })
               }
-
-
             />
-
 
             <Unscheduled
               notes={unscheduled}
