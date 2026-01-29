@@ -60,6 +60,7 @@ export default function Card({ note, rowIndex, colIndex, onDelete, onUpdate, onD
           ? "opacity-75 scale-[0.98] ring-2 ring-blue-400/40"
           : "cursor-grab hover:-translate-y-0.5",
         "focus-within:ring-2 focus-within:ring-blue-400/40",
+        note.folderId === 4 ? "bg-green-100" : "bg-white"
       ].join(" ")}
     >
       <div className="flex items-start gap-2 mb-3 min-w-0">
