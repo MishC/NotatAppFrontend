@@ -110,6 +110,19 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
   color: white !important;
 }
 
+.calendar-container,
+.fc-view-harness,
+.fc-scroller-harness,
+.fc-scroller,
+.fc-daygrid-body,
+.fc-daygrid-day-frame,
+.fc-daygrid-day-events {
+  overflow: visible !important;
+}
+
+@media (max-width: 640px) {
+  .calendar-container { padding: 0 !important; }
+}
 
 
 @media (max-width: 640px) {
