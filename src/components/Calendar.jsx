@@ -32,7 +32,7 @@ export default function Calendar({
 // Posted by Volobot Advanced Systems, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-01-29, License - CC BY-SA 4.0
 
-const [width, setWidth] = useState<number>(window.innerWidth);
+const [width, setWidth] = useState(window.innerWidth);
 
 function handleWindowSizeChange() {
     setWidth(window.innerWidth);
