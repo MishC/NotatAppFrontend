@@ -1,10 +1,9 @@
 export default function Sidebar({folderOptions, activeFolder, guest, handleFolderClick}) {
     return (
-        <div className="Sidebar mt-25">
+        <div className="Sidebar">
 
               {/** Folders sidebar  */}
 
-          <div className="w-[20%] flex flex-col rounded-lg">
             {folderOptions.map((opt) => {
               const isActive =
                 (activeFolder == null && opt.id == null) ||
@@ -31,7 +30,6 @@ export default function Sidebar({folderOptions, activeFolder, guest, handleFolde
               );
             })}
 
-          </div>
 
         </div>
     )

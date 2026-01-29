@@ -189,7 +189,7 @@ export default function NoteApp() {
     [filteredNotes]
   );
   return (
-    <div className="w-full">
+    <div className="w-full mx-auto">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
       {guest && (
         <Header
@@ -221,9 +221,10 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
-        <div className=" w-[80%] flexspace-between mx-auto mt-20 px-6">
+        <div className=" main w-full sm:w-[80%] mx-auto md:mt-20 px-6  flex flex-col sm:flex-row sm:gap-4">
           {/** Folders sidebar  */}
-          <div className="main flex flex-row">
+
+          <div className="w-full sm:w-[20%] sm:mt-50 justify-center text-center d-block mb-10 ml-20">
 
           <Sidebar
             folderOptions={folderOptions}
@@ -231,8 +232,9 @@ export default function NoteApp() {
             guest={guest}
             handleFolderClick={handleFolderClick}
           />
+          </div>
 
-          <div className="overflow-visible calendar-container center flex flex-col">
+          <div className="calendar-container center  justify-start w-full mt-10">
             <Calendar
               events={events}
               onOpen={(note) => switchModalState(note)}
@@ -257,7 +259,6 @@ export default function NoteApp() {
             />
           </div>
           </div>
-        </div>
       )
       }
 
