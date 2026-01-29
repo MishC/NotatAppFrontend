@@ -1,7 +1,7 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useRef, useEffect,useMemo } from "react";
+import { useRef, useEffect,useMemo,useState } from "react";
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
@@ -27,7 +27,25 @@ export default function Calendar({
   onMoveDate,
 }) {
 
-  const isMobile = useMemo(() => window.innerWidth < 640, []);
+//  const isMobile = useMemo(() => window.innerWidth < 640, []);
+  // Source - https://stackoverflow.com/a
+// Posted by Volobot Advanced Systems, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-01-29, License - CC BY-SA 4.0
+
+const [width, setWidth] = useState<number>(window.innerWidth);
+
+function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+}
+useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+        window.removeEventListener('resize', handleWindowSizeChange);
+    }
+}, []);
+
+const isMobile = width <= 768;
+
 
   const calRef = useRef(null);
   const wrapRef = useRef(null);
@@ -81,9 +99,9 @@ export default function Calendar({
         plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
           initialView={isMobile ? "listWeek" : "dayGridMonth"}
 
-         height="auto"
-  contentHeight="auto"
-  aspectRatio={isMobile ? 1.2 : 1.6}
+        height="auto"
+        contentHeight="auto"
+        aspectRatio={isMobile ? 1.2 : 1.6}
         
         themeSystem="standard"
         firstDay={1}
