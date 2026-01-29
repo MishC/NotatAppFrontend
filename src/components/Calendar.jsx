@@ -1,10 +1,13 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect,useMemo } from "react";
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
+import listPlugin from "@fullcalendar/list";
+
+
 
 import "./Calendar.css"
 
@@ -75,29 +78,27 @@ export default function Calendar({
     <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView={isMobile ? "listWeek" : "dayGridMonth"}
-  headerToolbar={{
-    left: isMobile ? "prev,next" : "prev,next today",
-    center: "title",
-    right: isMobile ? "dayGridMonth,listWeek" : "dayGridMonth,timeGridWeek,listWeek",
-  }}
-  buttonText={{
-    dayGridMonth: "Month",
-    timeGridWeek: "Week",
-    listWeek: "List",
-  }}
+        plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
+          initialView={isMobile ? "listWeek" : "dayGridMonth"}
+
+         height="auto"
+  contentHeight="auto"
+  aspectRatio={isMobile ? 1.2 : 1.6}
+        
         themeSystem="standard"
-        height="auto"
         firstDay={1}
+        dayMaxEvents={isMobile ? 2 : 4}
         {...handlers}
+
 
         editable={true}
         droppable={true}
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
-        class="calendar"
+        longPressDelay={350}       // aby scroll nebol “drag”
+  eventLongPressDelay={350}
+  selectLongPressDelay={350}
 
         eventClassNames={(arg) => {
     const note = arg.event.extendedProps?.note;
