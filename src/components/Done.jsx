@@ -16,9 +16,8 @@ export default function Done({ notes, onOpen, onUncomplete, onDelete }) {
   }, [notes, q]);
 
   return (
-    <div className="w-full mt-6">
+    <div className="w-[80%] mt-6 mx-auto">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-        <h2 className="text-2xl font-bold text-slate-800">Done</h2>
 
         <input
           value={q}

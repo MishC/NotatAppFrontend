@@ -93,7 +93,7 @@ const isMobile = width <= 768;
 
 
   return (
-    <div className="w-[90%] ml-20 border-0 my-calendar" ref={wrapRef}>
+    <div className="w-[90%] mx-auto border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
