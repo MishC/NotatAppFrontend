@@ -13,6 +13,7 @@ import Plus from "./icons/Plus";
 import Sidebar from "./Sidebar";
 import Calendar from "./Calendar";
 import Unscheduled from "./Unscheduled";
+import Done from "./Done";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
 import {
@@ -157,6 +158,9 @@ export default function NoteApp() {
     return notes.filter(n => n && n.folderId === activeFolder);
   }, [notes, activeFolder]);
 
+  const isDoneView = String(activeFolder) === "4";
+
+
 
   const noteById = useMemo(() => {
     const m = new Map();
@@ -235,6 +239,14 @@ export default function NoteApp() {
           </div>
 
           <div className="overflow-visible calendar-container center  justify-start w-full mt-10">
+             {isDoneView ? (
+               <Done
+               notes={filteredNotes}
+               onOpen={(n) => switchModalState(n)}
+               onUncomplete={(n) => handleUpdateNote(n.id, { folderId: null })}
+              onDelete={(n) => handleDeleteNote(n.id)}
+            />
+         ) : (
             <Calendar
               events={events}
               onOpen={(note) => switchModalState(note)}
@@ -246,14 +258,7 @@ export default function NoteApp() {
                 handleUpdateNote(note.id, { scheduledAt: ymd })
               }
             />
-
-            <Unscheduled
-              notes={unscheduled}
-              onOpen={(n) => switchModalState(n)}
-              onDelete={(id) => handleDeleteNote(id)}
-              onComplete={(n) => handleUpdateNote(n.id, { ...n, folderId: 4 })}
-              onEdit={(n) => switchModalState(n)}
-            />
+            )}
           </div>
           </div>
       )
