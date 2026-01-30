@@ -12,6 +12,11 @@
   /*background-color: rgb(243 244 246);*/
 }
 
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
