@@ -19,7 +19,7 @@ export default function BaseInputField({
     "rounded-lg border border-slate-300",
     "focus:border-blue-500 focus:ring-2 focus:ring-blue-200",
     "outline-none",
-    "p-4",
+    "p-3",
     hasLeft ? "pl-12" : "",
     hasRight ? "pr-12" : "",
     inputClass,

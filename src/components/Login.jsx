@@ -109,7 +109,7 @@ export default function Login() {
           autoRunActive={autoRunActive}
         />        <form
           onSubmit={!flowId ? onStart : onVerify}
-          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-lg md:mr-30"
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-base md:mr-30"
         >
 
 
@@ -125,11 +125,13 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 rightIcon={<EmailIcon />}
+                inputClass="text-xl"
               />
               <BaseInputField
                 id="psw_login"
                 type={showPwd ? "text" : "password"}
                 placeholder="Password"
+                inputClass="text-xl"
                 value={pwd}
                 onChange={(e) => setPwd(e.target.value)}
                 rightIcon={
@@ -186,7 +188,7 @@ export default function Login() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 maxLength={6}
-                inputClass="text-2xl text-center tracking-widest font-mono"
+                inputClass="text-xl text-center tracking-widest font-mono"
               />
 
 

@@ -5,6 +5,7 @@ export default function Plus({
   className = "",
 }) {
   const sizeMap = {
+    8: "w-8 h-8",
     10: "w-10 h-10",
     12: "w-12 h-12",
     14: "w-14 h-14",
@@ -27,7 +28,7 @@ export default function Plus({
       className={[
         sizeCls,
         colorCls,
-        "text-white text-3xl leading-none grid place-items-center",
+        "text-white text-2xl sm:text-3xl leading-none grid place-items-center",
         "shadow-lg transition cursor-pointer select-none",
         className,
       ].join(" ")}

@@ -13,6 +13,7 @@ import Plus from "./icons/Plus";
 import Sidebar from "./Sidebar";
 import Calendar from "./Calendar";
 import Unscheduled from "./Unscheduled";
+import Subheader from "./Subheader";
 import Done from "./Done";
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
@@ -192,6 +193,7 @@ export default function NoteApp() {
         }),
     [filteredNotes]
   );
+
   return (
     <div className="w-full mx-auto m-0 p-0">
       {user && <Header userName={user.email} onLogout={onLogoutClick} />}
@@ -202,15 +204,7 @@ export default function NoteApp() {
         />
       )}
 
-      <div className="w-full md:max-w-7xl mx-auto px-5 mt-6">
-        <div className="flex items-center gap-4 justify-center">
-          <Plus onClick={() => setShowNoteModal(true)} className="rounded-2xl text-white text-3xl grid place-items-center shadow-lg transition" />
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-800">
-            Note Board
-          </h1>
-        </div>
-        <p className="mt-2 text-slate-600 text-xl text-center">Calendar</p>
-      </div>
+      <Subheader setShowNoteModal={setShowNoteModal} />
 
       <div className="p-5 rounded-xl">
         {error ? (
@@ -285,6 +279,5 @@ export default function NoteApp() {
         )
       }
     </div >
-
   );
 }

@@ -14,7 +14,8 @@ export default function AuthTitle({ smallText, bigText, autoRunActive }) {
         "sm:p-2 md:text-left md:mr-20  p-2",
         "animated-color-hover",
         autoRunActive ? "auto-run" : "",
-        smallText === "Sign Up" ? "text-[14px]" : "text-[12px]",
+         "text-[32px]",
+
       ].join(" ")}
     >
       <span className="block lg:hidden">{smallText}</span>

@@ -2,8 +2,12 @@
   /*max-width: 1280px;*/
   margin: 0 auto;
   text-align: center;
+  box-sizing:  border-box;
 }
 .App {
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
-
- 
