@@ -79,82 +79,103 @@ export function createCalendarHandlers({
     },
 
     /** Attach menu + handlers to event DOM */
-    eventDidMount(info) {
-      const el = info.el;
-      const note = info.event.extendedProps?.note;
-      if (!note) return;
+eventDidMount(info) {
+  const el = info.el;
+  const note = info.event.extendedProps?.note;
+  if (!note) return;
 
-      const wrap = el.querySelector(".fc-card-menu-wrap");
-      const btn = el.querySelector(".fc-card-menu-btn");
-      const menu = el.querySelector(".fc-card-menu");
-      const card = el.querySelector(".fc-note-card");
+  const wrap = el.querySelector(".fc-card-menu-wrap");
+  const btn = el.querySelector(".fc-card-menu-btn");
+  const menu = el.querySelector(".fc-card-menu");
+  const card = el.querySelector(".fc-note-card");
+  if (!wrap || !btn || !menu || !card) return;
 
-      if (!wrap || !btn || !menu || !card) return;
+  const harness = el.closest(".fc-daygrid-event-harness");
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
 
-      const harness = el.closest(".fc-daygrid-event-harness");
+  const setOpen = (open) => {
+    menu.classList.toggle("hidden", !open);
 
-const setOpen = (open) => {
-  menu.classList.toggle("hidden", !open);
+    // lift event + harness so nothing covers the dropdown
+    el.classList.toggle("fc-menu-open", open);
+    harness?.classList.toggle("fc-menu-open", open);
+  };
 
-  // lift event + harness so nothing covers the dropdown
-  el.classList.toggle("fc-menu-open", open);
-  harness?.classList.toggle("fc-menu-open", open);
-};
+  const stop = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
 
-   const toggleMenu = (e) => {
-  e.stopPropagation();
-  e.preventDefault();
-  const open = menu.classList.contains("hidden");
-  setOpen(open);
-};
+  // Desktop: toggle menu (only from button)
+  const toggleMenu = (e) => {
+    stop(e);
+    const open = menu.classList.contains("hidden");
+    setOpen(open);
+  };
 
-      const onCardClick = (e) => {
-        if (wrap.contains(e.target)) return;
-        e.stopPropagation();
-        e.preventDefault();
-        menu.classList.toggle("hidden");
-      };
+  // Mobile: tap on card opens modal (NOT menu)
+  const onCardPointerDown = (e) => {
+    if (!isMobile) return;
 
-const onDocClick = (e) => {
-  if (!card.contains(e.target)) setOpen(false);
-};
+    // ignore tap on button/menu area if you still want the menu to work
+    // if you don't want menu at all on mobile, remove this if-block
+    if (wrap.contains(e.target)) return;
 
+    stop(e);
+    setOpen(false);
+    onOpen?.(note);
+  };
 
-      const stop = (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      };
+  // Desktop: click on card toggles menu (optional behavior)
+  // If you want card-click menu ONLY on desktop, keep this:
+  const onCardClickDesktop = (e) => {
+    if (isMobile) return;
+    if (wrap.contains(e.target)) return;
+    stop(e);
+    const open = menu.classList.contains("hidden");
+    setOpen(open);
+  };
 
-      const onMenuClick = (e) => {
-        const li = e.target.closest(".fc-menu-item");
-        if (!li) return;
+  const onDocClick = (e) => {
+    if (!card.contains(e.target)) setOpen(false);
+  };
 
-        e.stopPropagation();
-        e.preventDefault();
-        menu.classList.add("hidden");
+  const onMenuClick = (e) => {
+    const li = e.target.closest(".fc-menu-item");
+    if (!li) return;
 
-        const act = li.getAttribute("data-act");
-        if (act === "edit") onOpen?.(note);
-        if (act === "complete") onComplete?.(note);
-        if (act === "delete") onDelete?.(note);
-      };
+    stop(e);
+    setOpen(false);
 
-      card.addEventListener("click", onCardClick);
-      btn.addEventListener("click", toggleMenu);
-      btn.addEventListener("mousedown", stop);
-      btn.addEventListener("touchstart", stop, { passive: false });
-      menu.addEventListener("click", onMenuClick);
-      document.addEventListener("click", onDocClick);
+    const act = li.getAttribute("data-act");
+    if (act === "edit") onOpen?.(note);
+    if (act === "complete") onComplete?.(note);
+    if (act === "delete") onDelete?.(note);
+  };
 
-      info.event.setExtendedProp("__cleanup", () => {
-        card.removeEventListener("click", onCardClick);
-        btn.removeEventListener("click", toggleMenu);
-        btn.removeEventListener("mousedown", stop);
-        btn.removeEventListener("touchstart", stop);
-        menu.removeEventListener("click", onMenuClick);
-        document.removeEventListener("click", onDocClick);
-      });
-    },
+  // ✅ listeners
+  card.addEventListener("pointerdown", onCardPointerDown, { passive: false });
+
+  // Desktop behavior:
+  card.addEventListener("click", onCardClickDesktop);
+
+  btn.addEventListener("click", toggleMenu);
+  btn.addEventListener("pointerdown", stop, { passive: false }); // prevent drag start from button
+  menu.addEventListener("click", onMenuClick);
+  document.addEventListener("click", onDocClick);
+
+  info.event.setExtendedProp("__cleanup", () => {
+    card.removeEventListener("pointerdown", onCardPointerDown);
+    card.removeEventListener("click", onCardClickDesktop);
+
+    btn.removeEventListener("click", toggleMenu);
+    btn.removeEventListener("pointerdown", stop);
+
+    menu.removeEventListener("click", onMenuClick);
+    document.removeEventListener("click", onDocClick);
+  });
+},
+
 
     eventWillUnmount(info) {
       const fn = info.event.extendedProps?.__cleanup;
