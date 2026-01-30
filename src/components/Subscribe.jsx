@@ -49,7 +49,12 @@ export default function Subscribe() {
       return;
     }
 
-    await registerAction(email, pwd, phone);
+    const result = await registerAction({ email, password: pwd, phone, setMsg, setErr });
+    if (!result.ok) {
+      setErr(result.error);
+      return;
+    }
+
 
     setMsg("Registration successful! Redirecting to login...");
 
