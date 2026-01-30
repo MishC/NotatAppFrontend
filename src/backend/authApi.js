@@ -8,6 +8,14 @@ const API_REFRESH = `${API_PREFIX}/refresh`;
 
 let refreshPromise = null;
 
+////
+function toMsg(body, status) {
+  return typeof body === "string"
+    ? body
+    : body?.message || body?.error || `HTTP error! status: ${status}`;
+}
+
+
 export async function refreshAccessToken() {
   if (refreshPromise) return refreshPromise;
 
@@ -52,11 +60,6 @@ async function readBody(res) {
   }
 }
 
-function toMsg(body, status) {
-  return typeof body === "string"
-    ? body
-    : body?.message || body?.error || `HTTP error! status: ${status}`;
-}
 
 /** helper **/
 async function apiJson(url, options = {}) {
