@@ -1,10 +1,10 @@
-const API_BASE = "http://localhost:5001";
+const API_PREFIX = "/api/auth";
 
-const API_LOGIN = "/api/auth/login";
-const API_VERIFY_2FA = "/api/auth/verify-2fa";
-const API_REGISTER = "/api/auth/register";
-const API_LOGOUT = "/api/auth/logout";
-const API_REFRESH = "/api/auth/refresh";
+const API_LOGIN = `${API_PREFIX}/login`;
+const API_VERIFY_2FA = `${API_PREFIX}/verify-2fa`;
+const API_REGISTER = `${API_PREFIX}/register`;
+const API_LOGOUT = `${API_PREFIX}/logout`;
+const API_REFRESH = `${API_PREFIX}/refresh`;
 
 let refreshPromise = null;
 
@@ -18,7 +18,10 @@ export async function refreshAccessToken() {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) throw new Error("refresh_failed");
+    if (!res.ok) {
+      const body = await readBody(res);
+      throw new Error(toMsg(body, res.status));
+    }
 
     const data = await res.json().catch(() => null);
     const accessToken = data?.accessToken;
