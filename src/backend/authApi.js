@@ -1,3 +1,5 @@
+const API_BASE = "http://localhost:5001";
+
 const API_LOGIN = "/api/auth/login";
 const API_VERIFY_2FA = "/api/auth/verify-2fa";
 const API_REGISTER = "/api/auth/register";
