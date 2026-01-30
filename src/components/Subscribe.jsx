@@ -101,6 +101,7 @@ export default function Subscribe() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             rightIcon={<PhoneIcon />}
+            inputClass="text-xl  tracking-widest font-mono"
 
           />
 
@@ -109,6 +110,7 @@ export default function Subscribe() {
             type={showPwd ? "text" : "password"}
             placeholder="Password"
             value={pwd}
+            inputClass="text-xl tracking-widest font-mono"
             onChange={(e) => setPwd(e.target.value)}
             rightIcon={
               <EyeIcon isOpen={showPwd} onClick={() => setShowPwd((v) => !v)} />
