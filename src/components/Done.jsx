@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
-export default function Done({ notes, onOpen, onUncomplete, onDelete }) {
+export default function Done({ notes, onOpen, folderOptions, onDelete }) {
   const [q, setQ] = useState("");
 
   const rows = useMemo(() => {
@@ -14,6 +14,8 @@ export default function Done({ notes, onOpen, onUncomplete, onDelete }) {
       return title.includes(t) || content.includes(t);
     });
   }, [notes, q]);
+
+  
 
   return (
     <div className="w-[80%] mt-6 mx-auto">
@@ -58,7 +60,7 @@ export default function Done({ notes, onOpen, onUncomplete, onDelete }) {
 
                 <td className="px-4 py-3 text-slate-700">{formatDateDDMMYYYY(n.scheduledAt)}</td>
 
-                <td className="px-4 py-3 text-slate-700">{String(n.folderId ?? "—")}</td>
+                <td className="px-4 py-3 text-slate-700">{folderOptions.filter((o) => o.id === n.folderId).map((o) => o.label).join(", ") || "—"}</td>
 
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">

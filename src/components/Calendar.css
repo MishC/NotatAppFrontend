@@ -121,8 +121,14 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 }
 
 .fc .fc-button-primary {
-  background-color: white;
-  color: black;
+  background-color:oklch(70.5% 0.213 47.604); 
+  border-color: white !important;
+  
+  color: white;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: oklch(55.3% 0.195 38.402);
 }
 
 @media (max-width: 640px) {

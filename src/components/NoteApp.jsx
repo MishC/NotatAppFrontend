@@ -237,7 +237,7 @@ export default function NoteApp() {
                <Done
                notes={filteredNotes}
                onOpen={(n) => switchModalState(n)}
-               onUncomplete={(n) => handleUpdateNote(n.id, { folderId: null })}
+               folderOptions={folderOptions}
               onDelete={(n) => handleDeleteNote(n.id)}
             />
          ) : (
@@ -279,5 +279,6 @@ export default function NoteApp() {
         )
       }
     </div >
+
   );
 }
