@@ -219,7 +219,7 @@ export default function NoteApp() {
           />
           </div>
 
-          <div className="overflow-visible calendar-container center  justify-start w-full">
+          <div className="overflow-visible calendar-container center  justify-center items-center mx-auto w-[90%]">
              {activeFolder=== 4? (
                <Done
                notes={filteredNotes}

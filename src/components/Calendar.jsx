@@ -6,8 +6,7 @@ import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
 import listPlugin from "@fullcalendar/list";
-import timeGridPlugin from "@fullcalendar/timegrid";
-
+import { getWidthBucket, isMobile, isTablet} from "../helpers/screenHelpers";
 
 
 
@@ -15,12 +14,12 @@ import "./Calendar.css"
 
 /**
  * props:
- *  - events: [{ id, title, start: 'YYYY-MM-DD', allDay: true, extendedProps: { note } }]
- *  - onOpen(note), onEdit(note), onDelete(note), onComplete(note)
- *  - onSaveDate(note, ymd)   // pri prijatí z externého DnD
- *  - onMoveDate(note, ymd)   // pri presune vnútri kalendára
- *  - noteById: Map<string, note> // záloha pre eventReceive, ak by extendedProps.note chýbal
- */
+ *  - Full
+ *  - onOpen(note), onEdit(note), onDelete(note), onComplete(note) // when the note is opened, edited, deleted, or completed
+ *  - eventDrop(info)   // when an event is dropped
+ *  - eventReceive(info)   // when an event is received from external drag-and-drop
+**/
+
 export default function Calendar({
   events,
   onOpen,
@@ -29,25 +28,23 @@ export default function Calendar({
   onMoveDate,
 }) {
 
-//  const isMobile = useMemo(() => window.innerWidth < 640, []);
   // Source - https://stackoverflow.com/a
 // Posted by Volobot Advanced Systems, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-01-29, License - CC BY-SA 4.0
 
 const [width, setWidth] = useState(window.innerWidth);
 
+
 function handleWindowSizeChange() {
     setWidth(window.innerWidth);
 }
 useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
+    
     return () => {
         window.removeEventListener('resize', handleWindowSizeChange);
     }
-}, []);
-
-const isMobile = width <= 822;
-
+}, [width]);
 
   const calRef = useRef(null);
   const wrapRef = useRef(null);
@@ -68,20 +65,7 @@ const isMobile = width <= 822;
     onMoveDate,
   });
 
-  const openMenu = () => {
-    menu.classList.remove("hidden");
 
-    // reset
-    menu.style.left = "";
-    menu.style.right = "";
-
-    // if it would overflow, anchor to left instead
-    const rect = menu.getBoundingClientRect();
-    if (rect.right > window.innerWidth - 8) {
-      menu.style.right = "";
-      menu.style.left = "";
-    }
-  };
 
   useEffect(() => {
     if (!wrapRef.current || !calRef.current) return;
@@ -91,14 +75,13 @@ const isMobile = width <= 822;
     ro.observe(wrapRef.current);
     return () => ro.disconnect();
   }, []);
-  let __dragMoveHandler = null;
 
 
   return (
     <div className="w-[90%] mx-auto border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
-        plugins={[dayGridPlugin, interactionPlugin,listPlugin, timeGridPlugin]}
+        plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
           initialView={isMobile ? "listWeek" : "dayGridMonth"}
 
         height="auto"
@@ -111,7 +94,7 @@ const isMobile = width <= 822;
          headerToolbar={{
     right: "prev,next",
     left: "title",
-    center: isMobile
+    center: isMobile || isTablet
       ? "listWeek"
       : "dayGridMonth,listWeek",
   }}
