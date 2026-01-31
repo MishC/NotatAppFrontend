@@ -6,6 +6,8 @@ import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
 import listPlugin from "@fullcalendar/list";
+import timeGridPlugin from "@fullcalendar/timegrid";
+
 
 
 
@@ -44,7 +46,7 @@ useEffect(() => {
     }
 }, []);
 
-const isMobile = width <= 768;
+const isMobile = width <= 822;
 
 
   const calRef = useRef(null);
@@ -96,7 +98,7 @@ const isMobile = width <= 768;
     <div className="w-[90%] mx-auto border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
-        plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
+        plugins={[dayGridPlugin, interactionPlugin,listPlugin, timeGridPlugin]}
           initialView={isMobile ? "listWeek" : "dayGridMonth"}
 
         height="auto"
@@ -106,6 +108,20 @@ const isMobile = width <= 768;
         themeSystem="standard"
         firstDay={1}
         dayMaxEvents={isMobile ? 2 : 4}
+         headerToolbar={{
+    right: "prev,next today",
+    left: "title",
+    center: isMobile
+      ? "listWeek"
+      : "dayGridMonth,listWeek",
+  }}
+
+  views={{
+    dayGridMonth: { buttonText: "Month" },
+    timeGridWeek: { buttonText: "Week" },
+    timeGridDay: { buttonText: "Day" },
+    listWeek: { buttonText: "List" },
+  }}
         {...handlers}
 
 

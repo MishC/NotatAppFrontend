@@ -68,7 +68,7 @@ export async function initNotesAndFoldersAction({
           { id: null, label: "All" },
           ...folders.filter(f => !isDone(f)).map(f => ({ id: f.id, label: f.name })),
           ...folders.filter(isDone).map(f => ({ id: f.id, label: f.name })),
-          { id: OVERDUE_ID, label: "Overdue" }
+          { id: OVERDUE_ID, label: "Overdues" }
 
         ]);
         

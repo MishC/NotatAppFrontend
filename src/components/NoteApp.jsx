@@ -9,12 +9,12 @@ import { getColorClassById } from "../helpers/colors";
 import Header from "./Header";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
-import Plus from "./icons/Plus";
 import Sidebar from "./Sidebar";
 import Calendar from "./Calendar";
-import Unscheduled from "./Unscheduled";
 import Subheader from "./Subheader";
 import Done from "./Done";
+import Overdues from  "./Overdues";
+
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
 import {
@@ -26,6 +26,7 @@ import {
   selectFolderAction,
   toggleModalAction,
 } from "../actions/noteActions";
+import { OVERDUE_ID } from "../backend/notesApi";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
@@ -40,6 +41,7 @@ export default function NoteApp() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
 
+
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
 
@@ -48,6 +50,9 @@ export default function NoteApp() {
 
   const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
   const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
+
+  const isDoneView = activeFolder === 4;
+  const isOverdueView = activeFolder === OVERDUE_ID;
 
   // auth preload
   useEffect(() => {
@@ -82,13 +87,13 @@ export default function NoteApp() {
 
   useEffect(() => {
     if (!error) return;
-    const t = setTimeout(() => setError(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+    const t = setTimeout(() => setError(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of error msg
     return () => clearTimeout(t);// if error state is changed before 4 sec timeout, it will be executed -cleared timeout
   }, [error]);
 
   useEffect(() => {
     if (!msg) return;
-    const t = setTimeout(() => setMsg(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of msg
+    const t = setTimeout(() => setMsg(""), 4000);//scheduler runs immediately and after 4 sec is planned changed state of success msg
     return () => clearTimeout(t); // if msg state is changed before 4 sec timeout, it will be executed -cleared timeout
   }, [msg]);
 
@@ -136,10 +141,12 @@ export default function NoteApp() {
   const filteredNotes = useMemo(() => {
     const isRealFolder = typeof activeFolder === "number";
     if (!isRealFolder) return notes;
-    return notes.filter(n => n && n.folderId === activeFolder);
+
+    return notes.filter(n => n && String(n.folderId) === String(activeFolder));
   }, [notes, activeFolder]);
 
-  const isDoneView = String(activeFolder) === "4";
+
+
 
 
 
@@ -186,7 +193,7 @@ export default function NoteApp() {
 
       <Subheader setShowNoteModal={setShowNoteModal} />
 
-      <div className="p-5 rounded-xl">
+      <div className={error||msg? "p-5 rounded-xl" : "p-2"}>
         {error ? (
           <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
         ) : msg ? (
@@ -199,10 +206,10 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
-        <div className="main w-full sm:w-[80%] mx-auto md:mt-20 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
+        <div className="main w-full sm:w-[80%] mx-auto md:mt-12 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
           {/** Folders sidebar  */}
 
-          <div className="w-full sm:w-[20%] sm:mt-50 justify-center text-center d-block mb-10 ml-20 align-center">
+          <div className="w-full sm:w-[20%] sm:items-center justify-center text-center d-block mb-10 ml-20 align-center">
 
           <Sidebar
             folderOptions={folderOptions}
@@ -212,15 +219,22 @@ export default function NoteApp() {
           />
           </div>
 
-          <div className="overflow-visible calendar-container center  justify-start w-full mt-10">
-             {isDoneView ? (
+          <div className="overflow-visible calendar-container center  justify-start w-full">
+             {activeFolder=== 4? (
                <Done
                notes={filteredNotes}
                onOpen={(n) => switchModalState(n)}
                folderOptions={folderOptions}
               onDelete={(n) => handleDeleteNote(n.id)}
             />
-         ) : (
+            )  : (activeFolder === OVERDUE_ID ? (
+              <Overdues
+                notes={filteredNotes} 
+                folderOptions={folderOptions}
+                onOpen={(n) => switchModalState(n)}
+                onDelete={(n) => handleDeleteNote(n.id)}
+              />
+            )    : (
             <Calendar
               events={events}
               onOpen={(note) => switchModalState(note)}
@@ -232,7 +246,9 @@ export default function NoteApp() {
                 handleUpdateNote(note.id, { scheduledAt: ymd })
               }
             />
-            )}
+            ))
+            }
+          
           </div>
           </div>
       )

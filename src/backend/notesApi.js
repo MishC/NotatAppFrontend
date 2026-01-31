@@ -59,7 +59,7 @@ export async function fetchFoldersApi({ API_URL2 }) {
   return (await apiRequest({ url: API_URL2 })) || [];
 }
 
-export const OVERDUE_ID = "overdue";
+export const OVERDUE_ID = "overdues";
 
 export async function fetchNotesApi({ API_URL, activeFolder }) {
   let url;

@@ -16,7 +16,7 @@ export default function Sidebar({folderOptions, activeFolder, guest, handleFolde
                 <button
                   key={opt.id ?? "all"}
                   onClick={() => handleFolderClick(opt)}
-                  className={label==="Overdue" ? "w-full text-red-500 text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer" : 
+                  className={label==="Overdues" ? "w-full text-red-500 text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer" : 
                     "w-full text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer"}
                 >
                   <span
