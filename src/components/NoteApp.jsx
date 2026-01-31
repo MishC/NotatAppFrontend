@@ -131,26 +131,6 @@ export default function NoteApp() {
 
 
 
-  // callendar callbacks - will be transfered soon
-
-  const onSaveDate = async (note, ymd) =>
-
-    updateNoteAction({
-      guest,
-      API_URL,
-      noteId: note.id,
-      updatedFields: { ...note, scheduledAt: ymd },
-      selectedNote: note,
-      activeFolder,
-      setNotes,
-      setLoading,
-      setError,
-      setIsModalOpen,
-      setSelectedNote,
-      setMsg,
-    });
-
-
   // derived
 
   const filteredNotes = useMemo(() => {
@@ -219,7 +199,7 @@ export default function NoteApp() {
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
-        <div className=" main w-full sm:w-[80%] mx-auto md:mt-20 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
+        <div className="main w-full sm:w-[80%] mx-auto md:mt-20 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
           {/** Folders sidebar  */}
 
           <div className="w-full sm:w-[20%] sm:mt-50 justify-center text-center d-block mb-10 ml-20 align-center">
