@@ -6,11 +6,12 @@ import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
 import listPlugin from "@fullcalendar/list";
-import { getWidthBucket, isMobile, isTablet} from "../helpers/screenHelpers";
+import { isDesktop, isMobile, isTablet} from "../helpers/screenHelpers";
 
 
 
 import "./Calendar.css"
+import { set } from "date-fns";
 
 /**
  * props:
@@ -35,17 +36,6 @@ export default function Calendar({
 const [width, setWidth] = useState(window.innerWidth);
 
 
-function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-}
-useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    
-    return () => {
-        window.removeEventListener('resize', handleWindowSizeChange);
-    }
-}, [width]);
-
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -67,38 +57,28 @@ useEffect(() => {
 
 
 
-  useEffect(() => {
-    if (!wrapRef.current || !calRef.current) return;
-    const ro = new ResizeObserver(() => {
-      calRef.current?.getApi?.()?.updateSize?.();
-    });
-    ro.observe(wrapRef.current);
-    return () => ro.disconnect();
-  }, []);
-
-
   return (
     <div className="w-[90%] mx-auto border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
-          initialView={isMobile ? "listWeek" : "dayGridMonth"}
+          initialView={isMobile(window.innerWidth) ? "listWeek" : "dayGridMonth"}
 
         height="auto"
         contentHeight="auto"
-        aspectRatio={isMobile ? 1.2 : 1.6}
-        
+        aspectRatio={isMobile(window.innerWidth) ? 1.2 : 1.6}
+
         themeSystem="standard"
         firstDay={1}
-        dayMaxEvents={isMobile ? 2 : 4}
+        dayMaxEvents={isMobile(window.innerWidth) ? 2 : 4}
          headerToolbar={{
     right: "prev,next",
     left: "title",
-    center: isMobile || isTablet
+    center: isMobile(window.innerWidth) || isTablet(window.innerWidth)
       ? "listWeek"
       : "dayGridMonth,listWeek",
   }}
-
+   
   views={{
     dayGridMonth: { buttonText: "Month" },
     timeGridWeek: { buttonText: "Week" },
@@ -112,7 +92,7 @@ useEffect(() => {
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
-        longPressDelay={350}       // aby scroll nebol “drag”
+        longPressDelay={350}       // scroll is not drag “drag”
   eventLongPressDelay={350}
   selectLongPressDelay={350}
 

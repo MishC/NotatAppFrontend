@@ -153,7 +153,6 @@ eventDidMount(info) {
     if (act === "delete") onDelete?.(note);
   };
 
-  // ✅ listeners
   card.addEventListener("pointerdown", onCardPointerDown, { passive: false });
 
   // Desktop behavior:
