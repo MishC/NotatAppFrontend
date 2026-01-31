@@ -11,7 +11,7 @@
             className="rounded-2xl text-white text-3xl grid place-items-center shadow-lg transition"
           />
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight text-slate-800">
-            Note Board
+        Scheduler
           </h1>
         </div>
         <p className="mt-2 text-slate-600 md:text-xl text-center">Calendar</p>
