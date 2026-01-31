@@ -109,7 +109,7 @@ const isMobile = width <= 822;
         firstDay={1}
         dayMaxEvents={isMobile ? 2 : 4}
          headerToolbar={{
-    right: "prev,next today",
+    right: "prev,next",
     left: "title",
     center: isMobile
       ? "listWeek"
@@ -119,7 +119,6 @@ const isMobile = width <= 822;
   views={{
     dayGridMonth: { buttonText: "Month" },
     timeGridWeek: { buttonText: "Week" },
-    timeGridDay: { buttonText: "Day" },
     listWeek: { buttonText: "List" },
   }}
         {...handlers}

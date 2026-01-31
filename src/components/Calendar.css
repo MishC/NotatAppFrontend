@@ -17,6 +17,9 @@
   background: #fff;
   position: relative;
   margin-top:0;
+  border: 1px solid #b9b7b7;
+  margin: 0 20px 0 0;
+  padding:20px;
 }
 
 /* Make your menu always on top */
@@ -135,7 +138,20 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 }
 
   .fc .fc-toolbar-title { font-size: 1.2rem; }
-  h2{font-size: 1.2rem; margin: 0;}
+  h2{font-size: 1.1rem; margin: 0; }
+
+  /* Day cell borders */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-width: 1px;
+}
+
+.fc .fc-button:focus {
+  box-shadow: none !important;
+  outline: 0px;
+}
+
+.fc div.fc-toolbar-chunk {justify-content: end;}
 
 
 @media (min-width: 640px) and (max-width: 822px) {
