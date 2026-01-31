@@ -100,7 +100,7 @@ export default function Login() {
 
   return (
     <div className="Login">
-      <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 p-6 sm:p-2">
+      <div className="w-full min-h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-8 p-6 mx-auto sm:p-12">
 
         <AuthTitle
           id="title"
@@ -109,7 +109,7 @@ export default function Login() {
           autoRunActive={autoRunActive}
         />        <form
           onSubmit={!flowId ? onStart : onVerify}
-          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-base md:mr-30"
+          className="w-full max-w-xl bg-white shadow-xl rounded-2xl p-10 space-y-6 text-base xl:mr-30"
         >
 
 
