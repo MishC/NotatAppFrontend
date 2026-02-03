@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { validateNote, buildPayload } from "../helpers/noteHelpers";
+import { todayYMD } from "../helpers/dateHelpers";
 
 export default function Noteform({
   folders,
@@ -77,7 +78,7 @@ export default function Noteform({
           type="date"
           value={newNote.scheduledAt}
           onChange={(e) => setNewNote({ ...newNote, scheduledAt: e.target.value })}
-          placeholder="YYYY-MM-DD"
+          placeholder= {todayYMD()}
           className="w-full px-4 py-3 text-lg rounded-lg border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
         />
       </div>
