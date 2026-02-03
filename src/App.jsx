@@ -5,6 +5,7 @@ import { RequireAuth, AuthOnly } from "./helpers/authGuard";
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
+import Diary from "./components/modals/Diary";
 import "./App.css";
 
 export default function App() {
@@ -41,6 +42,16 @@ export default function App() {
             <AuthOnly>
               <Subscribe />
             </AuthOnly>
+          }
+        />
+
+        {/*Diary */}
+        <Route
+          path="/diary"
+          element={
+            <RequireAuth>
+              <Diary />
+            </RequireAuth>
           }
         />
 
