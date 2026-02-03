@@ -14,7 +14,7 @@
         Scheduler
           </h1>
         </div>
-        <p className="mt-2 text-slate-600 md:text-xl text-center">Calendar</p>
+        <p className="mt-2 text-slate-600 md:text-xl text-center">Duties</p>
       </div>
     );
   }
