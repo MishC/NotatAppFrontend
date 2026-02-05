@@ -5,6 +5,49 @@
     min-width: 100vw;
   }
 
+  .Header {
+  width: 100%;
+}
+
+/* Date pill */
+.header-date {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.35);
+  color: rgba(30, 41, 59, 0.9); /* slate */
+}
+
+/* User badge */
+.header-user {
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.55);
+  color: rgba(40, 24, 0, 0.9);
+}
+
+/* Logout button */
+.header-logout {
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  border: 1px dashed rgba(80, 50, 0, 0.6);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-logout:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.header-logout:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+
 dancing-script-header
 {
   font-family: "Dancing Script", cursive;

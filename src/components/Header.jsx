@@ -1,59 +1,67 @@
 import { format } from "date-fns";
+import clsx from "clsx";
 import "./Header.css";
 
-export default function Header({ userName = "Guest", onLogout }) {
+export default function Header({
+  userName = "Guest",
+  onLogout,
+  maxWidth = "full",        // "full" | "container" | "custom"
+  bgColor = "lightGreen",   // "lightGreen" | "orange" | "custom"
+  customBgClass = "",
+  sticky = true,
+}) {
   const today = format(new Date(), "PPP");
-  const isMobile = window.innerWidth < 640;
+
+  const widthClass =
+    maxWidth === "container"
+      ? "max-w-6xl mx-auto"
+      : maxWidth === "custom"
+      ? "mx-auto"
+      : "w-full";
+
+  const bgClass =
+    bgColor === "orange"
+      ? "bg-orange-200/90"
+      : bgColor === "custom"
+      ? customBgClass
+      : "bg-green-100/90";
 
   return (
     <header
-      className={[
+      className={clsx(
         "Header",
-        "w-full",
-        "flex items-center justify-between",
-        "py-4 px-6",
-        "mx-0 mb-20",
+        sticky && "sticky top-0 z-40",
         "backdrop-blur-lg",
-        "bg-green-100",
-        "opacity-90",
-        "max-w-100vw",
-        "flex-auto",
-      "justify-between",
-      ].join(" ")}
+        bgClass
+      )}
     >
-      {/* Left side - Date */}
-      {!isMobile && (
-        <div className="text-base font-medium text-slate-700/90 bg-white/10 p-3 rounded-md font-dancing dancing-script-header">
+      <div
+        className={clsx(
+          "flex items-center justify-between",
+          "px-4 sm:px-6 py-3",
+          widthClass
+        )}
+      >
+        {/* LEFT – Date (hidden on mobile via CSS) */}
+        <div className="header-date hidden sm:block">
           {today}
         </div>
-      )}
 
-      {/* Right side - Guest + Clear Storage */}
-      <div className="flex justify-between md:d-block w-full md:w-auto items-center">
-        <span className="ml-2 text-lg font-semibold text-brown/95 bg-green/80 px-3 py-2 rounded-md text-sm sm:text-base">
-          {userName === "" ? "Guest" : userName}
-        </span>
+        {/* RIGHT – User + actions */}
+        <div className="flex items-center gap-3">
+          <span className="header-user">
+            {userName || "Guest"}
+          </span>
 
-        <button
-          onClick={onLogout}
-          className={[
-            "text-lg",
-            "font-medium",
-            "px-3 py-1",
-            "rounded-lg",
-            "border-dotted border-brown/90",
-            "text-black/80",
-            "cursor-pointer",
-            "transition",
-            "backdrop-blur-[1px]",
-            "hover:bg-white/50 hover:backdrop-blur-sm",
-            "active:bg-white/30 active:backdrop-blur-none",
-            "mr-2",
-          ].join(" ")}
-        >
-           Logout
-        </button>
-
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="header-logout"
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );
