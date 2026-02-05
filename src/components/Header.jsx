@@ -6,8 +6,8 @@ export default function Header({
   userName = "Guest",
   onLogout,
   maxWidth = "full",        // "full" | "container" | "custom"
-  bgColor = "lightGreen",   // "lightGreen" | "orange" | "custom"
-  customBgClass = "",
+  bgColor = "",  // "lightGreen" | "orange" | "custom" | "default"|
+  customBgClass,
   sticky = true,
   showDate = true
 }) {
@@ -17,15 +17,16 @@ export default function Header({
     maxWidth === "container"
       ? "max-w-6xl mx-auto"
       : maxWidth === "custom"
-      ? "mx-auto"
-      : "w-full";
+        ? "mx-auto"
+        : "w-full";
 
   const bgClass =
     bgColor === "orange"
       ? "bg-orange-200/90"
       : bgColor === "custom"
-      ? customBgClass
-      : "bg-green-100/90";
+        ? customBgClass
+        : "bg-green-100/90";
+
 
   return (
     <header
@@ -44,9 +45,11 @@ export default function Header({
         )}
       >
         {/* LEFT – Date (hidden on mobile via CSS) */}
-        <div className="header-date hidden sm:block">
-          {today}
-        </div>
+        {showDate && (
+          <div className="header-date hidden sm:block">
+            {today}
+          </div>
+        )}
 
         {/* RIGHT – User + actions */}
         <div className="flex items-center gap-3">

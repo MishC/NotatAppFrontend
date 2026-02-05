@@ -46,10 +46,10 @@ function FeatureCard({ title, subtitle, Icon, onClick }) {
 export function Home({ onNavigate }) {
   // onNavigate("duties" | "calendar" | "diary")
   return (
-    <div className="min-h-screen bg-[rgb(245,255,245)]">
+    <div className="min-h-screen max-h-100vh bg-[rgb(245,255,245)]">
 
       {/* Top bar */}
-      <div className="sticky top-0 z-10 border-b border-black/10 bg-white/70 backdrop-blur">
+      <div className="sticky top-0 z-10 border-b border-black/10 bg-white/70 backdrop-blur ">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-2xl bg-[rgb(255,140,0)] shadow-sm" />
@@ -62,7 +62,7 @@ export function Home({ onNavigate }) {
           <div className="text-xs md:text-sm text-black/50">
             Orange + light green theme
           </div>
-               <Header maxWidth="container" />
+              <div className="w-20"><Header maxWidth="10px" showDate={false} bgColor="custom" customBgClass="bg-[rgb(245,255,245)]" /></div>
 
         </div>
       </div>
@@ -92,20 +92,19 @@ export function Home({ onNavigate }) {
                 One home for your duties, calendar and diary
               </h1>
               <p className="mt-3 text-black/60 max-w-2xl">
-                Pick a module below. Big, friendly UI. (A potom spravíš routing / state podľa toho.)
+                Pick a module below.
               </p>
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => onNavigate?.("duties")}
+                onClick={() => onNavigate?.("/")}
                 className="
                   rounded-2xl px-4 py-3 font-medium
                   bg-[rgb(255,140,0)] text-white
                   shadow-sm hover:shadow-md transition
                 "
               >
-                Start with Duties
               </button>
               <button
                 onClick={() => onNavigate?.("calendar")}
@@ -125,13 +124,13 @@ export function Home({ onNavigate }) {
         {/* 3 Tiles */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
           <FeatureCard
-            title="Scheduler Duties"
+            title="ToDo"
             subtitle="Tasks, deadlines, folders, overdue, done."
             Icon={ClipboardList}
-            onClick={() => onNavigate?.("duties")}
+            onClick={() => onNavigate?.("/")}
           />
           <FeatureCard
-            title="Planner Calendar"
+            title="Calendar"
             subtitle="FullCalendar view of your notes / tasks."
             Icon={CalendarDays}
             onClick={() => onNavigate?.("calendar")}
@@ -145,8 +144,7 @@ export function Home({ onNavigate }) {
         </div>
 
         {/* Footer hint */}
-        <div className="mt-10 text-xs text-black/45">
-          Tip: use the same data model, but display it differently in each module.
+        <div className="sticky bottom-0 mt-10 text-xs text-black/45">
         </div>
       </div>
     </div>
