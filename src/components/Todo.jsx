@@ -11,7 +11,6 @@ import { isDesktop, isMobile, isTablet} from "../helpers/screenHelpers";
 
 
 import "./styles/Calendar.css"
-import { set } from "date-fns";
 
 /**
  * props:
@@ -21,17 +20,13 @@ import { set } from "date-fns";
  *  - eventReceive(info)   // when an event is received from external drag-and-drop
 **/
 
-export default function Calendar({
+export default function Todo({
   events,
   onOpen,
   onComplete,
   onDelete,
   onMoveDate,
 }) {
-
-
-
-const [width, setWidth] = useState(window.innerWidth);
 
 
   const calRef = useRef(null);

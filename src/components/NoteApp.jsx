@@ -10,7 +10,7 @@ import Header from "./Header";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
 import Sidebar from "./Sidebar";
-import Calendar from "./Calendar";
+import Todo from "./Todo";
 import Subheader from "./Subheader";
 import Done from "./Done";
 import Overdues from  "./Overdues";
@@ -235,7 +235,7 @@ export default function NoteApp() {
                 onDelete={(n) => handleDeleteNote(n.id)}
               />
             )    : (
-            <Calendar
+            <Todo
               events={events}
               onOpen={(note) => switchModalState(note)}
               onComplete={(note) =>

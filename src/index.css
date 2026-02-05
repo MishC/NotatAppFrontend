@@ -11,7 +11,36 @@
   -moz-osx-font-smoothing: grayscale;
   /*background-color: rgb(243 244 246);*/
   
+  /* Backgrounds */
+  --bg-main: 245 255 245;        /* very light green */
+  --bg-surface: 255 255 255;     /* cards, panels */
+  --bg-glass: 255 255 255 / 0.7;
+
+  /* Primary accent (purple) */
+  --primary: 139 92 246;         /* violet-500 */
+  --primary-soft: 237 233 254;   /* violet-100 */
+  --primary-muted: 196 181 253;  /* violet-300 */
+
+  /* Text */
+  --text-main: 15 23 42;         /* slate-900 */
+  --text-muted: 100 116 139;     /* slate-500 */
+
+  /* Borders */
+  --border-soft: 15 23 42 / 0.1;
+
+  /* Success / calm green */
+  --success: 34 197 94;          /* green-500 */
 }
+
+/* =========================
+   Global base styles
+   ========================= */
+html,
+body {
+  background-color: rgb(var(--bg-main));
+  color: rgb(var(--text-main));
+}
+
 
 html {
   box-sizing: border-box;

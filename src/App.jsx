@@ -19,7 +19,7 @@ export default function App() {
       <Routes>
         {/* Main */}
         <Route
-          path="/"
+          path="/todo"
           element={
             <RequireAuth>
               <NoteApp />
@@ -58,7 +58,7 @@ export default function App() {
         />
 
           <Route
-          path="/home"
+          path="/"
           element={
             <RequireAuth>
               <Home />
