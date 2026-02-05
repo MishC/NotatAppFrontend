@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { resetAuth, setGuest, setAuthedUser } from "../reducers/authSlice";
 import { getColorClassById } from "../helpers/colors";
+import { format } from "date-fns";
 
 
 import Header from "./Header";
@@ -14,6 +15,7 @@ import Todo from "./Todo";
 import Subheader from "./Subheader";
 import Done from "./Done";
 import Overdues from  "./Overdues";
+import NavigationBar from "./NavigationBar";
 
 
 import { logoutAction, removeGuestMode } from "../actions/authActions";
@@ -182,8 +184,10 @@ export default function NoteApp() {
   );
 
   return (
-    <div className="w-full mx-auto m-0 p-0">
-      {user && <Header userName={user.email} onLogout={onLogoutClick} />}
+    <div className="w-full m-0 p-0">
+      {user && <NavigationBar userName={user.email}  onLogout={onLogoutClick} bgColor="bg-white-500"/>
+     
+      }
       {guest && (
         <Header
           userName="Guest"
@@ -191,7 +195,8 @@ export default function NoteApp() {
         />
       )}
 
-      <Subheader setShowNoteModal={setShowNoteModal} />
+     <div className="sm:flex sm:flex-row w-full sm:w-[80%] mx-auto"><span className="min-w-[30%]"></span>
+      <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} /></div>
 
       <div className={error||msg? "p-5 rounded-xl" : "p-2"}>
         {error ? (
@@ -202,14 +207,19 @@ export default function NoteApp() {
           <div>&nbsp;</div>
         )}
       </div>
+      
 
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
       ) : (
         <div className="main w-full sm:w-[80%] mx-auto md:mt-12 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
+         
+        
           {/** Folders sidebar  */}
+        
 
           <div className="w-full sm:w-[20%] sm:items-center justify-center text-center d-block mb-10 ml-20 align-center">
+           
 
           <Sidebar
             folderOptions={folderOptions}

@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import clsx from "clsx";
 import "./styles/Header.css";
+import NavigationBar from "./NavigationBar";
 
 export default function Header({
   userName = "Guest",
@@ -9,7 +10,8 @@ export default function Header({
   bgColor = "",  // "lightGreen" | "orange" | "custom" | "default"|
   customBgClass,
   sticky = true,
-  showDate = true
+  showDate = true,
+  showNav=true
 }) {
   const today = format(new Date(), "PPP");
 
@@ -50,6 +52,15 @@ export default function Header({
             {today}
           </div>
         )}
+
+        {/* CENTER – NAV BAR (slot) */}
+
+        {showNav && (
+          <div className="flex-1 flex justify-center">
+            <NavigationBar userName={userName} />
+          </div>
+        )}
+
 
         {/* RIGHT – User + actions */}
         <div className="flex items-center gap-3">

@@ -1,6 +1,10 @@
+import { format } from "date-fns";
+
 export default function Sidebar({folderOptions, activeFolder, guest, handleFolderClick}) {
     return (
         <div className="Sidebar">
+
+          
 
               {/** Folders sidebar  */}
 
@@ -13,6 +17,7 @@ export default function Sidebar({folderOptions, activeFolder, guest, handleFolde
 
 
               return (
+              
                 <button
                   key={opt.id ?? "all"}
                   onClick={() => handleFolderClick(opt)}
