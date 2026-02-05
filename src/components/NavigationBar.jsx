@@ -61,7 +61,7 @@ export default function NavigationBar({
         {/* Left: Brand + optional date */}
 
         
-        <div className="flex flex-col min-w-0">
+        <div className="flex gap-30 min-w-0">
                 <button
             onClick={() => navigate("/")}
             className="
@@ -82,7 +82,7 @@ export default function NavigationBar({
           </button>
 
         
-        </div>
+        
 
         {/* Center: Modern segmented nav */}
         <div
@@ -90,7 +90,7 @@ export default function NavigationBar({
             relative
             bg-white/50
             px-1 py-1
-            flex items-center
+            flex items-center justify-left
             sticky-top-0
           "
         >
@@ -140,6 +140,8 @@ export default function NavigationBar({
               );
             })}
           </div>
+        </div>
+
         </div>
 
         {/* Right: user + logout */}

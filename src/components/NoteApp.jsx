@@ -195,9 +195,7 @@ export default function NoteApp() {
         />
       )}
 
-     <div className="sm:flex sm:flex-row w-full sm:w-[80%] mx-auto"><span className="min-w-[30%]"></span>
-      <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} /></div>
-
+  
       <div className={error||msg? "p-5 rounded-xl" : "p-2"}>
         {error ? (
           <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
@@ -211,58 +209,66 @@ export default function NoteApp() {
 
       {loading ? (
         <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
-      ) : (
-        <div className="main w-full sm:w-[80%] mx-auto md:mt-12 m-0 p-0 flex flex-col sm:flex-row sm:gap-4">
-         
-        
-          {/** Folders sidebar  */}
-        
+      ) :  (
+    <div
+      className="
+        grid grid-cols-1
+        sm:grid-cols-[260px_1fr]
+        gap-4 md:gap-6
+        md:mt-12
+      "
+    >
+      {/* LEFT COLUMN: Sidebar */}
+      <aside className="w-full">
+        <Sidebar
+          folderOptions={folderOptions}
+          activeFolder={activeFolder}
+          guest={guest}
+          handleFolderClick={handleFolderClick}
+        />
+      </aside>
 
-          <div className="w-full sm:w-[20%] sm:items-center justify-center text-center d-block mb-10 ml-20 align-center">
-           
+      {/* RIGHT COLUMN: Subheader + Content */}
+      <section className="w-full min-w-0">
+        {/* Subheader is now aligned with content */}
+        <div className="mb-4">
+          <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} />
+        </div>
 
-          <Sidebar
-            folderOptions={folderOptions}
-            activeFolder={activeFolder}
-            guest={guest}
-            handleFolderClick={handleFolderClick}
-          />
-          </div>
-
-          <div className="overflow-visible calendar-container center  justify-center items-center mx-auto w-[90%]">
-             {activeFolder=== 4? (
-               <Done
-               notes={filteredNotes}
-               onOpen={(n) => switchModalState(n)}
-               folderOptions={folderOptions}
+        <div className="overflow-visible calendar-container">
+          {activeFolder === 4 ? (
+            <Done
+              notes={filteredNotes}
+              onOpen={(n) => switchModalState(n)}
+              folderOptions={folderOptions}
               onDelete={(n) => handleDeleteNote(n.id)}
             />
-            )  : (activeFolder === OVERDUE_ID ? (
-              <Overdues
-                notes={filteredNotes} 
-                folderOptions={folderOptions}
-                onOpen={(n) => switchModalState(n)}
-                onDelete={(n) => handleDeleteNote(n.id)}
-              />
-            )    : (
+          ) : activeFolder === OVERDUE_ID ? (
+            <Overdues
+              notes={filteredNotes}
+              folderOptions={folderOptions}
+              onOpen={(n) => switchModalState(n)}
+              onDelete={(n) => handleDeleteNote(n.id)}
+            />
+          ) : (
             <Todo
               events={events}
               onOpen={(note) => switchModalState(note)}
               onComplete={(note) =>
-                handleUpdateNote(note.id, { ...note, folderId: 4 /* done */ })
+                handleUpdateNote(note.id, { ...note, folderId: 4 })
               }
               onDelete={(note) => handleDeleteNote(note.id)}
               onMoveDate={(note, ymd) =>
                 handleUpdateNote(note.id, { scheduledAt: ymd })
               }
             />
-            ))
-            }
-          
-          </div>
-          </div>
-      )
-      }
+          )}
+        </div>
+      </section>
+    </div>
+  )}
+
+      
 
       {
         isModalOpen && selectedNote && (
