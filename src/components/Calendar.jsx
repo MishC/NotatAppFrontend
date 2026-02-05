@@ -10,7 +10,7 @@ import { isDesktop, isMobile, isTablet} from "../helpers/screenHelpers";
 
 
 
-import "./Calendar.css"
+import "./styles/Calendar.css"
 import { set } from "date-fns";
 
 /**

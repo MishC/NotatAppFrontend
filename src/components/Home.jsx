@@ -62,7 +62,8 @@ export function Home({ onNavigate }) {
           <div className="text-xs md:text-sm text-black/50">
             Orange + light green theme
           </div>
-              
+               <Header maxWidth="container" />
+
         </div>
       </div>
 

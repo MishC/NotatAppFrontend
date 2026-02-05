@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import clsx from "clsx";
-import "./Header.css";
+import "./styles/Header.css";
 
 export default function Header({
   userName = "Guest",
@@ -9,6 +9,7 @@ export default function Header({
   bgColor = "lightGreen",   // "lightGreen" | "orange" | "custom"
   customBgClass = "",
   sticky = true,
+  showDate = true
 }) {
   const today = format(new Date(), "PPP");
 
