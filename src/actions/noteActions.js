@@ -16,7 +16,7 @@ import {
 } from "../guest/guestModeApi";
 
 import { normalizeFolderId, validateNote } from "../helpers/noteHelpers";
-import { isPastYMD, todayYYYYMMDD, formatDateDDMMYYYY } from "../helpers/dateHelpers";
+import { isOverdue, todayYYYYMMDD, formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 
 const load = (k) => JSON.parse(localStorage.getItem(k) || "[]");
@@ -190,7 +190,7 @@ const nextScheduledAt =
       : (base?.scheduledAt ?? null);
 
   // Scheduleat cannot be past today
-  if (nextScheduledAt && isPastYMD(nextScheduledAt)) {
+  if (nextScheduledAt && isOverdue(nextScheduledAt)) {
     const formatted = formatDateDDMMYYYY(todayYYYYMMDD());
 
     setError(`Deadline must be today or in the future. (today: ${formatted})`);
