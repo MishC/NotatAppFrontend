@@ -5,7 +5,9 @@ import { RequireAuth, AuthOnly } from "./helpers/authGuard";
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
-import Diary from "./components/modals/Diary";
+import Diary from "./components/Diary";
+import { Home } from "./components/Home";
+
 import "./App.css";
 
 export default function App() {
@@ -51,6 +53,15 @@ export default function App() {
           element={
             <RequireAuth>
               <Diary />
+            </RequireAuth>
+          }
+        />
+
+          <Route
+          path="/home"
+          element={
+            <RequireAuth>
+              <Home />
             </RequireAuth>
           }
         />
