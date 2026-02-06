@@ -1,21 +1,43 @@
-import { useMemo, useState } from "react";
-import { formatDateDDMMYYYY, todayYYYYMMDD } from "../helpers/dateHelpers";
+import { useMemo, useState, useEffect } from "react";
+import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 import { fetchOverdueNotesApi } from "../backend/notesApi";
 
 export default function Overdues({ notes, onOpen, folderOptions, onDelete }) {
   const [q, setQ] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
+
+  const [localNotes, setLocalNotes] = useState(Array.isArray(notes) ? notes : []);
+
+  useEffect(() => {
+    if (Array.isArray(notes)) setLocalNotes(notes);
+  }, [notes]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchOverdueNotesApi({ API_URL })
+      .then((data) => {
+        if (cancelled) return;
+        setLocalNotes(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("fetchOverdueNotesApi failed:", err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [API_URL]);
 
   const rows = useMemo(() => {
-    fetchOverdueNotesApi().then((data) => {
-      setNotes(data);
-    });
+    const qq = (q || "").toLowerCase().trim();
 
-    return notes.filter((n) => {
+    return (localNotes || []).filter((n) => {
       const title = (n.title || "").toLowerCase().trim();
       const content = ((n.content || "").toLowerCase().trim()).slice(0, 10);
-      return title.includes(q) || content.includes(q);
+      return title.includes(qq) || content.includes(qq);
     });
-  }, [notes, q]);
+  }, [localNotes, q]);
 
   const isMobileView = window.innerWidth < 640;
 
@@ -52,12 +74,6 @@ export default function Overdues({ notes, onOpen, folderOptions, onDelete }) {
                   >
                     {n.title || "(no title)"}
                   </button>
-
-                  {/*n.content?.trim() && (
-                    <div className="text-sm text-slate-600 mt-1 line-clamp-2">
-                      {n.content}
-                    </div>
-                  )*/}
                 </td>
 
                 <td className="px-4 py-3 font-semibold text-red-700">

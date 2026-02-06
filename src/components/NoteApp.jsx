@@ -39,8 +39,6 @@ export default function NoteApp( ) {
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
 
-
-
   const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
   const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
 
