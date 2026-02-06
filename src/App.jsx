@@ -1,17 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
 import { RequireAuth, AuthOnly } from "./helpers/authGuard";
+
 
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
 import Diary from "./components/Diary";
-import { Home } from "./components/Home";
+import Home from "./components/Home";
+
 
 import "./App.css";
 
 export default function App() {
-  
   
 
   return (

@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipboardList, CalendarDays, BookOpen, ArrowRight } from "lucide-react";
-import Header from "./Header";
+import NavigationBar from "./NavigationBar";
 import DateComponent from "./DateComponent";
+import { logoutAction } from "../actions/authActions";
 
 function FeatureCard({ title, subtitle, Icon, onClick }) {
   return (
@@ -45,7 +46,7 @@ function FeatureCard({ title, subtitle, Icon, onClick }) {
   );
 }
 
-export function Home() {
+export default function Home( userName, onLogout ) {
   const navigate = useNavigate();
 
   const ctas = useMemo(
@@ -67,23 +68,18 @@ export function Home() {
     return () => clearInterval(id);
   }, [ctas.length]);
 
+ 
+  
+
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-main))]">
       {/* Top bar */}
       <div className="sticky top-0 z-10 border-b border-[rgb(var(--border-soft))] bg-white/70 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-10 rounded-lg-[rgb(var(--primary))] shrink-0" >
-                <img src="../../public/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
-              </div>
-            <div className="leading-tight">
-              <div className="font-semibold text-black/90">NoteApp</div>
-              <div className="text-xs text-black/50">Todo • Calendar • Diary</div>
-            </div>
-          </div>
-
-    
-        </div>
+        <NavigationBar
+          userName={userName}
+          isNavItemVisble={false}
+          isEmailVisible={false}
+        />
       </div>
 
 
