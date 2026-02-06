@@ -42,7 +42,7 @@ export default function Overdues({ notes, onOpen, folderOptions, onDelete }) {
   const isMobileView = window.innerWidth < 640;
 
   return (
-    <div className="w-[80%] mt-6 mx-auto">
+    <div className="w-[80%] mt-6 mx-auto sm:mx-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <input
           value={q}
