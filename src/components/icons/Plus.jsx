@@ -30,13 +30,13 @@ export default function Plus({
         "text-white leading-none grid place-items-center",
         "shadow-lg transition-all duration-200 ease-out",
         "cursor-pointer select-none",
-        open ? "rotate-180" : "rotate-0", // jemný motion hint
+        
         className,
       ].join(" ")}
     >
       <span
         className={[
-          "block text-2xl font-bold",
+          "block font-bold",
           "transition-transform duration-200 ease-out",
         ].join(" ")}
         style={{ lineHeight: 1 }}

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 import { useAutoClearMessage, getNotesApiUrl, getFoldersApiUrl } from "../helpers/noteHelpers";
 
-import Modal from "./modals/Modal";
+import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
 import Sidebar from "./Sidebar";
 import Todo from "./Todo";
@@ -156,13 +156,13 @@ export default function NoteApp() {
 
   return (
     <div className="w-full m-0 p-0">
-       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
-              <NavigationBar
-                userName={navUserName}
-                isNavItemVisble={true}
-                isEmailVisible={false}
-              />
-            </div>
+      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
+        <NavigationBar
+          userName={navUserName}
+          isNavItemVisble={true}
+          isEmailVisible={false}
+        />
+      </div>
 
       <div className={error || msg ? "p-5 rounded-xl" : "p-2"}>
         {error ? (
@@ -192,7 +192,10 @@ export default function NoteApp() {
               activeFolder={activeFolder}
               guest={guest}
               handleFolderClick={handleFolderClick}
+              setFolders={setFolders}
+              setError={setError}
             />
+
 
           </aside>
 
@@ -233,7 +236,7 @@ export default function NoteApp() {
       )}
 
       {isModalOpen && selectedNote && (
-        <Modal
+        <EditNoteModal
           selectedNote={selectedNote}
           switchModal={(n) => switchModalState(n)}
           updateNote={handleUpdateNote}

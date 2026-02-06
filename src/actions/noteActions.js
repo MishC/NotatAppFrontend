@@ -6,7 +6,8 @@ import {
   fetchNotesApi,
   fetchFoldersApi,
   OVERDUE_ID,
-  createFolderApi
+  createFolderApi, 
+  deleteFolderApi
 } from "../backend/notesApi";
 
 import {
@@ -333,5 +334,36 @@ export async function createFolderAction({ API_URL, folderName, setFolders, setE
     setFolders((prev) => [...prev, newFolder]);
   } catch (error) {
     setError(error.message);
+  }
+}
+
+export async function deleteFolderAction({ API_URL, folderId, setFolders, setError }) {
+  try {
+    await deleteFolderApi({ API_URL, folderId });
+    setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
+  } catch (error) {
+    setError(error.message);
+  }
+}
+
+export async function updateFolderAction({ API_URL, folderId, folderName, setFolders, setError }) {
+  try {
+    const res = await fetch(`${API_URL}/${folderId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: folderName }),
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Failed to update folder");
+
+    setFolders?.((prev) =>
+      prev.map((f) => (String(f.id) === String(folderId) ? { ...f, name: folderName, label: folderName } : f))
+    );
+
+    return true;
+  } catch (e) {
+    setError?.(e.message || "Error");
+    return false;
   }
 }

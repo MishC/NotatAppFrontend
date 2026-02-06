@@ -115,3 +115,18 @@ export async function createFolderApi({ API_URL, folderName }) {
   if (!API_URL) throw new Error("API_URL is required");
   return apiRequest({ url: API_URL, method: "POST", body: { name: folderName } });
 }
+
+export async function deleteFolderApi({ API_URL, folderId }) {
+  if (!API_URL) throw new Error("API_URL is required");
+  if (!folderId) throw new Error("Folder ID is required");
+  await apiRequest({ url: `${API_URL}/${folderId}`, method: "DELETE", expectJson: false });
+  return true;
+}
+
+export async function updateFolderApi({ API_URL, folderId, updatedFields }) {
+  if (!API_URL) throw new Error("API_URL is required");
+  if (!folderId) throw new Error("Folder ID is required");
+  await apiRequest({ url: `${API_URL}/${folderId}`, method: "PUT", body: updatedFields, expectJson: false });
+  return true;
+}
+  
