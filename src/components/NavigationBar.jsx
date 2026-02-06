@@ -211,11 +211,12 @@ export default function NavigationBar({
                   onClick={onLogout}
                   className={clsx(
                     isHome ? "flex" : "hidden sm:flex",
-                    "h-10 px-3 rounded-2xl",
+                    "h-10 px-3 rounded-2xl ",
                     "bg-white/60 border border-black/10",
                     "hover:bg-white transition",
                     "items-center gap-2",
-                    "text-black/70 hover:text-black/90"
+                    "text-black/70 hover:text-black/90",
+                    "cursor-pointer"
                   )}
                   title="Logout"
                 >
