@@ -1,31 +1,38 @@
 import { useMemo, useState } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
-export default function Done({ notes, onOpen, folderOptions, onDelete }) {
+export default function Overdues({ notes = [], onOpen, folderOptions = [], onDelete }) {
   const [q, setQ] = useState("");
 
-  const safeNotes = Array.isArray(notes) ? notes : [];
-  const safeFolders = Array.isArray(folderOptions) ? folderOptions : [];
+  // 🔹 folderId -> label mapa 
+  const folderLabelById = useMemo(() => {
+    const map = {};
+    for (const f of folderOptions) {
+      map[String(f.id)] = f.label;
+    }
+    return map;
+  }, [folderOptions]);
 
+  // 🔹 filter notes
   const rows = useMemo(() => {
-    const t = (q || "").trim().toLowerCase();
-    if (!t) return safeNotes;
+    const t = q.trim().toLowerCase();
+    if (!t) return notes;
 
-    return safeNotes.filter((n) => {
-      const title = (n?.title || "").toLowerCase();
-      const content = (n?.content || "").toLowerCase();
+    return notes.filter((n) => {
+      const title = (n.title || "").toLowerCase();
+      const content = (n.content || "").toLowerCase();
       return title.includes(t) || content.includes(t);
     });
-  }, [safeNotes, q]);
+  }, [notes, q]);
 
   return (
-    <div className="w-[80%] mt-6  mx-autosm:mx-0">
+    <div className="w-[80%] mt-6 mx-auto">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search done…"
-          className="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
+          placeholder="Search overdue…"
+          className="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-300"
         />
       </div>
 
@@ -42,32 +49,23 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
 
           <tbody className="divide-y divide-slate-100">
             {rows.map((n) => (
-              <tr key={n.id} className="hover:bg-slate-50">
+              <tr key={n.id} className="hover:bg-red-50/40">
                 <td className="px-4 py-3">
                   <button
-                    className="font-semibold text-slate-900 hover:text-blue-600"
+                    className="font-semibold text-slate-900 hover:text-red-600"
                     onClick={() => onOpen?.(n)}
                     title="Open"
                   >
                     {n.title || "(no title)"}
                   </button>
-
-                  {n.content?.trim() && (
-                    <div className="text-sm text-slate-600 mt-1 line-clamp-2">
-                      {n.content}
-                    </div>
-                  )}
                 </td>
 
-                <td className="px-4 py-3 text-slate-700">
+                <td className="px-4 py-3 font-semibold text-red-700">
                   {formatDateDDMMYYYY(n.scheduledAt)}
                 </td>
 
                 <td className="px-4 py-3 text-slate-700">
-                  {safeFolders
-                    .filter((o) => String(o.id) === String(n.folderId))
-                    .map((o) => o.label)
-                    .join(", ") || "—"}
+                  {folderLabelById[String(n.folderId)] || "—"}
                 </td>
 
                 <td className="px-4 py-3">
@@ -93,7 +91,7 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
             {rows.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-slate-500" colSpan={4}>
-                  No done notes.
+                  No overdue notes.
                 </td>
               </tr>
             )}
