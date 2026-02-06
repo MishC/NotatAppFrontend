@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { resetAuth, setGuest, setAuthedUser } from "../reducers/authSlice";
 import { getColorClassById } from "../helpers/colors";
-import { format } from "date-fns";
 
 
 import Header from "./Header";
@@ -30,7 +29,7 @@ import {
 } from "../actions/noteActions";
 import { OVERDUE_ID } from "../backend/notesApi";
 
-export default function NoteApp() {
+export default function NoteApp( user) {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [folderOptions, setFolderOptions] = useState([{ id: null, label: "All" }]);
@@ -44,7 +43,6 @@ export default function NoteApp() {
   const [showNoteModal, setShowNoteModal] = useState(false);
 
 
-  const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
 
   const dispatch = useDispatch();
@@ -54,14 +52,7 @@ export default function NoteApp() {
   const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
 
   // auth preload
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const email = localStorage.getItem("email");
-    if (token && email) {
-      dispatch(setGuest(false));
-      dispatch(setAuthedUser(email));
-    }
-  }, [dispatch]);
+
 
   // data load
   useEffect(() => {
@@ -96,13 +87,6 @@ export default function NoteApp() {
     return () => clearTimeout(t); // if msg state is changed before 4 sec timeout, it will be executed -cleared timeout
   }, [msg]);
 
-
-  // actions
-  const onLogoutClick = async () => {
-    await logoutAction({ dispatch, navigate }).finally(() => {
-      dispatch(resetAuth());
-    });
-  };
 
   const switchModalState = (note) =>
     toggleModalAction(note, setIsModalOpen, setSelectedNote);
@@ -182,13 +166,12 @@ export default function NoteApp() {
 
   return (
     <div className="w-full m-0 p-0">
-      {user && <NavigationBar userName={user.email}  onLogout={onLogoutClick} bgColor="bg-white-500"/>
+      {user && <NavigationBar userName={user?.email} bgColor="bg-white-500"/>
      
       }
       {guest && (
         <NavigationBar
           userName="Guest"
-          onLogout={() => removeGuestMode(dispatch, navigate)}
           bgColor="bg-white-500"
         />
       )}

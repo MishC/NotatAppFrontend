@@ -1,8 +1,9 @@
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
+import { LogOut } from "lucide-react";
 
-export default function MobileCollapseMenu({ open, items, activePath, onGo }) {
+export default function MobileCollapseMenu({ open, items, activePath, onGo, onLogout, userName}) {
   return (
     <AnimatePresence initial={false}>
       {open && (
@@ -38,6 +39,20 @@ export default function MobileCollapseMenu({ open, items, activePath, onGo }) {
                   </button>
                 );
               })}
+                 {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-black/5 border-t border-black/10"
+                  >
+                    <LogOut className="h-5 w-5 text-black/70" />
+                    <div className="flex-1">
+                      <div className="font-medium text-black/90">Logout</div>
+                      <div className="text-xs text-black/50">
+                        {userName || "Guest"}
+                      </div>
+                    </div>
+                  </button>
+                )}
             </div>
           </div>
         </motion.div>

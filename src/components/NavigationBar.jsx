@@ -1,9 +1,10 @@
 import  { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
 import clsx from "clsx";
 import MobileCollapseMenu from "./MobileCollapseMenu";
+import { useLogout } from "../helpers/authhelpers";
+
 
 
 import {
@@ -18,16 +19,20 @@ import {
 
 export default function NavigationBar({
   userName = "Guest",
-  onLogout=false,
   sticky = false,
-  bgColor = "bg-white",
-  isEmailVisible = false
-
-
-
+  bgColor = "bg-white/70",
+  isEmailVisible = false,
+  isNavItemVisble=true,
 }) {
+
+
+ const onLogout = useLogout();
+
+  
   const navigate = useNavigate();
   const location = useLocation();
+  const isHome = location.pathname === "/";
+
   const [open, setOpen] = useState(false);
   const items = useMemo(
     () => [
@@ -66,19 +71,25 @@ export default function NavigationBar({
 
 
   return (
-    <div className={`NavigationBar ${bgColor}  shadow-sm`}>
+    <div className={`NavigationBar`}>
       <header
         className={clsx(
           sticky && "sticky top-0 z-50",
           "w-full",
-          "backdrop-blur-xl", bgColor
+          "backdrop-blur-xl", bgColor, "border-b border-[rgb(var(--border-soft))]"
         )}
       >
-        <div className="mx-auto w-full px-4 sm:px-6 py-3 flex justify-between">
+<motion.div
+  layout
+  className={clsx(
+    "mx-auto px-4 py-3 flex items-center justify-between",
+    isHome ? "max-w-6xl" : "w-full"
+  )}
+>
           {/* Left: Brand + optional date */}
 
 
-          <div className="flex gap-30 min-w-0">
+          <div className={clsx("flex", isHome?"items-center gap-3" :"gap-8 min-w-0")}>
             <button
               onClick={() => go("/")}
               className="
@@ -89,9 +100,10 @@ export default function NavigationBar({
             "
               title="Go Home"
             >
-              <div className="h-9 w-10 rounded-lg-[rgb(var(--primary))] shrink-0" >
-                <img src="../../public/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
-              </div>
+              <div className="h-9 w-10 rounded-lg bg-[rgb(var(--primary))] shrink-0 flex items-center justify-center">
+  <img src="/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
+</div>
+
               <div className="leading-tight min-w-0 hidden sm:block">
                 <div className="font-semibold text-black/90 truncate">NoteApp</div>
                 <div className="text-xs text-black/50 truncate">
@@ -100,10 +112,9 @@ export default function NavigationBar({
               </div>
             </button>
 
-
-
-
             {/* Center: Modern segmented nav */}
+
+            {isNavItemVisble && (
             <div className="hidden sm:flex items-center">
 
               <div
@@ -112,7 +123,7 @@ export default function NavigationBar({
             bg-white/50
             px-1 py-1
             flex items-center justify-left
-            sticky-top-0
+            sticky top-0
           "
               >
 
@@ -162,16 +173,13 @@ export default function NavigationBar({
                   })}
                 </div>
               </div>
-            </div>
+            </div>)}
           </div>
 
-          {/* Right: Mobile Menu collapse+ user + logout */}
-
-          {/* Mobile Menu */}
-          {/* Right: mobile menu + logout */}
+          {/* Right: Mobile Menu collapse+ user + logout */}          
         <div className="flex items-center gap-2">
-          {/* Mobile hamburger - only visible for mobiles */}
-          <button
+          {/* Mobile Collapse Menu - only visible for mobiles */}
+         {isNavItemVisble && <button
             onClick={() => setOpen((v) => !v)}   
             className="
               sm:hidden 
@@ -183,7 +191,7 @@ export default function NavigationBar({
             aria-label="Toggle menu"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          </button>}
               
 
           <div className="flex items-center gap-2 mr-2">
@@ -194,18 +202,18 @@ export default function NavigationBar({
                     {userName || "Guest"}
                   </span>
           </div>)}
-          {onLogout && (
+          {onLogout&& (
             
             <button
               onClick={onLogout}
-              className="
-                hidden sm:flex
-                h-10 px-3 rounded-2xl
-                bg-white/60 border border-black/10
-                hover:bg-white transition
-                items-center gap-2
-                text-black/70 hover:text-black/90
-              "
+              className={clsx(
+                isHome ? "flex" : "hidden sm:flex",
+                "h-10 px-3 rounded-2xl",
+                "bg-white/60 border border-black/10",
+                "hover:bg-white transition",
+                "items-center gap-2",
+                "text-black/70 hover:text-black/90"
+              )}
               title="Logout"
             >
               <LogOut className="h-4 w-4" />
@@ -214,7 +222,7 @@ export default function NavigationBar({
           )}
         </div>
       </div>
-      </div>
+      </motion.div>
 
       {/* Mobile collapse panel (no z-index drama) */}
       <MobileCollapseMenu
@@ -222,6 +230,8 @@ export default function NavigationBar({
         items={items}
         activePath={location.pathname}
         onGo={go}
+        onLogout={onLogout}
+  userName={userName}
       />
     </header>
    
