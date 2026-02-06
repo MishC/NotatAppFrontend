@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipboardList, CalendarDays, BookOpen, ArrowRight } from "lucide-react";
 import NavigationBar from "./NavigationBar";
 import DateComponent from "./DateComponent";
-import { logoutAction } from "../actions/authActions";
+import { getDisplayName } from "../helpers/authhelpers";
 
 function FeatureCard({ title, subtitle, Icon, onClick }) {
   return (
@@ -46,8 +47,12 @@ function FeatureCard({ title, subtitle, Icon, onClick }) {
   );
 }
 
-export default function Home( userName, onLogout ) {
+export default function Home() {
   const navigate = useNavigate();
+  const user = useSelector((s) => s.auth.user);
+  const guest = useSelector((s) => s.auth.guest);
+  const userName = getDisplayName(user, guest);
+
 
   const ctas = useMemo(
     () => [
@@ -69,7 +74,7 @@ export default function Home( userName, onLogout ) {
   }, [ctas.length]);
 
  
-  
+  console.log(userName);
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-main))]">
@@ -78,7 +83,7 @@ export default function Home( userName, onLogout ) {
         <NavigationBar
           userName={userName}
           isNavItemVisble={false}
-          isEmailVisible={false}
+          isEmailVisible={true}
         />
       </div>
 

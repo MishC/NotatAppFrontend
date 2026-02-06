@@ -16,3 +16,13 @@ export function useLogout() {
     }
   };
 }
+
+export function getDisplayName(user, guest) {
+  if (typeof user === "string" && user.trim()) return user;
+  if (user && typeof user === "object") {
+    if (user.email) return String(user.email);
+    if (user.name) return String(user.name);
+  }
+  return guest ? "Guest" : "Guest";
+}
+

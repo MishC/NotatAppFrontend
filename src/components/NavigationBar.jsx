@@ -1,4 +1,4 @@
-import  { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import clsx from "clsx";
@@ -22,13 +22,13 @@ export default function NavigationBar({
   sticky = false,
   bgColor = "bg-white/70",
   isEmailVisible = false,
-  isNavItemVisble=true,
+  isNavItemVisble = true,
 }) {
 
 
- const onLogout = useLogout();
+  const onLogout = useLogout();
 
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -79,17 +79,17 @@ export default function NavigationBar({
           "backdrop-blur-xl", bgColor, "border-b border-[rgb(var(--border-soft))]"
         )}
       >
-<motion.div
-  layout
-  className={clsx(
-    "mx-auto px-4 py-3 flex items-center justify-between",
-    isHome ? "max-w-6xl" : "w-full"
-  )}
->
-          {/* Left: Brand + optional date */}
+        <motion.div
+          layout
+          className={clsx(
+            "mx-auto px-4 py-3 flex items-center justify-between",
+            isHome ? "max-w-6xl" : "w-full"
+          )}
+        >
+          {/* Left: Brand   ==Logo */}
 
 
-          <div className={clsx("flex", isHome?"items-center gap-3" :"gap-8 min-w-0")}>
+          <div className={clsx("flex", isHome ? "items-center gap-3" : "gap-8 min-w-0")}>
             <button
               onClick={() => go("/")}
               className="
@@ -101,13 +101,13 @@ export default function NavigationBar({
               title="Go Home"
             >
               <div className="h-9 w-10 rounded-lg bg-[rgb(var(--primary))] shrink-0 flex items-center justify-center">
-  <img src="/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
-</div>
+                <img src="/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
+              </div>
 
               <div className="leading-tight min-w-0 hidden sm:block">
                 <div className="font-semibold text-black/90 truncate">NoteApp</div>
                 <div className="text-xs text-black/50 truncate">
-                  {active?.label==="Home"?"Todo • Calendar • Diary":`${active?.label}`}
+                  {active?.label === "Home" ? "Todo • Calendar • Diary" : `${active?.label}`}
                 </div>
               </div>
             </button>
@@ -115,126 +115,129 @@ export default function NavigationBar({
             {/* Center: Modern segmented nav */}
 
             {isNavItemVisble && (
-            <div className="hidden sm:flex items-center">
+              <div className="hidden sm:flex items-center">
 
-              <div
-                className="
+                <div
+                  className="
             relative
             bg-white/50
             px-1 py-1
             flex items-center justify-left
             sticky top-0
           "
-              >
-
-
-                {/* animated active pill */}
-                <motion.div
-                  className="absolute top-1 bottom-1 rounded-[999px] bg-[rgb(var(--primary-soft))]"
-                  layout
-                  transition={{ type: "spring", stiffness: 520, damping: 36 }}
-                  style={{
-                    left: `calc(${activeIndex} * var(--seg-w))`,
-                    width: `var(--seg-w)`,
-                  }}
-                />
-
-                {/* buttons */}
-                <div
-                  className="relative grid"
-                  style={{
-                    // segment width: keep consistent, looks modern
-                    ["--seg-w"]: "110px",
-                    gridTemplateColumns: `repeat(${items.length}, var(--seg-w))`,
-                  }}
                 >
-                  {items.map((it, idx) => {
-                    const Icon = it.icon;
-                    const isActive = idx === activeIndex;
 
-                    return (
-                      <button
-                        key={it.key}
-                        onClick={() => navigate(it.path)}
-                        className={clsx(
-                          "relative z-10",
-                          "h-10 rounded-[999px]",
-                          "flex items-center justify-center gap-2",
-                          "text-sm font-medium transition", "cursor-pointer", "hover:bg-black/7",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/40",
-                          isActive ? "text-[rgb(var(--primary))]" : "text-black/70 hover:text-black/90"
-                        )}
-                        title={it.label}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span className="hidden sm:inline">{it.label}</span>
-                      </button>
-                    );
-                  })}
+
+                  {/* animated active pill */}
+                  <motion.div
+                    className="absolute top-1 bottom-1 rounded-[999px] bg-[rgb(var(--primary-soft))]"
+                    layout
+                    transition={{ type: "spring", stiffness: 520, damping: 36 }}
+                    style={{
+                      left: `calc(${activeIndex} * var(--seg-w))`,
+                      width: `var(--seg-w)`,
+                    }}
+                  />
+
+                  {/* buttons */}
+                  <div
+                    className="relative grid"
+                    style={{
+                      // segment width: keep consistent, looks modern
+                      ["--seg-w"]: "110px",
+                      gridTemplateColumns: `repeat(${items.length}, var(--seg-w))`,
+                    }}
+                  >
+                    {items.map((it, idx) => {
+                      const Icon = it.icon;
+                      const isActive = idx === activeIndex;
+
+                      return (
+                        <button
+                          key={it.key}
+                          onClick={() => navigate(it.path)}
+                          className={clsx(
+                            "relative z-10",
+                            "h-10 rounded-[999px]",
+                            "flex items-center justify-center gap-2",
+                            "text-sm font-medium transition", "cursor-pointer", "hover:bg-black/7",
+                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))]/40",
+                            isActive ? "text-[rgb(var(--primary))]" : "text-black/70 hover:text-black/90"
+                          )}
+                          title={it.label}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="hidden sm:inline">{it.label}</span>
+                        </button>
+                      );
+                    })
+                    }
+                  </div>
                 </div>
               </div>
-            </div>)}
+            )} {/*isNavItemVisble end */}
           </div>
 
-          {/* Right: Mobile Menu collapse+ user + logout */}          
-        <div className="flex items-center gap-2">
-          {/* Mobile Collapse Menu - only visible for mobiles */}
-         {isNavItemVisble && <button
-            onClick={() => setOpen((v) => !v)}   
-            className="
+          {/* Right: Mobile Menu collapse+ user + logout */}
+          <div className="flex items-center gap-2">
+            {/* Toggle menu*/}
+            {isNavItemVisble && <button
+              onClick={() => setOpen((v) => !v)}
+              className="
               sm:hidden 
               h-10 w-10 rounded-2xl
               bg-white/60 border border-black/10
               hover:bg-white transition
               grid place-items-center
             "
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>}
-              
-
-          <div className="flex items-center gap-2 mr-2">
-           {isEmailVisible && (<div className="hidden sm:flex items-center gap-2 bg-white/50 px-3 py-2">
-         
-          <div className="h-2 w-2 rounded-full bg-[rgb(var(--success))]" />
-          <span className="text-sm font-semibold text-black/80">
-                    {userName || "Guest"}
-                  </span>
-          </div>)}
-          {onLogout&& (
-            
-            <button
-              onClick={onLogout}
-              className={clsx(
-                isHome ? "flex" : "hidden sm:flex",
-                "h-10 px-3 rounded-2xl",
-                "bg-white/60 border border-black/10",
-                "hover:bg-white transition",
-                "items-center gap-2",
-                "text-black/70 hover:text-black/90"
-              )}
-              title="Logout"
+              aria-label="Toggle menu"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden md:inline text-sm font-medium">Logout</span>
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
-          )}
-        </div>
-      </div>
-      </motion.div>
+            }
 
-      {/* Mobile collapse panel (no z-index drama) */}
-      <MobileCollapseMenu
-        open={open}
-        items={items}
-        activePath={location.pathname}
-        onGo={go}
-        onLogout={onLogout}
-  userName={userName}
-      />
-    </header>
-   
+
+            <div className="flex items-center gap-2 mr-2">
+              {isEmailVisible && (<div className="hidden sm:flex items-center gap-2 bg-white/50 px-3 py-2">
+
+                <div className="h-2 w-2 rounded-full bg-[rgb(var(--success))]" />
+                <span className="text-sm font-semibold text-black/80">
+                  {userName || "Guest"}
+                </span>
+              </div>)}
+              {onLogout && (
+
+                <button
+                  onClick={onLogout}
+                  className={clsx(
+                    isHome ? "flex" : "hidden sm:flex",
+                    "h-10 px-3 rounded-2xl",
+                    "bg-white/60 border border-black/10",
+                    "hover:bg-white transition",
+                    "items-center gap-2",
+                    "text-black/70 hover:text-black/90"
+                  )}
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden md:inline text-sm font-medium">Logout</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Mobile collapse panel */}
+        <MobileCollapseMenu
+          open={open}
+          items={items}
+          activePath={location.pathname}
+          onGo={go}
+          onLogout={onLogout}
+          userName={userName}
+        />
+      </header>
+
     </div>
   );
 }
