@@ -73,7 +73,9 @@ export function Home() {
       <div className="sticky top-0 z-10 border-b border-[rgb(var(--border-soft))] bg-white/70 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-2xl bg-[rgb(var(--primary))] shadow-sm" />
+            <div className="h-9 w-10 rounded-lg-[rgb(var(--primary))] shrink-0" >
+                <img src="../../public/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
+              </div>
             <div className="leading-tight">
               <div className="font-semibold text-black/90">NoteApp</div>
               <div className="text-xs text-black/50">Todo • Calendar • Diary</div>

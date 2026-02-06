@@ -2,7 +2,7 @@ import { format } from "date-fns";
 
 export default function Sidebar({folderOptions, activeFolder, guest, handleFolderClick}) {
     return (
-        <div className="Sidebar w-[80%] mx-auto">
+        <div className="Sidebar w-[80%]  mx-auto">
 
             {folderOptions.map((opt) => {
               const isActive =
