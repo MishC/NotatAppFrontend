@@ -1,7 +1,8 @@
 export default function Plus({
   onClick,
-  color = "bg-orange-500 hover:bg-orange-700",   // "orange" | "blue" | "slate"
-  size = 12,          // 2|4|6|8|10 | 12 | 14 | 16
+  open = false, // keď true → minus
+  color = "bg-orange-500 hover:bg-orange-700",
+  size = 12,
   className = "",
 }) {
   const sizeMap = {
@@ -16,23 +17,33 @@ export default function Plus({
     16: "w-16 h-16",
   };
 
-
   const sizeCls = sizeMap[size] || sizeMap[12];
 
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label="Add note"
+      aria-label={open ? "Close" : "Add"}
       className={[
         sizeCls,
         color,
         "text-white leading-none grid place-items-center",
-        "shadow-lg transition cursor-pointer select-none",
+        "shadow-lg transition-all duration-200 ease-out",
+        "cursor-pointer select-none",
+        open ? "rotate-180" : "rotate-0", // jemný motion hint
         className,
       ].join(" ")}
     >
-      +
+      <span
+        className={[
+          "block text-2xl font-bold",
+          "transition-transform duration-200 ease-out",
+        ].join(" ")}
+        style={{ lineHeight: 1 }}
+        aria-hidden="true"
+      >
+        {open ? "−" : "+"}
+      </span>
     </button>
   );
 }

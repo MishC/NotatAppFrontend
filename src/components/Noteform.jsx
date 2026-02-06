@@ -131,6 +131,7 @@ export default function Noteform({
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Plus
           size="6"
+          open={showInput}
           color="bg-slate-500"
           className="rounded-lg items-center text-base"
           onClick={() => setShowInput((v) => !v)}
