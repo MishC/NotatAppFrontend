@@ -9,7 +9,7 @@ import Sidebar from "./Sidebar";
 import Todo from "./Todo";
 import Subheader from "./Subheader";
 import Done from "./Done";
-import Overdues from  "./Overdues";
+import Overdues from "./Overdues";
 import NavigationBar from "./NavigationBar";
 
 import {
@@ -113,10 +113,9 @@ export default function NoteApp() {
     []
   );
 
-  const handleFolderClick = useCallback(
-    (opt) => selectFolderAction(opt, setActiveFolder),
-    []
-  );
+  const handleFolderClick = useCallback((opt) => {
+    selectFolderAction(opt, setActiveFolder);
+  }, []);
 
   const handleAddNote = useCallback(
     (newNote) =>
@@ -188,6 +187,7 @@ export default function NoteApp() {
               guest={guest}
               handleFolderClick={handleFolderClick}
             />
+
           </aside>
 
           {/* RIGHT COLUMN: Subheader + Content */}
