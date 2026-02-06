@@ -53,9 +53,6 @@ export default function NoteApp() {
   const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
   const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
 
-  const isDoneView = activeFolder === 4;
-  const isOverdueView = activeFolder === OVERDUE_ID;
-
   // auth preload
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -189,9 +186,10 @@ export default function NoteApp() {
      
       }
       {guest && (
-        <Header
+        <NavigationBar
           userName="Guest"
           onLogout={() => removeGuestMode(dispatch, navigate)}
+          bgColor="bg-white-500"
         />
       )}
 
@@ -219,7 +217,7 @@ export default function NoteApp() {
       "
     >
       {/* LEFT COLUMN: Sidebar */}
-      <aside className="w-full">
+      <aside className="w-full min-w-0">
         <Sidebar
           folderOptions={folderOptions}
           activeFolder={activeFolder}
@@ -231,11 +229,11 @@ export default function NoteApp() {
       {/* RIGHT COLUMN: Subheader + Content */}
       <section className="w-full min-w-0">
         {/* Subheader is now aligned with content */}
-        <div className="mb-4">
+        <div className="mb-4 flex ml-[10%] sm:block sm:ml-0">
           <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} />
         </div>
 
-        <div className="overflow-visible calendar-container">
+        <div className="relative flex  justify-center mx-auto sm:mx-0 sm:block overflow-visible calendar-container">
           {activeFolder === 4 ? (
             <Done
               notes={filteredNotes}
