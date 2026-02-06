@@ -41,7 +41,6 @@ body.fc-dragging-tight * {
 
 .fc-drag-handle {
 
-  
   cursor: grab;
   user-select: none;
 }
@@ -151,6 +150,7 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 }
 
 .fc div.fc-toolbar-chunk {justify-content: end;}
+.fc .fc-button-group > .fc-button.fc-button-active, .fc .fc-button-group > .fc-button:active, .fc .fc-button-group > .fc-button:focus, .fc .fc-button-group > .fc-button:hover {background-color: rgb(var(--primary));}
 
 
 @media (min-width: 640px) and (max-width: 822px) {
