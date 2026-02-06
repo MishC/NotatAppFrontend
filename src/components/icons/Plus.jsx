@@ -1,10 +1,13 @@
 export default function Plus({
   onClick,
   color = "bg-orange-500 hover:bg-orange-700",   // "orange" | "blue" | "slate"
-  size = 12,          // 10 | 12 | 14 | 16
+  size = 12,          // 2|4|6|8|10 | 12 | 14 | 16
   className = "",
 }) {
   const sizeMap = {
+    2: "w-2 h-2",
+    4: "w-4 h-4",
+    6: "w-6 h-6",
     8: "w-8 h-8",
     10: "w-10 h-10",
     11: "w-11 h-11",
@@ -24,7 +27,7 @@ export default function Plus({
       className={[
         sizeCls,
         color,
-        "text-white text-2xl sm:text-3xl leading-none grid place-items-center",
+        "text-white leading-none grid place-items-center",
         "shadow-lg transition cursor-pointer select-none",
         className,
       ].join(" ")}

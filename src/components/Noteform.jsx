@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { validateNote, buildPayload } from "../helpers/noteHelpers";
 import { todayYYYYMMDD} from "../helpers/dateHelpers";
+import Plus from "./icons/Plus";
+import { createFolderAction } from "../actions/noteActions";
 
 export default function Noteform({
   folders,
@@ -71,6 +73,11 @@ export default function Noteform({
           ))}
         </select>
       )}
+
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <Plus size="6" color="bg-slate-500" className="rounded-lg items-center text-base" onClick={() => {createFolderAction({ API_URL, folderName: newFolderName, setFolders, setError })}} />
+        Add Folder
+      </div>
 
       <div className="w-full flex items-center gap-3 mb-5 py-3 text-xl">
         <span className="mt-1 text-red-400">Deadline</span>

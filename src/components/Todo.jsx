@@ -16,12 +16,10 @@ function useWindowWidth() {
 
   useEffect(() => {
     let raf = null;
-
     const onResize = () => {
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => setW(window.innerWidth));
     };
-
     window.addEventListener("resize", onResize, { passive: true });
     return () => {
       if (raf) cancelAnimationFrame(raf);
@@ -32,24 +30,23 @@ function useWindowWidth() {
   return w;
 }
 
+const VIEW_KEY = "noteapp.fc.view";
+
 export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
-  const dragFixRef = useRef({
-    raf: null,
-    mouseX: 10,
-    mouseY: 10,
-    onMove: null,
-  });
+  const dragFixRef = useRef({ raf: null, mouseX: 10, mouseY: 10, onMove: null });
 
-  // ✅ single, reactive width source (no window.innerWidth in render)
   const width = useWindowWidth();
   const mobile = useMemo(() => isMobile(width), [width]);
   const tablet = useMemo(() => isTablet(width), [width]);
   const compact = mobile || tablet;
 
-  // ✅ stable handlers (prevents FC from rebinding a ton)
+  // ✅ Default view = List, but only on first mount (persisted)
+  const [initialView] = useState(() => localStorage.getItem(VIEW_KEY) || "listWeek");
+  const currentViewRef = useRef(initialView);
+
   const handlers = useMemo(
     () =>
       createCalendarHandlers({
@@ -62,20 +59,16 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     [onOpen, onComplete, onDelete, onMoveDate]
   );
 
-  // ✅ always default to List
-  const initialView = "listWeek";
-
-  // ✅ memoized toolbar so it doesn't recreate each render
   const headerToolbar = useMemo(
     () => ({
       right: "prev,next",
       left: "title",
+      // ✅ On mobile/tablet show ONLY List button
       center: compact ? "listWeek" : "listWeek,dayGridMonth",
     }),
     [compact]
   );
 
-  // ✅ memoized views
   const views = useMemo(
     () => ({
       dayGridMonth: { buttonText: "Month" },
@@ -84,7 +77,6 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     []
   );
 
-  // ✅ stable props derived allows smoother updates
   const aspectRatio = useMemo(() => (mobile ? 1.2 : 1.6), [mobile]);
   const dayMaxEvents = useMemo(() => (mobile ? 2 : 4), [mobile]);
 
@@ -134,10 +126,24 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     };
   }, []);
 
-  // ✅ only when breakpoint changes, updateSize to avoid jump
+  // ✅ Remember view when user changes it
+  const handleDatesSet = useCallback((arg) => {
+    const v = arg?.view?.type || "listWeek";
+    currentViewRef.current = v;
+    localStorage.setItem(VIEW_KEY, v);
+  }, []);
+
+  // ✅ Only force List if Month is not allowed (mobile/tablet)
   useEffect(() => {
     const api = calRef.current?.getApi?.();
     if (!api) return;
+
+    if (compact && api.view.type === "dayGridMonth") {
+      api.changeView("listWeek");
+      currentViewRef.current = "listWeek";
+      localStorage.setItem(VIEW_KEY, "listWeek");
+    }
+
     requestAnimationFrame(() => api.updateSize());
   }, [compact]);
 
@@ -147,7 +153,7 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
         ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
 
-        // ✅ ALWAYS list default
+        // ✅ default List on first mount only
         initialView={initialView}
 
         height="auto"
@@ -175,6 +181,9 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
 
         eventClassNames={eventClassNames}
         eventContent={eventContent}
+
+        // ✅ this is the key part
+        datesSet={handleDatesSet}
       />
     </div>
   );

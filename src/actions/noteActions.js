@@ -5,7 +5,8 @@ import {
   swapNotesApi,
   fetchNotesApi,
   fetchFoldersApi,
-  OVERDUE_ID
+  OVERDUE_ID,
+  createFolderApi
 } from "../backend/notesApi";
 
 import {
@@ -322,4 +323,15 @@ export function toggleModalAction(note, setIsModalOpen, setSelectedNote) {
   setSelectedNote(note);
   setIsModalOpen(true);
   return true;
+}
+
+
+//Folders
+export async function createFolderAction({ API_URL, folderName, setFolders, setError }) {
+  try {
+    const newFolder = await createFolderApi({ API_URL, folderName });
+    setFolders((prev) => [...prev, newFolder]);
+  } catch (error) {
+    setError(error.message);
+  }
 }

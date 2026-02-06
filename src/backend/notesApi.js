@@ -86,6 +86,8 @@ export async function addNoteApi({ API_URL, newNote }) {
 }
 
 export async function deleteNoteApi({ API_URL, id }) {
+  if (!API_URL) throw new Error("API_URL is required");
+  if (!id) throw new Error("Note ID is required");
   await apiRequest({ url: `${API_URL}/${id}`, method: "DELETE", expectJson: false });
   return true;
 }
@@ -106,4 +108,10 @@ export async function swapNotesApi({ API_URL, sourceId, targetId }) {
     expectJson: false,
   });
   return true;
+}
+
+// Folders
+export async function createFolderApi({ API_URL, folderName }) {
+  if (!API_URL) throw new Error("API_URL is required");
+  return apiRequest({ url: API_URL, method: "POST", body: { name: folderName } });
 }
