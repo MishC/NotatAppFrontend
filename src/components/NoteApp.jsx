@@ -156,7 +156,13 @@ export default function NoteApp() {
 
   return (
     <div className="w-full m-0 p-0">
-      <NavigationBar userName={navUserName} bgColor="bg-white-500" />
+       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
+              <NavigationBar
+                userName={navUserName}
+                isNavItemVisble={true}
+                isEmailVisible={false}
+              />
+            </div>
 
       <div className={error || msg ? "p-5 rounded-xl" : "p-2"}>
         {error ? (

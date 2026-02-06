@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 const Sidebar = React.memo(function Sidebar({ folderOptions, activeFolder, guest, handleFolderClick }) {
   return (
-    <div className="Sidebar w-[80%]  mx-auto sm:mt-20 ">
+    <div className="Sidebar w-[80%]  mx-auto sm:mt-10 ">
       {folderOptions.map((opt) => {
         const isActive =
           (activeFolder == null && opt.id == null) ||

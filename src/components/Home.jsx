@@ -77,7 +77,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[rgb(var(--bg-main))]">
       {/* Top bar */}
-      <div className="sticky top-0 z-10 border-b border-[rgb(var(--border-soft))] bg-white/70 backdrop-blur">
+      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
         <NavigationBar
           userName={userName}
           isNavItemVisble={false}
