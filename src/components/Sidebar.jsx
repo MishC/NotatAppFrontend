@@ -46,20 +46,15 @@ const Sidebar = React.memo(function Sidebar({
                 ? "w-full text-red-500 text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer"
                 : [
                     "w-full text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
-                    "group", // ✅ enable group-hover
+                    "group", 
                   ].join(" ")
             }
           >
-            {/* ✅ Parallelogram indicator: bigger + shadow on hover */}
             <span
               className={[
                 "absolute left-0 top-0.5 h-[78%] w-1",
                 "transition-all duration-200 ease-out",
-                // base state
                 isActive ? "bg-orange-500 opacity-100 " : "bg-orange-500 opacity-0 ",
-                // hover: make it ~2x thicker + add shadow (only when visible)
-                "group-hover:opacity-100",
               ].join(" ")}
              
               aria-hidden="true"
