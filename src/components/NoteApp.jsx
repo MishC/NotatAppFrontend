@@ -1,12 +1,8 @@
 // src/components/NoteApp.jsx
 import { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { resetAuth, setGuest, setAuthedUser } from "../reducers/authSlice";
+import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 
-
-import Header from "./Header";
 import Modal from "./modals/Modal";
 import NoteFormModal from "./modals/NoteFormModal";
 import Sidebar from "./Sidebar";
@@ -16,8 +12,6 @@ import Done from "./Done";
 import Overdues from  "./Overdues";
 import NavigationBar from "./NavigationBar";
 
-
-import { logoutAction, removeGuestMode } from "../actions/authActions";
 import {
   initNotesAndFoldersAction,
   syncGuestAction,
@@ -29,7 +23,7 @@ import {
 } from "../actions/noteActions";
 import { OVERDUE_ID } from "../backend/notesApi";
 
-export default function NoteApp( user) {
+export default function NoteApp( ) {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [folderOptions, setFolderOptions] = useState([{ id: null, label: "All" }]);
@@ -42,11 +36,10 @@ export default function NoteApp( user) {
   const [selectedNote, setSelectedNote] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
 
-
+  const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+
 
   const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
   const API_URL2 = import.meta.env.VITE_API_URL + "/api/folders";
