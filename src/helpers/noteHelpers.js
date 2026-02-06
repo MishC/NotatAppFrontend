@@ -1,4 +1,13 @@
 import { todayYYYYMMDD } from "./dateHelpers";
+import { useEffect } from "react";
+
+export function getNotesApiUrl() {
+  return import.meta.env.VITE_API_URL + "/api/notes";
+}
+
+export function getFoldersApiUrl() {
+  return import.meta.env.VITE_API_URL + "/api/folders";
+}
 
 export function validateNote(newNote, guest) {
   if (!newNote.title.trim()) {
@@ -50,4 +59,14 @@ export function createEmptyNote() {
     scheduledAt: null
   };
 }
+
+export function useAutoClearMessage(value, setValue, ms = 4000) {
+  useEffect(() => {
+    if (!value) return;
+    const t = setTimeout(() => setValue(""), ms);
+    return () => clearTimeout(t);
+  }, [value, setValue, ms]);
+}
+
+
 

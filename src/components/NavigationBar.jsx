@@ -89,7 +89,7 @@ export default function NavigationBar({
           {/* Left: Brand   ==Logo */}
 
 
-          <div className={clsx("flex", isHome ? "items-center gap-3" : "gap-8 min-w-0")}>
+          <div className={clsx("flex", isHome ? "items-center gap-3" : "gap-30 min-w-0")}>
             <button
               onClick={() => go("/")}
               className="

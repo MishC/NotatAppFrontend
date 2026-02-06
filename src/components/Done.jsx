@@ -4,7 +4,7 @@ import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 export default function Overdues({ notes = [], onOpen, folderOptions = [], onDelete }) {
   const [q, setQ] = useState("");
 
-  // 🔹 folderId -> label mapa 
+  // folderId -> label map
   const folderLabelById = useMemo(() => {
     const map = {};
     for (const f of folderOptions) {
@@ -13,7 +13,7 @@ export default function Overdues({ notes = [], onOpen, folderOptions = [], onDel
     return map;
   }, [folderOptions]);
 
-  // 🔹 filter notes
+  // filter notes
   const rows = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return notes;
@@ -26,7 +26,7 @@ export default function Overdues({ notes = [], onOpen, folderOptions = [], onDel
   }, [notes, q]);
 
   return (
-    <div className="w-[80%] mt-6 mx-auto">
+    <div className="w-[80%] mt-6 mx-auto sm:mx-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <input
           value={q}
