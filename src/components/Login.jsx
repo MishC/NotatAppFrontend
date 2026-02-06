@@ -138,7 +138,7 @@ export default function Login() {
                   <EyeIcon isOpen={showPwd} onClick={() => setShowPwd((v) => !v)} />
                 } />
 
-              <div className="flex gap-8 pt-3 pb-1 items-center">
+              <div className="flex flex-col sm:flex-row gap-8 pt-3 pb-1 items-center">
                 <p className="text-slate-600 font-medium whitespace-nowrap">
                   Verification Channel:
                 </p>
