@@ -1,34 +1,38 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useRef, useEffect,useMemo,useState } from "react";
+import listPlugin from "@fullcalendar/list";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
+
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
 import { isOverdue } from "../helpers/dateHelpers";
-import listPlugin from "@fullcalendar/list";
-import { isDesktop, isMobile, isTablet} from "../helpers/screenHelpers";
+import { isMobile, isTablet } from "../helpers/screenHelpers";
 
+import "./styles/Calendar.css";
 
+function useWindowWidth() {
+  const [w, setW] = useState(() => window.innerWidth);
 
-import "./styles/Calendar.css"
+  useEffect(() => {
+    let raf = null;
 
-/**
- * props:
- *  - Full
- *  - onOpen(note), onEdit(note), onDelete(note), onComplete(note) // when the note is opened, edited, deleted, or completed
- *  - eventDrop(info)   // when an event is dropped
- *  - eventReceive(info)   // when an event is received from external drag-and-drop
-**/
+    const onResize = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setW(window.innerWidth));
+    };
 
-export default function Todo({
-  events,
-  onOpen,
-  onComplete,
-  onDelete,
-  onMoveDate,
-}) {
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
 
+  return w;
+}
 
+export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -39,100 +43,138 @@ export default function Todo({
     onMove: null,
   });
 
+  // ✅ single, reactive width source (no window.innerWidth in render)
+  const width = useWindowWidth();
+  const mobile = useMemo(() => isMobile(width), [width]);
+  const tablet = useMemo(() => isTablet(width), [width]);
+  const compact = mobile || tablet;
 
-  const handlers = createCalendarHandlers({
-    dragFixRef,
-    onOpen,
-    onComplete,
-    onDelete,
-    onMoveDate,
-  });
+  // ✅ stable handlers (prevents FC from rebinding a ton)
+  const handlers = useMemo(
+    () =>
+      createCalendarHandlers({
+        dragFixRef,
+        onOpen,
+        onComplete,
+        onDelete,
+        onMoveDate,
+      }),
+    [onOpen, onComplete, onDelete, onMoveDate]
+  );
 
+  // ✅ always default to List
+  const initialView = "listWeek";
 
+  // ✅ memoized toolbar so it doesn't recreate each render
+  const headerToolbar = useMemo(
+    () => ({
+      right: "prev,next",
+      left: "title",
+      center: compact ? "listWeek" : "listWeek,dayGridMonth",
+    }),
+    [compact]
+  );
+
+  // ✅ memoized views
+  const views = useMemo(
+    () => ({
+      dayGridMonth: { buttonText: "Month" },
+      listWeek: { buttonText: "List" },
+    }),
+    []
+  );
+
+  // ✅ stable props derived allows smoother updates
+  const aspectRatio = useMemo(() => (mobile ? 1.2 : 1.6), [mobile]);
+  const dayMaxEvents = useMemo(() => (mobile ? 2 : 4), [mobile]);
+
+  const eventClassNames = useCallback((arg) => {
+    const note = arg.event.extendedProps?.note;
+    const ymd = arg.event.startStr?.slice(0, 10) ?? note?.scheduledAt?.slice(0, 10);
+    return isOverdue(ymd) ? ["fc-note-overdue"] : [];
+  }, []);
+
+  const eventContent = useCallback((arg) => {
+    const note = arg.event.extendedProps?.note;
+    const title = escapeHtml(note?.title ?? arg.event.title ?? "");
+    const content = escapeHtml((note?.content ?? "").trim());
+    const colorClass = note?.colorClass ?? "note-color-1";
+
+    return {
+      html: `
+        <div class="fc-note-card ${colorClass}" data-evt-id="${arg.event.id}" style="z-index:4">
+          <div class="fc-drag-handle" title="Drag">
+            <div class="fc-card-header" style="display:flex;gap:.5rem;align-items:flex-start;">
+              <div class="fc-note-title" style="flex:1; font-weight:600;">${title}</div>
+              <div class="fc-card-menu-wrap" style="position:relative;">
+                <button class="fc-card-menu-btn ${colorClass}" aria-haspopup="menu" aria-label="Actions" title="Actions" style="
+                  width:2rem;height:2rem;border-radius:20px; z-index:10; cursor:pointer;
+                ">☰</button>
+                <ul class="fc-card-menu hidden" role="menu" style="
+                  position:absolute; right:0; top:2.25rem; min-width:11rem;
+                  background:white; border:1px solid #e2e8f0ff; border-radius:.5rem;
+                  box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
+                  padding:.25rem .25rem;
+                  z-index:99999; cursor:pointer; }"
+                ">
+                  <li role="menuitem" data-act="edit" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#1E90f4;">🖉 Edit</li>
+                  <li role="menuitem" data-act="complete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#4a2;">✓ Mark complete</li>
+                  <li role="menuitem" data-act="delete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#dc2626;">× Delete</li>
+                </ul>
+              </div>
+            </div>
+            ${
+              content
+                ? `<div class="fc-note-body" style="margin-top:.375rem;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.5rem .75rem;">${content}</div>`
+                : ""
+            }
+          </div>
+        </div>
+      `,
+    };
+  }, []);
+
+  // ✅ only when breakpoint changes, updateSize to avoid jump
+  useEffect(() => {
+    const api = calRef.current?.getApi?.();
+    if (!api) return;
+    requestAnimationFrame(() => api.updateSize());
+  }, [compact]);
 
   return (
     <div className=" w-[90%] border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
-        plugins={[dayGridPlugin, interactionPlugin,listPlugin]}
-          initialView={isMobile(window.innerWidth) ? "listWeek" : "dayGridMonth"}
+        plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+
+        // ✅ ALWAYS list default
+        initialView={initialView}
 
         height="auto"
         contentHeight="auto"
-        aspectRatio={isMobile(window.innerWidth) ? 1.2 : 1.6}
+        aspectRatio={aspectRatio}
 
         themeSystem="standard"
         firstDay={1}
-        dayMaxEvents={isMobile(window.innerWidth) ? 2 : 4}
-         headerToolbar={{
-    right: "prev,next",
-    left: "title",
-    center: isMobile(window.innerWidth) || isTablet(window.innerWidth)
-      ? "listWeek"
-      : "dayGridMonth,listWeek",
-  }}
-   
-  views={{
-    dayGridMonth: { buttonText: "Month" },
-    timeGridWeek: { buttonText: "Week" },
-    listWeek: { buttonText: "List" },
-  }}
-        {...handlers}
+        dayMaxEvents={dayMaxEvents}
 
+        headerToolbar={headerToolbar}
+        views={views}
+
+        {...handlers}
 
         editable={true}
         droppable={true}
         eventStartEditable={true}
         eventDurationEditable={false}
         events={events}
-        longPressDelay={350}       // scroll is not drag “drag”
-  eventLongPressDelay={350}
-  selectLongPressDelay={350}
 
-        eventClassNames={(arg) => {
-    const note = arg.event.extendedProps?.note;
-    const ymd = arg.event.startStr?.slice(0,10) ?? note?.scheduledAt?.slice(0,10);
-    return isOverdue(ymd) ? ["fc-note-overdue"] : [];
-  }}
+        longPressDelay={350}
+        eventLongPressDelay={350}
+        selectLongPressDelay={350}
 
-
-        eventContent={(arg) => {
-          const note = arg.event.extendedProps?.note;
-          const title = escapeHtml(note?.title ?? arg.event.title ?? "");
-          const content = escapeHtml((note?.content ?? "").trim());
-          const colorClass = note?.colorClass ?? "note-color-1";
-
-          return {
-            html: `
-              <div class="fc-note-card ${colorClass}" data-evt-id="${arg.event.id}" style="z-index:4">
-                <div class="fc-drag-handle" title="Drag">
-                <div class="fc-card-header" style="display:flex;gap:.5rem;align-items:flex-start;">
-                  <div class="fc-note-title" style="flex:1; font-weight:600;">${title}</div>
-                  <div class="fc-card-menu-wrap" style="position:relative;">
-                    <button class="fc-card-menu-btn ${colorClass}" aria-haspopup="menu" aria-label="Actions" title="Actions" style="
-                      width:2rem;height:2rem;border-radius:20px; z-index:10; cursor:pointer;
-                    ">☰</button>
-                   <ul class="fc-card-menu hidden" role="menu" style="
-  position:absolute; right:0; top:2.25rem; min-width:11rem;
-  background:white; border:1px solid #e2e8f0ff; border-radius:.5rem;
-  box-shadow:0 10px 15px -3px rgba(0,0,0,.1);
-  padding:.25rem .25rem;
-  z-index:99999; cursor:pointer; }"
-">
-
-                      <li role="menuitem" data-act="edit" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#1E90f4;">🖉 Edit</li>
-                      <li role="menuitem" data-act="complete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#4a2;">✓ Mark complete</li>
-                      <li role="menuitem" data-act="delete" class="fc-menu-item" style="padding:.5rem .75rem;border-radius:.375rem;cursor:pointer;color:#dc2626;">× Delete</li>
-                    </ul>
-                  </div>
-                </div>
-                ${content ? `<div class="fc-note-body" style="margin-top:.375rem;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:.75rem;padding:.5rem .75rem;">${content}</div>` : ""}
-              </div>
-                </div>
-            `,
-          };
-        }}
-
+        eventClassNames={eventClassNames}
+        eventContent={eventContent}
       />
     </div>
   );
