@@ -1,25 +1,26 @@
 import { useMemo, useState } from "react";
-
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 export default function Done({ notes, onOpen, folderOptions, onDelete }) {
   const [q, setQ] = useState("");
 
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeFolders = Array.isArray(folderOptions) ? folderOptions : [];
+
   const rows = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    if (!t) return notes;
-    return notes.filter((n) => {
-      const title = (n.title || "").toLowerCase();
-      const content = (n.content || "").toLowerCase();
+    const t = (q || "").trim().toLowerCase();
+    if (!t) return safeNotes;
+
+    return safeNotes.filter((n) => {
+      const title = (n?.title || "").toLowerCase();
+      const content = (n?.content || "").toLowerCase();
       return title.includes(t) || content.includes(t);
     });
-  }, [notes, q]);
+  }, [safeNotes, q]);
 
-  
   return (
     <div className="w-[80%] mt-6  mx-autosm:mx-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -50,6 +51,7 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
                   >
                     {n.title || "(no title)"}
                   </button>
+
                   {n.content?.trim() && (
                     <div className="text-sm text-slate-600 mt-1 line-clamp-2">
                       {n.content}
@@ -57,9 +59,16 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
                   )}
                 </td>
 
-                <td className="px-4 py-3 text-slate-700">{formatDateDDMMYYYY(n.scheduledAt)}</td>
+                <td className="px-4 py-3 text-slate-700">
+                  {formatDateDDMMYYYY(n.scheduledAt)}
+                </td>
 
-                <td className="px-4 py-3 text-slate-700">{folderOptions.filter((o) => o.id === n.folderId).map((o) => o.label).join(", ") || "—"}</td>
+                <td className="px-4 py-3 text-slate-700">
+                  {safeFolders
+                    .filter((o) => String(o.id) === String(n.folderId))
+                    .map((o) => o.label)
+                    .join(", ") || "—"}
+                </td>
 
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
@@ -69,6 +78,7 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
                     >
                       Edit
                     </button>
+
                     <button
                       className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
                       onClick={() => onDelete?.(n)}
