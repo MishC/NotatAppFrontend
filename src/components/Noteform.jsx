@@ -12,7 +12,7 @@ export default function Noteform({
     title: "",
     content: "",
     folderId: "",
-    scheduledAt: "", 
+    scheduledAt: todayYYYYMMDD(),
   });
   const [error, setError] = useState(null);
 
