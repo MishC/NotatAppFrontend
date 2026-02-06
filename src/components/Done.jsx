@@ -16,9 +16,8 @@ export default function Done({ notes, onOpen, folderOptions, onDelete }) {
   }, [notes, q]);
 
   
-
   return (
-    <div className="w-[80%] mt-6 mx-auto">
+    <div className="w-[80%] mt-6  mx-autosm:mx-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
 
         <input
