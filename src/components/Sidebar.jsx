@@ -38,7 +38,7 @@ const Sidebar = React.memo(function Sidebar({
         const deletable = isDeletable(opt);
 
         return (
-          <button
+          <div
             key={opt.id ?? "all"}
             onClick={() => handleFolderClick(opt)}
             className={
@@ -64,7 +64,7 @@ const Sidebar = React.memo(function Sidebar({
               className={[
                 "block rounded-2xl transition-colors duration-200 ease-out",
                 "hover:bg-black/[0.04] active:bg-black/[0.06]",
-                "pr-10", // ✅ reserve space for right icon so layout doesn't jump
+                "pr-10", 
               ].join(" ")}
             >
               {label}
@@ -92,7 +92,7 @@ const Sidebar = React.memo(function Sidebar({
                 />
               </span>
             )}
-          </button>
+          </div>
         );
       })}
 

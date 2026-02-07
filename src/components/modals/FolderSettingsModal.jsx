@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
-import EditNoteModal from "./EditNoteModal" 
 import { deleteFolderAction, updateFolderAction } from "../../actions/noteActions"; 
 
 export default function FolderSettingsModal({ isOpen, onClose, folder, setFolders, setError }) {
@@ -11,6 +10,13 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
     setName(folder?.name ?? folder?.title ?? "");
   }, [folder]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e) => e.key === "Escape" && onClose?.();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const folderId = folder?.id;
@@ -18,73 +24,84 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={() => onClose()} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+
       {/* card */}
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white p-8 md:p-10 shadow-xl">
-        <button
-          onClick={() => onClose()}
-          className="absolute top-4 right-4 px-3 py-1 rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
-          aria-label="Close"
-        >
-          Close
-        </button>
+      <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 md:p-8 shadow-xl">
+        {/* Header */}
+        <header>
+          <div className="w-full flex items-center justify-between">
+            <span className="text-lg font-semibold text-black/90">
+              {folder?.name ?? folder?.title ?? "Folder"}
+            </span>
 
-      <main>
-        <div className="flex flex-col gap-3">
-          <div className="text-sm text-black/60">Folder title</div>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-4 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-300"
-            placeholder="Folder name"
-            autoFocus
-          />
-        </div>
-      </main>
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-10 w-10 rounded-2xl bg-white/60 hover:bg-white transition grid place-items-center"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </header>
 
-      <footer>
-        <div className="w-full flex items-center justify-between gap-3">
-          {/* BIG red delete left */}
-          <button
-            type="button"
-            className="px-6 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition w-[45%]"
-            onClick={async () => {
-              if (!folderId) return;
-              const ok = await deleteFolderAction({ API_URL, folderId, setFolders, setError });
-              if (ok) onClose();
-            }}
-          >
-            Delete
-          </button>
+        {/* Body */}
+        <main className="mt-5">
+          <div className="flex flex-col gap-3">
+            <div className="text-sm text-black/60">Folder title</div>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-4 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-300"
+              placeholder="Folder name"
+              autoFocus
+            />
+          </div>
+        </main>
 
-          {/* Orange save right */}
-          <button
-            type="button"
-            className="px-6 py-4 rounded-xl bg-orange-500 hover:bg-orange-700 text-white font-bold transition w-[45%]"
-            onClick={async () => {
-              if (!folderId) return;
-              const trimmed = name.trim();
-              if (!trimmed) {
-                setError?.("Folder name cannot be empty.");
-                return;
-              }
+        {/* Footer */}
+        <footer className="mt-6">
+          <div className="w-full flex items-center justify-between gap-3">
+            <button
+              type="button"
+              className="px-6 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition w-[45%]"
+              onClick={async () => {
+                if (!folderId) return;
+                const ok = await deleteFolderAction({ API_URL, folderId, setFolders, setError });
+                if (ok) onClose();
+              }}
+            >
+              Delete
+            </button>
 
-              const ok = await updateFolderAction({
-                API_URL,
-                folderId,
-                folderName: trimmed,
-                setFolders,
-                setError,
-              });
+            <button
+              type="button"
+              className="px-6 py-4 rounded-xl bg-orange-500 hover:bg-orange-700 text-white font-bold transition w-[45%]"
+              onClick={async () => {
+                if (!folderId) return;
+                const trimmed = name.trim();
+                if (!trimmed) {
+                  setError?.("Folder name cannot be empty.");
+                  return;
+                }
 
-              if (ok) onClose();
-            }}
-          >
-            Save
-          </button>
-        </div>
-      </footer>
-    </div>
+                const ok = await updateFolderAction({
+                  API_URL,
+                  folderId,
+                  folderName: trimmed,
+                  setFolders,
+                  setError,
+                });
+
+                if (ok) onClose();
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
