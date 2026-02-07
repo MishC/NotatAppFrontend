@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import Plus from "./icons/Plus"; // uprav path
 import FolderSettingsModal from "./modals/FolderSettingsModal"; // nový modal
 
-const Sidebar = React.memo(function Sidebar({
+function Sidebar({
   folderOptions,
   activeFolder,
   guest,
@@ -105,6 +105,6 @@ const Sidebar = React.memo(function Sidebar({
       />
     </div>
   );
-});
+};
 
-export default Sidebar;
+export default React.memo(Sidebar);
