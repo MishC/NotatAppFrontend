@@ -6,7 +6,7 @@ import {
   fetchNotesApi,
   fetchFoldersApi,
   fetchAllNotesByFolderIdApi,
-  OVERDUE_ID,
+  
   createFolderApi, 
   deleteFolderApi
 } from "../backend/notesApi";
@@ -33,7 +33,6 @@ export async function initNotesAndFoldersAction({
   activeFolder,
   setNotes,
   setFolders,
-  setFolderOptions,
   setLoading,
   setError,
 }) {
@@ -46,7 +45,6 @@ export async function initNotesAndFoldersAction({
 
     setNotes(savedNotes);
     setFolders(savedFolders); // now is only All folder allowed
-    setFolderOptions([{ id: null, label: "All" }]);
 
 
     setLoading(false);
@@ -64,16 +62,7 @@ export async function initNotesAndFoldersAction({
       })(),
       (async () => {
         const folders = await fetchFoldersApi({ API_URL2 });
-        setFolders(folders);
-
-        const isDone = (f) => (f?.name || "").trim().toLowerCase() === "done";
-        setFolderOptions([
-          { id: null, label: "All" },
-          ...folders.filter(f => !isDone(f)).map(f => ({ id: f.id, label: f.name })),
-          ...folders.filter(isDone).map(f => ({ id: f.id, label: f.name })),
-          { id: OVERDUE_ID, label: "Overdues" }
-
-        ]);
+        setFolders(folders);    
         
       })(),
     ]);
@@ -328,8 +317,18 @@ export function toggleModalAction(note, setIsModalOpen, setSelectedNote) {
 
 
 //Folders
-/* 9) CREATE FOLDER */
-export async function createFolderAction({ API_URL, folderName, setFolders, setError }) {
+/* 9) FETCH ALL FOLDERS */
+export async function fetchAllFoldersAction({ API_URL, setFolders, setError }) {
+  try {
+    const folders = await fetchFoldersApi({ API_URL });
+    setFolders(folders);
+  } catch (error) {
+    setError(error.message);
+  }
+}
+
+/* 10) CREATE FOLDER */
+export async function createFolderAction({ API_URL, folderName, setFolders,setError }) {
   try {
     const newFolder = await createFolderApi({ API_URL, folderName });
     setFolders((prev) => [...prev, newFolder]);
@@ -338,7 +337,7 @@ export async function createFolderAction({ API_URL, folderName, setFolders, setE
   }
 }
 
-/* 10) DELETE FOLDER */
+/* 11) DELETE FOLDER */
 export async function deleteFolderAction({ API_URL, folderId, setFolders, setError }) {
   try {
     await deleteFolderApi({ API_URL, folderId });

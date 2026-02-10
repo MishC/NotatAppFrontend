@@ -5,12 +5,10 @@ import Plus from "./icons/Plus";
 import { createFolderAction } from "../actions/noteActions";
 
 export default function Noteform({
-  folders = [],
   handleAddNote,
   guest = false,
   setShowNoteModal = () => {},
 }) {
-  const API_URL2 = useMemo(() => import.meta.env.VITE_API_URL + "/api/folders", []);
 
   const [newNote, setNewNote] = useState(() => ({
     title: "",
@@ -20,9 +18,7 @@ export default function Noteform({
   }));
 
   const [error, setError] = useState(null);
-
-
-  const [foldersLocal, setFoldersLocal] = useState(() => folders);
+  const [foldersLocal, setFoldersLocal] = useState(() =>folders);
 
   const [showInput, setShowInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
-export default function Overdues({ notes = [], onOpen, folderOptions = [], onDelete }) {
+export default function Overdues({ notes = [], onOpen, onDelete }) {
   const [q, setQ] = useState("");
 
   // folderId -> label map

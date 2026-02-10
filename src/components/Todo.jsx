@@ -62,7 +62,6 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     () => ({
       right: "prev,next",
       left: "title",
-      // ✅ On mobile/tablet show ONLY List button
       center: compact ? "listWeek" : "listWeek,dayGridMonth",
     }),
     [compact]

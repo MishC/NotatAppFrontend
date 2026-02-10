@@ -22,12 +22,10 @@ import {
   toggleModalAction,
 } from "../actions/noteActions";
 
-import { OVERDUE_ID } from "../backend/notesApi";
 
 export default function NoteApp() {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [folderOptions, setFolderOptions] = useState([{ id: null, label: "All" }]);
   const [activeFolder, setActiveFolder] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -53,8 +51,6 @@ export default function NoteApp() {
   // -------------------------
 
   const filteredNotes = useMemo(() => {
-    const isRealFolder = typeof activeFolder === "number";
-    if (!isRealFolder) return notes;
     return notes.filter((n) => n && String(n.folderId) === String(activeFolder));
   }, [notes, activeFolder]);
 
@@ -76,7 +72,7 @@ export default function NoteApp() {
             start: n.scheduledAt,
             allDay: true,
             extendedProps: { note: { ...n, colorClass } },
-            classNames: [n.folderId === 4 ? "fc-done-event" : ""],
+            classNames: [n.folderId === 5 ? "fc-done-event" : ""],
           };
         }),
     [filteredNotes]
@@ -86,20 +82,22 @@ export default function NoteApp() {
   // Effects
   // -------------------------
 
+  //Set Up notes and folders
   useEffect(() => {
-    initNotesAndFoldersAction({
+    initNotesAndFoldersAction({ 
       guest,
       API_URL,
       API_URL2,
       activeFolder,
       setNotes,
       setFolders,
-      setFolderOptions,
       setLoading,
       setError,
     });
   }, [guest, activeFolder, API_URL, API_URL2]);
 
+
+// Set up a guest from local storage
   useEffect(() => {
     syncGuestAction({ guest, notes, folders });
   }, [guest, notes, folders]);
@@ -152,7 +150,7 @@ export default function NoteApp() {
   // UI helpers
   // -------------------------
 
-  const navUserName = user?.email ? user.email : guest ? "Guest" : "Guest";
+  const navUserName = user?.email ? user.email : guest ? "Guest" : "Guest"; 
 
   return (
     <div className="w-full m-0 p-0">
@@ -188,11 +186,9 @@ export default function NoteApp() {
           {/* LEFT COLUMN: Sidebar */}
           <aside className="w-full min-w-[30%]">
             <Sidebar
-              folderOptions={folderOptions}
               activeFolder={activeFolder}
               guest={guest}
               handleFolderClick={handleFolderClick}
-              setFolders={setFolders}
               setError={setError}
             />
 
@@ -207,17 +203,15 @@ export default function NoteApp() {
             </div>
 
             <div className="relative flex  justify-center mx-auto sm:mx-0 sm:block overflow-visible calendar-container">
-              {activeFolder === 4 ? (
+              {activeFolder === 5 ? (
                 <Done
                   notes={filteredNotes}
                   onOpen={(n) => switchModalState(n)}
-                  folderOptions={folderOptions}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
-              ) : activeFolder === OVERDUE_ID ? (
+              ) : activeFolder === 1 ? (
                 <Overdues
                   notes={filteredNotes}
-                  folderOptions={folderOptions}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
@@ -225,7 +219,7 @@ export default function NoteApp() {
                 <Todo
                   events={events}
                   onOpen={(note) => switchModalState(note)}
-                  onComplete={(note) => handleUpdateNote(note.id, { ...note, folderId: 4 })}
+                  onComplete={(note) => handleUpdateNote(note.id, { ...note, folderId: 5 })}
                   onDelete={(note) => handleDeleteNote(note.id)}
                   onMoveDate={(note, ymd) => handleUpdateNote(note.id, { scheduledAt: ymd })}
                 />
@@ -240,13 +234,11 @@ export default function NoteApp() {
           selectedNote={selectedNote}
           switchModal={(n) => switchModalState(n)}
           updateNote={handleUpdateNote}
-          folders={folders}
         />
       )}
 
       {showNoteModal && (
         <NoteFormModal
-          folders={folders}
           setShowNoteModal={setShowNoteModal}
           handleAddNote={handleAddNote}
         />

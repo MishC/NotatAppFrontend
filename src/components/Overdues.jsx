@@ -1,15 +1,18 @@
 import { useMemo, useState, useEffect } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 import { fetchOverdueNotesApi } from "../backend/notesApi";
+import { fetchAllFoldersAction } from "../actions/noteActions"; 
 
-export default function Overdues({ notes, onOpen, folderOptions, onDelete }) {
+export default function Overdues({ notes, onOpen,  onDelete }) {
   const [q, setQ] = useState("");
-  const API_URL = import.meta.env.VITE_API_URL + "/api/notes";
+  const API_URL = import.meta.env.VITE_API_NOTES;
 
   const [localNotes, setLocalNotes] = useState(Array.isArray(notes) ? notes : []);
+  const [folders, setFolders] = useState([]);
 
   useEffect(() => {
     if (Array.isArray(notes)) setLocalNotes(notes);
+    fetchAllFoldersAction({ API_URL, setFolders });
   }, [notes]);
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export default function Overdues({ notes, onOpen, folderOptions, onDelete }) {
                 </td>
 
                 <td className="px-4 py-3 text-slate-700">
-                  {folderOptions
+                  {folders
                     .filter((o) => String(o.id) === String(n.folderId))
                     .map((o) => o.label)
                     .join(", ") || "—"}

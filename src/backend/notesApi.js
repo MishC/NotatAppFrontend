@@ -57,21 +57,15 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
   return expectJson ? readBody(res) : null;
 }
 
-export async function fetchFoldersApi({ API_URL2 } = {}) {
-  if (!API_URL2) throw new Error("API_URL is required");
-  return (await apiRequest({ url: API_URL2 })) || [];
-}
-
-export const OVERDUE_ID = "overdues";
 
 export async function fetchNotesApi({ API_URL, activeFolder }) {
   let url;
 
   if (!API_URL) throw new Error("API_URL is required");
 
-  if (activeFolder === OVERDUE_ID) url = `${API_URL}/overdues`;
-  else if (activeFolder === 4) url = `${API_URL}/done`;
-  else url = `${API_URL}/pending`;
+  if (activeFolder === 1) url = `${API_URL}/overdues`;
+  else if (activeFolder === 5) url = `${API_URL}/done`;
+  else url = `${API_URL}/pending`;  //"All"
 
   return (await apiRequest({ url, method: "GET" })) || [];
 }
@@ -118,6 +112,12 @@ export async function swapNotesApi({ API_URL, sourceId, targetId }) {
 }
 
 // Folders
+
+export async function fetchFoldersApi({ API_URL2 } = {}) {
+  if (!API_URL2) throw new Error("API_URL is required");
+  return (await apiRequest({ url: API_URL2 })) || [];
+}
+
 export async function createFolderApi({ API_URL, folderName }) {
   if (!API_URL) throw new Error("API_URL is required");
   return apiRequest({ url: API_URL, method: "POST", body: { name: folderName } });

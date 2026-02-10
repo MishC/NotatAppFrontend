@@ -1,48 +1,59 @@
-import React, { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Plus from "./icons/Plus"; // uprav path
 import FolderSettingsModal from "./modals/FolderSettingsModal"; // nový modal
-
+import { fetchAllFoldersAction } from "../actions/noteActions";
 function Sidebar({
-  folderOptions,
   activeFolder,
   guest,
   handleFolderClick,
   setFolders,
   setError,
 }) {
-  const [openFolderId, setOpenFolderId] = useState(null);
+  const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal: let you make optional folder in modal window
 
-  const folderById = useMemo(() => {
-    const m = new Map();
-    for (const f of folderOptions) m.set(String(f.id), f);
-    return m;
-  }, [folderOptions]);
+  useEffect(() => { 
+    try {
+      const folders = fetchAllFoldersAction({ API_URL, setFolders, setError });
+      setFolders(folders);
+    } catch (error) {
+      setError(error.message);
+    }
+  }, [API_URL]);
+
 
   const isDeletable = (opt) => {
     if (!opt) return false;
     if (opt.id == null) return false; // All
-    if (String(opt.id) === "4") return false; // done (ak nechceš mazať)
-    if (String(opt.id) === "overdues") return false;
-    if (opt.label === "Overdues") return false;
-    return true;
+    if (String(opt.id) <= "5") return false; 
   };
 
   return (
-    <div className="Sidebar w-[80%]  mx-auto sm:mt-10 ">
-      {folderOptions.map((opt) => {
+    <div className="Sidebar w-[90%]  mx-auto sm:mt-10 ">
+      <div key="all"
+            onClick={() => handleFolderClick("all")}
+            className={
+             
+                    "w-full text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer"
+                    
+            }
+          >
+
+            </div>
+      {folders.map((opt) => {
         const isActive =
-          (activeFolder == null && opt.id == null) ||
+          (activeFolder ==null && opt.id ==null) ||
           String(activeFolder) === String(opt.id);
 
-        const label = opt.label === "All" && guest ? "Notes" : opt.label;
-        const deletable = isDeletable(opt);
+        const deletable = isDeletable(opt.id);
+
 
         return (
+   
           <div
-            key={opt.id ?? "all"}
+            key={opt.id}
             onClick={() => handleFolderClick(opt)}
             className={
-              label === "Overdues"
+              opt.id === 1
                 ? "w-full text-red-500 text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer"
                 : [
                     "w-full text-left px-6 py-4 text-lg md:text-xl lg:text-2xl font-semibold relative cursor-pointer",
@@ -67,7 +78,7 @@ function Sidebar({
                 "pr-10", 
               ].join(" ")}
             >
-              {label}
+              {opt.name}
             </span>
 
             {deletable && (
@@ -99,11 +110,12 @@ function Sidebar({
       <FolderSettingsModal
         isOpen={openFolderId != null}
         onClose={() => setOpenFolderId(null)}
-        folder={openFolderId != null ? folderById.get(String(openFolderId)) : null}
+        folder={activeFolder}
         setFolders={setFolders}
         setError={setError}
       />
     </div>
+   
   );
 };
 

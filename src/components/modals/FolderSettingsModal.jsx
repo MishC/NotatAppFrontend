@@ -3,7 +3,6 @@ import { X } from "lucide-react";
 import { deleteFolderAction, updateFolderAction } from "../../actions/noteActions"; 
 
 export default function FolderSettingsModal({ isOpen, onClose, folder, setFolders, setError }) {
-  const API_URL = useMemo(() => import.meta.env.VITE_API_URL + "/api/folders", []);
   const [name, setName] = useState("");
 
   useEffect(() => {
