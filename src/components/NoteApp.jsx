@@ -189,6 +189,7 @@ export default function NoteApp() {
           <aside className="w-full min-w-[30%]">
             <Sidebar
               folders={folders}
+              setFolders={setFolders}
               activeFolder={activeFolder} //null => "All"
               guest={guest}
               handleFolderClick={handleFolderClick}

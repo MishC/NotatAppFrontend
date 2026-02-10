@@ -1,15 +1,15 @@
 import React,{ useEffect, useMemo, useState } from "react";
 import Plus from "./icons/Plus"; // uprav path
 import FolderSettingsModal from "./modals/FolderSettingsModal"; // nový modal
-import { fetchAllFoldersAction } from "../actions/noteActions";
 function Sidebar({
   folders,
+  setFolders,
   activeFolder,
   guest,
   handleFolderClick,
   setError,
 }) {
-  const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal: let you make optional folder in modal window
+  const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
 
   const isDeletable = (opt) => {
     if (!opt) return false;
