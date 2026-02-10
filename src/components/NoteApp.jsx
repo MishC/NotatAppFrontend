@@ -97,6 +97,8 @@ export default function NoteApp() {
   }, [guest, activeFolder, API_URL, API_URL2]);
 
 
+
+
 // Set up a guest from local storage
   useEffect(() => {
     syncGuestAction({ guest, notes, folders });
@@ -186,6 +188,7 @@ export default function NoteApp() {
           {/* LEFT COLUMN: Sidebar */}
           <aside className="w-full min-w-[30%]">
             <Sidebar
+              folders={folders}
               activeFolder={activeFolder} //null => "All"
               guest={guest}
               handleFolderClick={handleFolderClick}

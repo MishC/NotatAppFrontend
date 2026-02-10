@@ -5,14 +5,19 @@ import { fetchAllFoldersAction } from "../actions/noteActions";
 
 export default function Overdues({ notes, onOpen,  onDelete }) {
   const [q, setQ] = useState("");
-  const API_URL = import.meta.env.VITE_API_NOTES;
+  const API_URL = import.meta.env.VITE_API_FOLDERS;
 
   const [localNotes, setLocalNotes] = useState(Array.isArray(notes) ? notes : []);
   const [folders, setFolders] = useState([]);
 
   useEffect(() => {
+    const folders = fetchAllFoldersAction({ API_URL, setError });
+    setFolders(folders);
+
+  }, [API_URL]);
+
+  useEffect(() => {
     if (Array.isArray(notes)) setLocalNotes(notes);
-    fetchAllFoldersAction({ API_URL, setFolders });
   }, [notes]);
 
   useEffect(() => {
@@ -86,7 +91,7 @@ export default function Overdues({ notes, onOpen,  onDelete }) {
                 <td className="px-4 py-3 text-slate-700">
                   {folders
                     .filter((o) => String(o.id) === String(n.folderId))
-                    .map((o) => o.label)
+                    .map((o) => o.name)
                     .join(", ") || "—"}
                 </td>
 

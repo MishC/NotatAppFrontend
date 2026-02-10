@@ -3,23 +3,13 @@ import Plus from "./icons/Plus"; // uprav path
 import FolderSettingsModal from "./modals/FolderSettingsModal"; // nový modal
 import { fetchAllFoldersAction } from "../actions/noteActions";
 function Sidebar({
+  folders,
   activeFolder,
   guest,
   handleFolderClick,
-  setFolders,
   setError,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal: let you make optional folder in modal window
-  const API_URL = import.meta.env.VITE_API_FOLDERS;
-  useEffect(() => {
-    try {
-      const folders = fetchAllFoldersAction({ API_URL, setFolders, setError });
-      setFolders(folders);
-    } catch (error) {
-      setError(error.message);
-    }
-  }, [API_URL]);
-
 
   const isDeletable = (opt) => {
     if (!opt) return false;

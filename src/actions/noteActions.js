@@ -318,10 +318,10 @@ export function toggleModalAction(note, setIsModalOpen, setSelectedNote) {
 
 //Folders
 /* 9) FETCH ALL FOLDERS */
-export async function fetchAllFoldersAction({ API_URL, setFolders, setError }) {
+export async function fetchAllFoldersAction({ API_URL, setError }) {
   try {
     const folders = await fetchFoldersApi({ API_URL });
-    setFolders(folders);
+    return folders;
   } catch (error) {
     setError(error.message);
   }
