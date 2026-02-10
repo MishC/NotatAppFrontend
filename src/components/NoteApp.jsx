@@ -39,9 +39,8 @@ export default function NoteApp() {
   const guest = useSelector((s) => s.auth.guest);
 
   // stable URLs
-  const API_URL = useMemo(() => getNotesApiUrl(), []);
-  const API_URL2 = useMemo(() => getFoldersApiUrl(), []);
-
+  const API_URL = import.meta.env.VITE_API_NOTES;
+  const API_URL2 = import.meta.env.VITE_API_FOLDERS;
   // auto clear messages (same behavior, cleaner)
   useAutoClearMessage(error, setError, 4000);
   useAutoClearMessage(msg, setMsg, 4000);
@@ -187,7 +186,7 @@ export default function NoteApp() {
           {/* LEFT COLUMN: Sidebar */}
           <aside className="w-full min-w-[30%]">
             <Sidebar
-              activeFolder={activeFolder}
+              activeFolder={activeFolder} //null => "All"
               guest={guest}
               handleFolderClick={handleFolderClick}
               setError={setError}
