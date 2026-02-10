@@ -5,6 +5,7 @@ import {
   swapNotesApi,
   fetchNotesApi,
   fetchFoldersApi,
+  fetchAllNotesByFolderIdApi,
   OVERDUE_ID,
   createFolderApi, 
   deleteFolderApi
@@ -177,7 +178,7 @@ export async function updateNoteAction({
   setSelectedNote,
   setMsg,
 }) {
-  // find base note safely (modal note OR lookup)
+  // find `initial note` aka `base`: either as object or id
   const base = selectedNote ?? noteById?.get(String(noteId));
   if (!guest && !base) {
     setError?.("No base note found for update.");
@@ -207,8 +208,7 @@ if (guest) {
     return true;
   }
 
-  // if we still don't have a base note, we can only update fields that backend accepts without full object.
-  // if your backend requires full payload, bail out safely:
+  // if not a good initial note:
   if (!base) {
     setError("Cannot update: note not found (missing base note).");
     return false;
@@ -328,6 +328,7 @@ export function toggleModalAction(note, setIsModalOpen, setSelectedNote) {
 
 
 //Folders
+/* 9) CREATE FOLDER */
 export async function createFolderAction({ API_URL, folderName, setFolders, setError }) {
   try {
     const newFolder = await createFolderApi({ API_URL, folderName });
@@ -337,6 +338,7 @@ export async function createFolderAction({ API_URL, folderName, setFolders, setE
   }
 }
 
+/* 10) DELETE FOLDER */
 export async function deleteFolderAction({ API_URL, folderId, setFolders, setError }) {
   try {
     await deleteFolderApi({ API_URL, folderId });
@@ -345,6 +347,8 @@ export async function deleteFolderAction({ API_URL, folderId, setFolders, setErr
     setError(error.message);
   }
 }
+
+/* 11) UPDATE FOLDER */
 
 export async function updateFolderAction({ API_URL, folderId, folderName, setFolders, setError }) {
   try {

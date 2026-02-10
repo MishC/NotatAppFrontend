@@ -16,6 +16,8 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
   const headers = { "Content-Type": "application/json" };
   if (token && !guest) headers.Authorization = `Bearer ${token}`;
 
+  ////
+
   const res = await fetch(url, {
     method,
     headers,
@@ -79,6 +81,11 @@ export async function fetchOverdueNotesApi({ API_URL } = {}) {
   return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
 }
 
+export async function fetchAllNotesByFolderIdApi({ API_URL, folderId }) {
+  if (!API_URL) throw new Error("API_URL is required");
+  if (!folderId) throw new Error("Folder ID is required");
+  return apiRequest({ url: `${API_URL}/folders/${folderId}/notes`, method: "GET" });
+}
 
 export async function addNoteApi({ API_URL, newNote }) {
   if (!API_URL) throw new Error("API_URL is required"); 
@@ -129,4 +136,3 @@ export async function updateFolderApi({ API_URL, folderId, updatedFields }) {
   await apiRequest({ url: `${API_URL}/${folderId}`, method: "PUT", body: updatedFields, expectJson: false });
   return true;
 }
-  
