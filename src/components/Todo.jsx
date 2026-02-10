@@ -43,7 +43,6 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
   const tablet = useMemo(() => isTablet(width), [width]);
   const compact = mobile || tablet;
 
-  // ✅ Default view = List, but only on first mount (persisted)
   const [initialView] = useState(() => localStorage.getItem(VIEW_KEY) || "listWeek");
   const currentViewRef = useRef(initialView);
 

@@ -213,6 +213,8 @@ eventDidMount(info) {
     },
   };
 }
+
+// Dragging a note
 export function onDrag(e) {
     const ghost = document.createElement("div");
     ghost.textContent = e.currentTarget.getAttribute("data-title") || "";
