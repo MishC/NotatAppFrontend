@@ -51,6 +51,7 @@ export default function NoteApp() {
   // -------------------------
 
   const filteredNotes = useMemo(() => {
+    if (!activeFolder) return notes;
     return notes.filter((n) => n && String(n.folderId) === String(activeFolder));
   }, [notes, activeFolder]);
 
