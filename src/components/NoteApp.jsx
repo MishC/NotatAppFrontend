@@ -186,7 +186,7 @@ export default function NoteApp() {
       "
         >
           {/* LEFT COLUMN: Sidebar */}
-          <aside className="w-full min-w-0">
+          <aside className="w-full min-w-[30%]">
             <Sidebar
               folderOptions={folderOptions}
               activeFolder={activeFolder}

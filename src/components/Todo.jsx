@@ -126,14 +126,12 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     };
   }, []);
 
-  // ✅ Remember view when user changes it
   const handleDatesSet = useCallback((arg) => {
     const v = arg?.view?.type || "listWeek";
     currentViewRef.current = v;
     localStorage.setItem(VIEW_KEY, v);
   }, []);
 
-  // ✅ Only force List if Month is not allowed (mobile/tablet)
   useEffect(() => {
     const api = calRef.current?.getApi?.();
     if (!api) return;
@@ -148,12 +146,11 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
   }, [compact]);
 
   return (
-    <div className=" w-[90%] border-0 my-calendar" ref={wrapRef}>
+    <div className=" w-full h-full border-0 my-calendar" ref={wrapRef}>
       <FullCalendar
         ref={calRef}
         plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
 
-        // ✅ default List on first mount only
         initialView={initialView}
 
         height="auto"
@@ -182,7 +179,6 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
         eventClassNames={eventClassNames}
         eventContent={eventContent}
 
-        // ✅ this is the key part
         datesSet={handleDatesSet}
       />
     </div>
