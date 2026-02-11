@@ -39,7 +39,7 @@ export default function Overdues({ notes, onOpen, folders, onDelete }) {
           </thead>
 
           <tbody className="divide-y divide-slate-100">
-            {rows.map((n) => (
+            {notes.map((n) => (
               <tr key={n.id} className="hover:bg-red-50/40">
                 <td className="px-4 py-3">
                   <button
@@ -82,7 +82,7 @@ export default function Overdues({ notes, onOpen, folders, onDelete }) {
               </tr>
             ))}
 
-            {rows.length === 0 && (
+            {notes.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-slate-500" colSpan={4}>
                   No overdue notes.
