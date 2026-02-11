@@ -186,7 +186,7 @@ export default function NoteApp() {
       "
         >
           {/* LEFT COLUMN: Sidebar */}
-          <aside className="w-full min-w-[30%]">
+          <aside className="w-full min-w-[30%] ml-10">
             <Sidebar
               folders={folders}
               setFolders={setFolders}
@@ -206,7 +206,7 @@ export default function NoteApp() {
               <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} />
             </div>
 
-            <div className="relative flex  justify-center mx-auto sm:mx-0 sm:block overflow-visible calendar-container">
+            <div className="relative flex  justify-center mx-auto sm:mr-20 sm:block overflow-visible calendar-container">
               {activeFolder === 5 ? (
                 <Done
                   notes={filteredNotes}
