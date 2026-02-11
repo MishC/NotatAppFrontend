@@ -5,7 +5,7 @@ import {
   swapNotesApi,
   fetchNotesApi,
   fetchFoldersApi,
-  fetchAllNotesByFolderIdApi,
+  updateFolderApi,
   
   createFolderApi, 
   deleteFolderApi
@@ -352,12 +352,7 @@ export async function deleteFolderAction({ API_URL, folderId, setFolders, setErr
 
 export async function updateFolderAction({ API_URL, folderId, folderName, setFolders, setError }) {
   try {
-    const res = await fetch(`${API_URL}/${folderId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: folderName }),
-      credentials: "include",
-    });
+    const res = await updateFolderApi({ API_URL, folderId, folderName });
 
     if (!res.ok) throw new Error("Failed to update folder");
 

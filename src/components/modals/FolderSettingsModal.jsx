@@ -8,10 +8,7 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
   const folderId = folder?.id;
 
 
-  useEffect(() => {
-    setName(folder?.name ?? folder?.title ?? "");
-  }, [folder]);
-
+ 
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
