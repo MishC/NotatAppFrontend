@@ -23,6 +23,7 @@ export default function Noteform({
 
   const [showInput, setShowInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const API_URL2 = import.meta.env.VITE_API_FOLDERS;
 
  
 

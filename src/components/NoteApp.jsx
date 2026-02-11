@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
-import { useAutoClearMessage, getNotesApiUrl, getFoldersApiUrl } from "../helpers/noteHelpers";
+import { useAutoClearMessage} from "../helpers/noteHelpers";
 
 import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
@@ -237,6 +237,7 @@ export default function NoteApp() {
       {isModalOpen && selectedNote && (
         <EditNoteModal
           selectedNote={selectedNote}
+          folders={folders}
           switchModal={(n) => switchModalState(n)}
           updateNote={handleUpdateNote}
         />

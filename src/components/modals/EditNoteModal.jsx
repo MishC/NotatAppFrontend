@@ -1,59 +1,108 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { todayYYYYMMDD } from "../../helpers/dateHelpers";
 
-export default function Modal({ selectedNote, switchModal, updateNote, folders = [] }) {
+export default function EditModal({
+  selectedNote,
+  folders = [],
+  switchModal,
+  updateNote,
+}) {
+  const minDate = todayYYYYMMDD();
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [folderId, setFolderId] = useState("");     // string for select
+  const [scheduledAt, setScheduledAt] = useState(""); // YYYY-MM-DD
+
   const [error, setError] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  const [folderId, setFolderId] = useState(selectedNote.folderId ?? "");
-  const [title, setTitle] = useState(selectedNote.title ?? "");
-  const [content, setContent] = useState(selectedNote.content ?? "");
-  const [scheduledAt, setScheduledAt] = useState(selectedNote.scheduledAt ?? "");
+  const close = () => switchModal(null);
 
-  const savingDisabled =
-    title === (selectedNote.title ?? "") &&
-    content === (selectedNote.content ?? "") &&
-    (folderId ?? "") === (selectedNote.folderId ?? "") &&
-    (scheduledAt ?? "") === (selectedNote.scheduledAt ?? "");
-
-    const minDate = todayYYYYMMDD();
-
-
-  const handleSave = async () => {
-    const success = await updateNote(selectedNote.id, {
-      title,
-      content,
-      folderId,
-      scheduledAt: scheduledAt?.trim() ? scheduledAt.trim() : null,
-    });
-    if (scheduledAt && scheduledAt < minDate) {
-  setError("Deadline cannot be in the past.");
-  return;
-}
-
-    if (!success) {
-      setError("Failed to update note!");
-      return;
-    }
-    setMsg("Note updated.");
-  };
-
+  // ✅ IMPORTANT: init only when note ID changes (modal opened for another note)
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && switchModal(null);
+    if (!selectedNote) return;
+
+    setTitle(selectedNote.title ?? "");
+    setContent(selectedNote.content ?? "");
+    setFolderId(selectedNote.folderId != null ? String(selectedNote.folderId) : "");
+    setScheduledAt(selectedNote.scheduledAt ?? "");
+
+    setError(null);
+    setMsg(null);
+    setSaving(false);
+  }, [selectedNote?.id]); // <--- THIS is the fix
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [switchModal]);
+  }, []);
+
+  const original = useMemo(() => {
+    return {
+      title: selectedNote?.title ?? "",
+      content: selectedNote?.content ?? "",
+      folderId: selectedNote?.folderId != null ? String(selectedNote.folderId) : "",
+      scheduledAt: selectedNote?.scheduledAt ?? "",
+    };
+  }, [selectedNote?.id]); // tie original hodnoty tiež naviaž na id
+
+  const savingDisabled =
+    !selectedNote ||
+    (title === original.title &&
+      content === original.content &&
+      folderId === original.folderId &&
+      scheduledAt === original.scheduledAt);
+
+  const handleSave = async () => {
+    if (!selectedNote || saving || savingDisabled) return;
+
+    // validate deadline
+    if (scheduledAt && scheduledAt < minDate) {
+      setError("Deadline cannot be in the past.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    setMsg(null);
+
+    const patch = {
+      title: title.trim(),
+      content: content ?? "",
+      folderId: folderId === "" ? null : Number(folderId), // ✅ send as number
+      scheduledAt: scheduledAt?.trim() ? scheduledAt.trim() : null,
+    };
+
+    try {
+      const ok = await updateNote(selectedNote.id, patch);
+      if (!ok) {
+        setError("Failed to update note.");
+        return;
+      }
+      setMsg("Note updated.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!selectedNote) return null;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={() => switchModal(null)} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/40" onClick={close} aria-hidden="true" />
+
       {/* card */}
       <div className="relative w-full max-w-2xl rounded-2xl bg-white p-8 md:p-10 shadow-xl">
         <button
-          onClick={() => switchModal(null)}
+          onClick={close}
           className="absolute top-4 right-4 px-3 py-1 rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
           aria-label="Close"
+          type="button"
         >
           Close
         </button>
@@ -63,7 +112,7 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => { setTitle(e.target.value); setMsg(null); }}
           placeholder="Title"
           className="w-full mb-5 px-4 py-3 text-xl rounded-lg border border-slate-300 text-slate-800 placeholder-slate-400
                      focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
@@ -71,38 +120,36 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
 
         <textarea
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={(e) => { setContent(e.target.value); setMsg(null); }}
           placeholder="Content"
           className="w-full mb-5 px-4 py-3 text-xl rounded-lg border border-slate-300 h-56 text-slate-800 placeholder-slate-400
                      focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
         />
 
+        {/* ✅ select is controlled by folderId state */}
         <select
-          value={folderId ?? ""}
-          onChange={(e) => setFolderId(Number(e.target.value))}
-          className="w-full mb-6 px-4 py-3 text-lg rounded-lg border border-slate-300 text-slate-800
-                     focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
-          disabled={!folders.length}
+          value={folderId}
+          onChange={(e) => { setFolderId(e.target.value); setMsg(null); }}
+          className="w-full p-4 my-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-300"
         >
-          <option value="" disabled className="text-slate-400">
-            {folders.length ? "Select a folder" : "No folders available"}
+          <option value="" disabled>
+            Select a folder
           </option>
-          {folders.map((folder) => (
-            <option key={folder.id} value={folder.id}>
-              {folder.name}
+          {folders.map((f) => (
+            <option key={f.id} value={String(f.id)}>
+              {f.name}
             </option>
           ))}
         </select>
 
-        {/* DateOnly (Deadline) */}
+        {/* Deadline */}
         <div className="w-full mb-8">
           <div className="flex items-center gap-3">
             <span className="mt-1 text-red-400">Deadline</span>
             <input
               type="date"
-              value={scheduledAt} // "YYYY-MM-DD"
-              onChange={(e) => setScheduledAt(e.target.value)}
-              placeholder="YEAR-MM-DD"
+              value={scheduledAt}
+              onChange={(e) => { setScheduledAt(e.target.value); setMsg(null); }}
               min={minDate}
               className="w-full px-4 py-3 text-lg rounded-lg border border-slate-300 text-slate-800
                          focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
@@ -112,20 +159,25 @@ export default function Modal({ selectedNote, switchModal, updateNote, folders =
 
         <div className="flex justify-end gap-3">
           <button
-            onClick={() => switchModal(null)}
+            onClick={close}
             className="px-6 py-3 text-lg rounded-md border border-slate-800 hover:bg-blue-600 hover:text-white"
+            type="button"
           >
             Close
           </button>
+
           <button
             onClick={handleSave}
-            disabled={savingDisabled}
+            disabled={savingDisabled || saving}
             className={[
               "px-6 py-3 text-lg rounded-md text-white shadow-sm transition",
-              savingDisabled ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700",
+              savingDisabled || saving
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700",
             ].join(" ")}
+            type="button"
           >
-            Save
+            {saving ? "Saving..." : "Save"}
           </button>
         </div>
 
