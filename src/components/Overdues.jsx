@@ -3,51 +3,18 @@ import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 import { fetchOverdueNotesApi } from "../backend/notesApi";
 import { fetchAllFoldersAction } from "../actions/noteActions"; 
 
-export default function Overdues({ notes, onOpen,  onDelete }) {
+export default function Overdues({ notes, onOpen, folders, onDelete }) {
   const [q, setQ] = useState("");
-  const API_URL = import.meta.env.VITE_API_FOLDERS;
+  
 
   const [localNotes, setLocalNotes] = useState(Array.isArray(notes) ? notes : []);
-  const [folders, setFolders] = useState([]);
 
-  useEffect(() => {
-    const folders = fetchAllFoldersAction({ API_URL, setError });
-    setFolders(folders);
-
-  }, [API_URL]);
-
+ 
   useEffect(() => {
     if (Array.isArray(notes)) setLocalNotes(notes);
   }, [notes]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchOverdueNotesApi({ API_URL })
-      .then((data) => {
-        if (cancelled) return;
-        setLocalNotes(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => {
-        console.error("fetchOverdueNotesApi failed:", err);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [API_URL]);
-
-  const rows = useMemo(() => {
-    const qq = (q || "").toLowerCase().trim();
-
-    return (localNotes || []).filter((n) => {
-      const title = (n.title || "").toLowerCase().trim();
-      const content = ((n.content || "").toLowerCase().trim()).slice(0, 10);
-      return title.includes(qq) || content.includes(qq);
-    });
-  }, [localNotes, q]);
-
-  const isMobileView = window.innerWidth < 640;
+ 
 
   return (
     <div className="w-[80%] mt-6 mx-auto sm:mx-0">
