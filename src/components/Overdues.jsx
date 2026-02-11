@@ -1,9 +1,8 @@
-import { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
-import { fetchOverdueNotesApi } from "../backend/notesApi";
-import { fetchAllFoldersAction } from "../actions/noteActions"; 
 
-export default function Overdues({ notes, onOpen, folders, onDelete }) {
+
+ function Overdues({ notes, onOpen, folders, onDelete }) {
   const [q, setQ] = useState("");
   
 
@@ -95,3 +94,5 @@ export default function Overdues({ notes, onOpen, folders, onDelete }) {
     </div>
   );
 }
+
+export default React.memo(Overdues);
