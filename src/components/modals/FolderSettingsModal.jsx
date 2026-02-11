@@ -3,7 +3,10 @@ import { X } from "lucide-react";
 import { deleteFolderAction, updateFolderAction } from "../../actions/noteActions"; 
 
 export default function FolderSettingsModal({ isOpen, onClose, folder, setFolders, setError }) {
+  const API_URL = import.meta.env.VITE_API_FOLDERS;
   const [name, setName] = useState("");
+  const folderId = folder?.id;
+
 
   useEffect(() => {
     setName(folder?.name ?? folder?.title ?? "");
@@ -18,7 +21,6 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
 
   if (!isOpen) return null;
 
-  const folderId = folder?.id;
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
@@ -31,13 +33,13 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
         <header>
           <div className="w-full flex items-center justify-between">
             <span className="text-lg font-semibold text-black/90">
-              {folder?.name ?? folder?.title ?? "Folder"}
+              Edit Folder Name
             </span>
 
             <button
               type="button"
               onClick={onClose}
-              className="h-10 w-10 rounded-2xl bg-white/60 hover:bg-white transition grid place-items-center"
+              className="h-10 w-10 rounded-2xl bg-white/60 hover:bg-white transition grid place-items-center cursor-pointer"
               aria-label="Close"
             >
               <X className="h-5 w-5" />
@@ -48,12 +50,12 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
         {/* Body */}
         <main className="mt-5">
           <div className="flex flex-col gap-3">
-            <div className="text-sm text-black/60">Folder title</div>
+            <div className="text-sm text-black/60">Current Name: {folder?.name}</div>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full p-4 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-300"
-              placeholder="Folder name"
+              placeholder="New folder name"
               autoFocus
             />
           </div>

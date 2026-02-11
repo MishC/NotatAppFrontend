@@ -1,6 +1,6 @@
-import React,{ useEffect, useMemo, useState } from "react";
-import Plus from "./icons/Plus"; // uprav path
-import FolderSettingsModal from "./modals/FolderSettingsModal"; // nový modal
+import React,{ use, useEffect, useMemo, useState } from "react";
+import Plus from "./icons/Plus"; 
+import FolderSettingsModal from "./modals/FolderSettingsModal"; 
 function Sidebar({
   folders,
   setFolders,
@@ -10,6 +10,7 @@ function Sidebar({
   setError,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
+  const [folder, setFolder] = useState(null);
 
 
   const sortedFolders = useMemo(() => {
@@ -24,6 +25,14 @@ function Sidebar({
   });
 }, [folders]);
 
+useEffect(() => {
+  console.log("openFolderId", openFolderId);
+  const folder = [...folders].filter((f) => f.id === openFolderId);
+  console.log("F",  folder);
+  console.log("Folders", folders);
+
+  setFolder(...folder);
+}, [folders, openFolderId]);
 
   return (
     <div className="Sidebar w-[90%]  mx-auto sm:mt-10 ">
@@ -111,7 +120,7 @@ function Sidebar({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenFolderId(String(opt.id));
+                  setOpenFolderId(Number(opt.id));
                 }}
               />
             </span>
@@ -124,7 +133,7 @@ function Sidebar({
       <FolderSettingsModal
         isOpen={openFolderId != null}
         onClose={() => setOpenFolderId(null)}
-        folder={activeFolder}
+        folder={folder}
         setFolders={setFolders}
         setError={setError}
       />

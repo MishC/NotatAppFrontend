@@ -339,6 +339,7 @@ export async function createFolderAction({ API_URL, folderName, setFolders,setEr
 
 /* 11) DELETE FOLDER */
 export async function deleteFolderAction({ API_URL, folderId, setFolders, setError }) {
+
   try {
     await deleteFolderApi({ API_URL, folderId });
     setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
