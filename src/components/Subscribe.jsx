@@ -30,11 +30,18 @@ export default function Subscribe() {
   useEffect(() => {
     const cleanupTimer = setTimeout(() => {
       setAutoRunActive(false);
-    }, 1000);
+    }, 2000);
     return () => {
       clearTimeout(cleanupTimer);
     };
   }, []);
+
+  useEffect(() => {
+  if (!msg.startsWith("Registration successful")) return;
+  const t = setTimeout(() => navigate("/auth/login", { replace: true }), 1500);
+  return () => clearTimeout(t);
+}, [msg, navigate]);
+
 
 //onSubmit registerAction
  const onSubscribe = async (e) => {
@@ -59,7 +66,7 @@ export default function Subscribe() {
     setMsg("Registration successful! Redirecting to login...");
 
     setTimeout(() => {
-      navigate("/auth");
+      navigate("/auth",  { replace: true });
     }, 1500);
   } catch (error) {
     console.error(error);

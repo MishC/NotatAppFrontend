@@ -1,17 +1,17 @@
 import { useMemo, useState } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
-export default function Overdues({ notes = [], onOpen, onDelete }) {
+export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
   const [q, setQ] = useState("");
 
   // folderId -> label map
   const folderLabelById = useMemo(() => {
     const map = {};
-    for (const f of folderOptions) {
-      map[String(f.id)] = f.label;
+    for (const f of folders) {
+      map[String(f.id)] = f.names;
     }
     return map;
-  }, [folderOptions]);
+  }, [folders]);
 
   // filter notes
   const rows = useMemo(() => {

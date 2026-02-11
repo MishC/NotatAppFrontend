@@ -36,11 +36,11 @@ export const hydrateAuth = () => (dispatch) => {
 export async function registerAction({ email, password, phone, setMsg, setErr }) {
   try {
     await registerApi(email, password, phone);
-    setMsg?.("Registration successful.");
+    setMsg("Registration successful.");
     return true;
   } catch (err) {
     console.error(err);
-    setErr?.(err.message || "Registration failed.");
+    setErr(err.message || "Registration failed.");
     return false;
   }
 }

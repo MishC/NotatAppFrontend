@@ -210,6 +210,7 @@ export default function NoteApp() {
               {activeFolder === 5 ? (
                 <Done
                   notes={filteredNotes}
+                  folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
