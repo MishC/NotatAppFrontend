@@ -5,6 +5,7 @@ import Plus from "./icons/Plus";
 import { createFolderAction } from "../actions/noteActions";
 
 export default function Noteform({
+  folders,
   handleAddNote,
   guest = false,
   setShowNoteModal = () => {},
@@ -23,10 +24,7 @@ export default function Noteform({
   const [showInput, setShowInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
 
-  // keep local folders synced with props (when parent updates)
-  useEffect(() => {
-    setFoldersLocal(folders);
-  }, [folders]);
+ 
 
   const normalizeForServer = (n) => ({
     ...n,

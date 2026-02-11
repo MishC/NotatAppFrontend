@@ -2,7 +2,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import { useRef, useEffect, useMemo, useState, useCallback } from "react";
+import React, { useRef, useEffect, useMemo, useState, useCallback } from "react";
 
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
@@ -32,7 +32,7 @@ function useWindowWidth() {
 
 const VIEW_KEY = "noteapp.fc.view";
 
-export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
+function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
   const calRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -182,3 +182,5 @@ export default function Todo({ events, onOpen, onComplete, onDelete, onMoveDate 
     </div>
   );
 }
+
+export default React.memo(Todo);
