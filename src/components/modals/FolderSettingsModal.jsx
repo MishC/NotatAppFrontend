@@ -71,6 +71,8 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
                 e.stopPropagation();
                 if (!folderId) return;
                 const ok = await deleteFolderAction({ API_URL, folderId, setFolders, setError });
+                console.log("DELETE ok =", ok);
+
                 if (ok) onClose();
 
               }}

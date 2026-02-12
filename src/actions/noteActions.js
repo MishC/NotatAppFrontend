@@ -324,6 +324,7 @@ export async function fetchAllFoldersAction({ API_URL, setError }) {
     return folders;
   } catch (error) {
     setError(error.message);
+    return false;
   }
 }
 
@@ -332,8 +333,10 @@ export async function createFolderAction({ API_URL, folderName, setFolders,setEr
   try {
     const newFolder = await createFolderApi({ API_URL, folderName });
     setFolders((prev) => [...prev, newFolder]);
+    return true;
   } catch (error) {
     setError(error.message);
+    return false;
   }
 }
 
@@ -343,8 +346,10 @@ export async function deleteFolderAction({ API_URL, folderId, setFolders, setErr
   try {
     await deleteFolderApi({ API_URL, folderId });
     setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
+    return true;
   } catch (error) {
     setError(error.message);
+    return false;
   }
 }
 
