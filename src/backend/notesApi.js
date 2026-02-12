@@ -130,9 +130,16 @@ export async function deleteFolderApi({ API_URL, folderId }) {
   return true;
 }
 
-export async function updateFolderApi({ API_URL, folderId, updatedFields }) {
+export async function updateFolderApi({ API_URL, folderId, name }) {
   if (!API_URL) throw new Error("API_URL is required");
-  if (!folderId) throw new Error("Folder ID is required");
-  await apiRequest({ url: `${API_URL}/${folderId}`, method: "PUT", body: updatedFields, expectJson: false });
+  if (folderId == null) throw new Error("Folder ID is required");
+
+  await apiRequest({
+    url: `${API_URL}/${folderId}`,
+    method: "PUT",
+    body: { name },          //UpdateFolderDto.Name
+    expectJson: false,
+  });
+
   return true;
 }

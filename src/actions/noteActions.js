@@ -352,17 +352,21 @@ export async function deleteFolderAction({ API_URL, folderId, setFolders, setErr
 
 export async function updateFolderAction({ API_URL, folderId, folderName, setFolders, setError }) {
   try {
-    const res = await updateFolderApi({ API_URL, folderId, folderName });
+    const trimmed = (folderName ?? "").trim();
+    if (!trimmed) throw new Error("Folder name cannot be empty.");
 
-    if (!res.ok) throw new Error("Failed to update folder");
-
+    await updateFolderApi({ API_URL, folderId, name: trimmed }); 
     setFolders?.((prev) =>
-      prev.map((f) => (String(f.id) === String(folderId) ? { ...f, name: folderName, label: folderName } : f))
+      prev.map((f) =>
+        String(f.id) === String(folderId)
+          ? { ...f, name: trimmed, label: trimmed }
+          : f
+      )
     );
 
     return true;
   } catch (e) {
-    setError?.(e.message || "Error");
+    setError?.(e?.message || "Error");
     return false;
   }
 }

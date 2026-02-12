@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
-import { deleteFolderAction, updateFolderAction } from "../../actions/noteActions"; 
+import { deleteFolderAction, updateFolderAction } from "../../actions/noteActions";
 
 export default function FolderSettingsModal({ isOpen, onClose, folder, setFolders, setError }) {
   const API_URL = import.meta.env.VITE_API_FOLDERS;
@@ -8,7 +8,7 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
   const folderId = folder?.id;
 
 
- 
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -22,10 +22,12 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/40" onMouseDown={onClose} aria-hidden="true" />
 
       {/* card */}
-      <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 md:p-8 shadow-xl">
+      <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 md:p-8 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}>
         {/* Header */}
         <header>
           <div className="w-full flex items-center justify-between">
@@ -64,10 +66,13 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
             <button
               type="button"
               className="px-6 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition w-[45%]"
-              onClick={async () => {
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (!folderId) return;
                 const ok = await deleteFolderAction({ API_URL, folderId, setFolders, setError });
                 if (ok) onClose();
+
               }}
             >
               Delete
@@ -76,7 +81,9 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
             <button
               type="button"
               className="px-6 py-4 rounded-xl bg-orange-500 hover:bg-orange-700 text-white font-bold transition w-[45%]"
-              onClick={async () => {
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (!folderId) return;
                 const trimmed = name.trim();
                 if (!trimmed) {
@@ -84,15 +91,9 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
                   return;
                 }
 
-                const ok = await updateFolderAction({
-                  API_URL,
-                  folderId,
-                  folderName: trimmed,
-                  setFolders,
-                  setError,
-                });
-
+                const ok = await updateFolderAction({ API_URL, folderId, folderName: trimmed, setFolders, setError });
                 if (ok) onClose();
+
               }}
             >
               Save
