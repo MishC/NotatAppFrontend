@@ -1,4 +1,4 @@
-import React,{ use, useEffect, useMemo, useState } from "react";
+import React,{ useEffect, useMemo, useState } from "react";
 import Plus from "./icons/Plus"; 
 import FolderSettingsModal from "./modals/FolderSettingsModal"; 
 function Sidebar({
