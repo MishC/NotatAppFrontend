@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
 import Diary from "./components/Diary";
 import Home from "./components/Home";
+import Calendar from "./components/Calendar";
 
 
 import "./App.css";
