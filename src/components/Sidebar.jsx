@@ -10,7 +10,6 @@ function Sidebar({
   setError,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
-  const [folder, setFolder] = useState(null);
 
 
   const sortedFolders = useMemo(() => {
@@ -24,11 +23,12 @@ function Sidebar({
     return 0;
   });
 }, [folders]);
+  
+const folder = folders.find(
+  (f) => String(f.id) === String(openFolderId)
+);
 
-useEffect(() => {
-  const folder = [...folders].filter((f) => f.id === openFolderId);
-  setFolder(...folder);
-}, [folders, openFolderId]);
+
 
   return (
     <div className="Sidebar w-[90%]  mx-auto sm:mt-10 ">
