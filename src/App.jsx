@@ -56,6 +56,14 @@ export default function App() {
             </RequireAuth>
           }
         />
+          <Route
+          path="/calendar"
+          element={
+            <RequireAuth>
+              <NoteApp />
+            </RequireAuth>
+          }
+        />
 
           <Route
           path="/"
