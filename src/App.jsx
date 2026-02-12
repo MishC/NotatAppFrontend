@@ -60,7 +60,7 @@ export default function App() {
           path="/calendar"
           element={
             <RequireAuth>
-              <NoteApp />
+              <Calendar />
             </RequireAuth>
           }
         />
