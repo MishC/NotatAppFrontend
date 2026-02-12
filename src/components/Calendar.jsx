@@ -48,7 +48,7 @@ export default function Calendar() {
   const guest = useSelector((s) => s.auth.guest);
 
   return (
-    <div className="w-full m-0 p-0">
+    <div className="w-full m-0 p-20">
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
         <NavigationBar
           userName={user?.name}
@@ -117,10 +117,10 @@ function renderEventContent(eventInfo) {
 
 function SidebarCalendar({ weekendsVisible, handleWeekendsToggle, currentEvents }) {
   return (
-    <div className='demo-app-sidebar'>
+    <div className='demo-app-sidebar text-center m-10 p-2 text-xl'>
       <div className='demo-app-sidebar-section'>
-        <h2>Instructions</h2>
-        <ul>
+        <h2 className="text-xxl">Instructions</h2>
+        <ul className="text-xxl">
           <li>Select dates and you will be prompted to create a new event</li>
           <li>Drag, drop, and resize events</li>
           <li>Click an event to delete it</li>
