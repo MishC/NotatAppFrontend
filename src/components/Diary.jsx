@@ -25,7 +25,21 @@ export default function Diary() {
               <div>&nbsp;</div>
             )}
           </div>
-          {"Flash Animation book Here"}
+          {"Choose your background -show backgrounds as images"}
+          
+
+          {/*Editor window*/}
+          
+          {"Choose your font"}
+          
+          {"Add text"}
+          {"Add emoji 🎉"}
+
+          {"Choose images"}
+          {"Choose your animation"}
+
+          {"Flash Animation book Here so it feels more dynamic - optional"}
+
     </div>
     
   );
