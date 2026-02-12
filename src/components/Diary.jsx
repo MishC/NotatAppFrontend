@@ -1,6 +1,7 @@
 import NavigationBar from "./NavigationBar";
 import { useSelector } from "react-redux";
 import {useState} from "react";
+
 export default function Diary() {
   const [error, setError] = useState(null);
   const [msg, setMsg] = useState(null);
@@ -39,6 +40,7 @@ export default function Diary() {
           {"Choose your animation"}
 
           {"Flash Animation book Here so it feels more dynamic - optional"}
+          {"Do not advanced graphics - no resources"}
 
     </div>
     
