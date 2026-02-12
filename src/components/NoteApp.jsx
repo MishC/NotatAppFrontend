@@ -246,6 +246,7 @@ export default function NoteApp() {
       {showNoteModal && (
         <NoteFormModal
           folders={folders}
+          setFolders={setFolders}
           setShowNoteModal={setShowNoteModal}
           handleAddNote={handleAddNote}
         />

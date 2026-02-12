@@ -138,4 +138,4 @@ useEffect(() => {
   );
 };
 
-export default React.memo(Sidebar);
+export default Sidebar;

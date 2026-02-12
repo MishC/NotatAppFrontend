@@ -6,6 +6,7 @@ import { createFolderAction } from "../actions/noteActions";
 
 export default function Noteform({
   folders,
+  setFolders,
   handleAddNote,
   guest = false,
   setShowNoteModal = () => {},
@@ -19,7 +20,6 @@ export default function Noteform({
   }));
 
   const [error, setError] = useState(null);
-  const [foldersLocal, setFoldersLocal] = useState(() =>folders);
 
   const [showInput, setShowInput] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -61,18 +61,16 @@ export default function Noteform({
         const created = await createFolderAction({
           API_URL: API_URL2,
           folderName: newFolderName.trim(),
-          setFolders: setFoldersLocal,
+          setFolders: setFolders,
           setError,
         });
 
-        // If your action returns created folder, use it.
-        // If not, we still keep UI stable (no crash).
+   
         if (created?.id != null) {
           noteDraft = { ...noteDraft, folderId: String(created.id) };
           setNewNote((prev) => ({ ...prev, folderId: String(created.id) }));
         }
       } catch (err) {
-        // createFolderAction likely sets error itself, but keep safety
         setError(err?.message || "Failed to create folder");
         return;
       }
@@ -115,7 +113,7 @@ export default function Noteform({
           <option value="" disabled>
             Select a folder
           </option>
-          {foldersLocal.map((f) => (
+          {folders.map((f) => (
             <option key={f.id} value={f.id}>
               {f.name}
             </option>
@@ -134,7 +132,7 @@ export default function Noteform({
         Add Folder
       </div>
 
-      {showInput && !guest && (
+      {showInput  && (
         <input
           type="text"
           placeholder="New folder name"

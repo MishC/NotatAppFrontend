@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import Noteform from "../Noteform";
 
-export default function NoteFormModal({ folders, setShowNoteModal, handleAddNote }) {
+export default function NoteFormModal({ folders, setFolders, setShowNoteModal, handleAddNote }) {
   const guest = useSelector((s) => s.auth.guest);
 
   return (
@@ -25,6 +25,7 @@ export default function NoteFormModal({ folders, setShowNoteModal, handleAddNote
 
         <Noteform
           folders={folders}
+          setFolders={setFolders}
           handleAddNote={handleAddNote}
           guest={guest}
           setShowNoteModal={setShowNoteModal}
