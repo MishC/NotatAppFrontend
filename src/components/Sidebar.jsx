@@ -26,11 +26,7 @@ function Sidebar({
 }, [folders]);
 
 useEffect(() => {
-  console.log("openFolderId", openFolderId);
   const folder = [...folders].filter((f) => f.id === openFolderId);
-  console.log("F",  folder);
-  console.log("Folders", folders);
-
   setFolder(...folder);
 }, [folders, openFolderId]);
 
