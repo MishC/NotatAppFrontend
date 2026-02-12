@@ -130,7 +130,7 @@ export default function Noteform({
           className="rounded-lg items-center text-base"
           onClick={() => setShowInput((v) => !v)}
         />
-        Add Folder
+        {!guest?"Add Folder":""}
       </div>
 
 
