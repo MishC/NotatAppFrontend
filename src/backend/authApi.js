@@ -67,7 +67,7 @@ async function apiJson(url, options = {}) {
     const token = tokenOverride ?? localStorage.getItem("accessToken");
     return fetch(url, {
       ...options,
-      credentials: "omit",
+      credentials: "include",
       headers: {
         ...(options.headers || {}),
         "Content-Type": "application/json",
