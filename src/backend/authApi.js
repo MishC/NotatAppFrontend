@@ -23,7 +23,6 @@ export async function refreshAccessToken() {
     const res = await fetch(API_REFRESH, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) {
