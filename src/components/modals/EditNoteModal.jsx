@@ -20,7 +20,6 @@ export default function EditModal({
 
   const close = () => switchModal(null);
 
-  // ✅ IMPORTANT: init only when note ID changes (modal opened for another note)
   useEffect(() => {
     if (!selectedNote) return;
 
@@ -73,7 +72,7 @@ export default function EditModal({
     const patch = {
       title: title.trim(),
       content: content ?? "",
-      folderId: folderId === "" ? null : Number(folderId), // ✅ send as number
+      folderId: folderId === "" ? null : Number(folderId), 
       scheduledAt: scheduledAt?.trim() ? scheduledAt.trim() : null,
     };
 
