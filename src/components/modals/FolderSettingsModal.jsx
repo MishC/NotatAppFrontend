@@ -20,14 +20,16 @@ export default function FolderSettingsModal({ isOpen, onClose, folder, setFolder
 
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      {/* overlay */}
-      <div className="absolute inset-0 bg-black/40" onMouseDown={onClose} aria-hidden="true" />
-
-      {/* card */}
-      <div className="relative w-full max-w-xl rounded-2xl bg-white p-6 md:p-8 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}>
+    <div
+    className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/40"
+    onMouseDown={onClose}
+    role="dialog"
+    aria-modal="true"
+  >
+    <div
+      className="relative w-full max-w-xl rounded-2xl bg-white p-6 md:p-8 shadow-xl"
+      onMouseDown={(e) => e.stopPropagation()}
+    >
         {/* Header */}
         <header>
           <div className="w-full flex items-center justify-between">
