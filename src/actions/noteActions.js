@@ -333,7 +333,7 @@ export async function createFolderAction({ API_URL, folderName, setFolders,setEr
   try {
     const newFolder = await createFolderApi({ API_URL, folderName });
     setFolders((prev) => [...prev, newFolder]);
-    return true;
+    return newFolder;
   } catch (error) {
     setError(error.message);
     return false;
