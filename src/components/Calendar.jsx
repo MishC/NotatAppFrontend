@@ -48,7 +48,7 @@ export default function Calendar() {
   const guest = useSelector((s) => s.auth.guest);
 
   return (
-    <div className="w-full m-0 p-20">
+    <div className="w-full m-0">
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
         <NavigationBar
           userName={user?.name}
@@ -75,7 +75,7 @@ export default function Calendar() {
           handleWeekendsToggle={handleWeekendsToggle}
           currentEvents={currentEvents}
         />
-        <div className='demo-app-main'>
+        <div className='demo-app-main m-20'>
           <FullCalendar
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={{
@@ -117,7 +117,7 @@ function renderEventContent(eventInfo) {
 
 function SidebarCalendar({ weekendsVisible, handleWeekendsToggle, currentEvents }) {
   return (
-    <div className='demo-app-sidebar text-center m-10 p-2 text-xl'>
+    <div className='demo-app-sidebar text-left m-20 p-2 text-xl'>
       <div className='demo-app-sidebar-section'>
         <h2 className="text-xxl">Instructions</h2>
         <ul className="text-xxl">
