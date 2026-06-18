@@ -1,6 +1,7 @@
 import { createElement, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
+  AlignJustify,
   Bold,
   ChevronLeft,
   ChevronRight,
@@ -89,7 +90,7 @@ export default function Diary() {
   const [lookupDate, setLookupDate] = useState("");
   const [loadingEntry, setLoadingEntry] = useState(false);
   const [editorLoadKey, setEditorLoadKey] = useState(0);
-  const [showEmptyLines, setShowEmptyLines] = useState(false);
+  const [showRuledLines, setShowRuledLines] = useState(false);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -391,6 +392,24 @@ export default function Diary() {
                 <ToolbarButton title="Emoji" Icon={Smile} onClick={() => insertText("✨")} />
                 <ToolbarButton title="Image" Icon={Image} onClick={() => handlePrototypeAction("Image insert")} />
                 <ToolbarButton title="Upload from disk" Icon={Upload} onClick={() => handlePrototypeAction("File upload")} />
+                <select
+                  defaultValue=""
+                  onChange={(e) => {
+                    if (!e.target.value) return;
+                    runCommand("foreColor", e.target.value);
+                    e.target.value = "";
+                  }}
+                  className="h-10 rounded-xl border border-emerald-100 bg-white/80 px-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
+                  title="Text color"
+                >
+                  <option value="">Text color</option>
+                  <option value="#111827">Black</option>
+                  <option value="#dc2626">Red</option>
+                  <option value="#ea580c">Orange</option>
+                  <option value="#059669">Green</option>
+                  <option value="#2563eb">Blue</option>
+                  <option value="#7c3aed">Purple</option>
+                </select>
                 <button
                   type="button"
                   onClick={trimEmptyLines}
@@ -401,16 +420,16 @@ export default function Diary() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowEmptyLines((value) => !value)}
+                  onClick={() => setShowRuledLines((value) => !value)}
                   className={[
-                    "h-10 rounded-xl border px-3 text-sm font-semibold transition",
-                    showEmptyLines
+                    "h-10 w-10 rounded-xl border grid place-items-center transition",
+                    showRuledLines
                       ? "border-orange-200 bg-orange-50 text-orange-700"
                       : "border-emerald-100 bg-white/80 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700",
                   ].join(" ")}
-                  title="Show empty lines"
+                  title="Show writing lines"
                 >
-                  ↵
+                  <AlignJustify className="h-4 w-4" />
                 </button>
                 <ToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
               </div>
@@ -445,7 +464,7 @@ export default function Diary() {
                         onInput={handleEditorInput}
                         className={[
                           "diary-editor-page w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100",
-                          showEmptyLines ? "diary-editor-page--show-empty-lines" : "",
+                          showRuledLines ? "diary-editor-page--ruled-lines" : "",
                         ].join(" ")}
                       />
                     </div>

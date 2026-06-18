@@ -20,18 +20,11 @@
   overflow-y: auto;
 }
 
-.diary-editor-page--show-empty-lines {
+.diary-editor-page--ruled-lines {
   background-image:
-    linear-gradient(to bottom, transparent calc(2rem - 1px), rgba(16, 185, 129, 0.16) calc(2rem - 1px), rgba(16, 185, 129, 0.16) 2rem);
+    linear-gradient(to bottom, transparent 0 1.72rem, rgba(16, 185, 129, 0.2) 1.72rem calc(1.72rem + 1px), transparent calc(1.72rem + 1px) 2rem);
   background-size: 100% 2rem;
-}
-
-.diary-editor-page--show-empty-lines::after {
-  content: "↵";
-  display: inline-block;
-  margin-left: 0.25rem;
-  color: rgba(249, 115, 22, 0.65);
-  font-weight: 700;
+  background-position: 0 1.25rem;
 }
 
 .diary-book-flip {
