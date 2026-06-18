@@ -11,6 +11,8 @@ function Sidebar({
   overdueCount = 0,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
+  const overdueTotal = Number(overdueCount) || 0;
+  const hasOverdueTasks = overdueTotal > 0;
 
 
   const sortedFolders = useMemo(() => {
@@ -98,10 +100,10 @@ const folder = folders.find(
             ].join(" ")}
           >
             <span>{opt.name}</span>
-            {String(opt.id) === "1" && overdueCount > 0 && (
+            {String(opt.id) === "1" && hasOverdueTasks && (
               <span
                 className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-red-500 px-2 text-sm font-bold text-white shadow-sm"
-                title={`${overdueCount} overdue task${overdueCount === 1 ? "" : "s"}`}
+                title={`${overdueTotal} overdue task${overdueTotal === 1 ? "" : "s"}`}
               >
                 !
               </span>
