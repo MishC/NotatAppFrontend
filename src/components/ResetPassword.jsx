@@ -14,7 +14,6 @@ import "./Login.css";
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
   const [resetEmail, setResetEmail] = useState("");
-  const [token, setToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showResetForm, setShowResetForm] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
@@ -67,14 +66,13 @@ export default function ResetPassword() {
     setLoadingReset(true);
 
     try {
-      if (!resetEmail || !token || !newPassword) {
-        setErr("Email, token, and new password are required.");
+      if (!resetEmail || !newPassword) {
+        setErr("Email and new password are required.");
         return;
       }
 
       const result = await resetPasswordAction({
         email: resetEmail,
-        token,
         newPassword,
         setMsg,
         setErr,
@@ -96,17 +94,17 @@ export default function ResetPassword() {
 
   return (
     <div className="ResetPassword min-h-screen bg-emerald-50">
-      <div className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 p-6 sm:p-2">
-        <AuthTitle
-          smallText="Reset Password"
-          bigText="Reset Your Password"
-          autoRunActive={autoRunActive}
-        />
+      <div className="w-full min-h-screen flex flex-col items-center justify-center px-5 py-10 sm:px-8">
+        <div className="w-full max-w-xl flex flex-col items-center gap-8">
+          <AuthTitle
+            smallText="Reset Password"
+            bigText="Reset Your Password"
+            autoRunActive={autoRunActive}
+          />
 
-        <div className="w-full max-w-xl space-y-6 md:mr-20">
           <form
             onSubmit={onForgotPassword}
-            className="w-full bg-white shadow-xl rounded-2xl p-10 space-y-6"
+            className="w-full bg-white shadow-xl rounded-2xl p-7 sm:p-10 space-y-6 mx-auto"
           >
             <AuthAlert err={!showResetForm ? err : ""} msg={!showResetForm ? msg : ""} />
 
@@ -133,7 +131,7 @@ export default function ResetPassword() {
           {showResetForm && (
             <form
               onSubmit={onResetPassword}
-              className="w-full bg-white shadow-xl rounded-2xl p-10 space-y-6"
+              className="w-full bg-white shadow-xl rounded-2xl p-7 sm:p-10 space-y-6 mx-auto"
             >
               <AuthAlert err={err} msg={msg} />
 
@@ -145,15 +143,6 @@ export default function ResetPassword() {
                 value={resetEmail}
                 onChange={(e) => setResetEmail(e.target.value)}
                 rightIcon={<EmailIcon />}
-              />
-
-              <BaseInputField
-                id="reset-token"
-                type="text"
-                placeholder="Reset Token"
-                inputClass="text-lg tracking-widest font-mono"
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
               />
 
               <BaseInputField
