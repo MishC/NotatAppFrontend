@@ -15,6 +15,48 @@ export function formatDateDDMMYYYY(ymd) {
   return `${d}-${m}-${y}`;
 }
 
+export function parseDiaryDateInput(input) {
+  const value = String(input || "").trim();
+  if (!value) return "";
+
+  const toValidYMD = (y, m, d) => {
+    const year = Number(y);
+    const month = Number(m);
+    const day = Number(d);
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      return "";
+    }
+
+    return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  };
+
+  const isoMatch = value.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoMatch) {
+    const [, y, m, d] = isoMatch;
+    return toValidYMD(y, m, d);
+  }
+
+  const euMatch = value.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (euMatch) {
+    const [, d, m, y] = euMatch;
+    return toValidYMD(y, m, d);
+  }
+
+  const usMatch = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (usMatch) {
+    const [, m, d, y] = usMatch;
+    return toValidYMD(y, m, d);
+  }
+
+  return "";
+}
+
 
 export function isOverdue(ymd) {
   if (!ymd) return false;

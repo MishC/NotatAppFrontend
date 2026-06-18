@@ -11,6 +11,7 @@ import {
   Plus,
   Quote,
   Save,
+  Search,
   Smile,
   Sparkles,
   Underline,
@@ -19,11 +20,37 @@ import {
 
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
+import { formatDateDDMMYYYY, parseDiaryDateInput, todayYYYYMMDD } from "../helpers/dateHelpers";
 import "./styles/Diary.css";
 
 const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
-const PAGE_MAX_HEIGHT = 1000;
+const PAGE_MAX_HEIGHT = 650;
 const PAGE_FLIP_MS = 900;
+const DEFAULT_ENTRY_TITLE = formatDateDDMMYYYY(todayYYYYMMDD());
+
+function getDiaryApiUrl(date) {
+  const base = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const apiBase = base.endsWith("/api") ? base : `${base}/api`;
+  return `${apiBase}/diary?date=${encodeURIComponent(date)}`;
+}
+
+function normalizeDiaryPages(data, fallbackTitle) {
+  if (Array.isArray(data?.pages) && data.pages.length > 0) {
+    return data.pages.map((page, index) => ({
+      title: page.title || (index === 0 ? fallbackTitle : `Page ${index + 1}`),
+      html: page.html || page.content || "",
+      text: page.text || "",
+    }));
+  }
+
+  return [
+    {
+      title: data?.title || fallbackTitle,
+      html: data?.html || data?.content || "",
+      text: data?.text || "",
+    },
+  ];
+}
 
 function ToolbarButton({ title, Icon, onClick }) {
   return (
@@ -43,12 +70,15 @@ export default function Diary() {
   const editorRef = useRef(null);
   const pagesRef = useRef([]);
   const flipTimerRef = useRef(null);
-  const [pages, setPages] = useState([{ title: "Today", html: "", text: "" }]);
+  const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageDirection, setPageDirection] = useState(1);
   const [isPageFlipping, setIsPageFlipping] = useState(false);
   const [flipHtml, setFlipHtml] = useState("");
   const [frameStyle, setFrameStyle] = useState("marker");
+  const [lookupDate, setLookupDate] = useState("");
+  const [loadingEntry, setLoadingEntry] = useState(false);
+  const [editorLoadKey, setEditorLoadKey] = useState(0);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -69,7 +99,7 @@ export default function Diary() {
   useEffect(() => {
     if (!editorRef.current) return;
     editorRef.current.innerHTML = pagesRef.current[pageIndex]?.html || "";
-  }, [pageIndex]);
+  }, [pageIndex, editorLoadKey]);
 
   const updateCurrentPage = (updates) => {
     setPages((prev) =>
@@ -157,6 +187,51 @@ export default function Diary() {
     setMsg("Diary entry saved locally in the editor draft.");
   };
 
+  const handleLoadEntry = async () => {
+    setMsg("");
+    const normalizedDate = parseDiaryDateInput(lookupDate);
+
+    if (!normalizedDate) {
+      setMsg("Use date format like 17.06.2026, 06/17/2026, or 2026-06-17.");
+      return;
+    }
+
+    setLoadingEntry(true);
+    try {
+      const response = await fetch(getDiaryApiUrl(normalizedDate), {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.status === 404) {
+        const title = formatDateDDMMYYYY(normalizedDate);
+        setPages([{ title, html: "", text: "" }]);
+        setPageIndex(0);
+        setEditorLoadKey((key) => key + 1);
+        setMsg("No diary entry found for this date. You can start writing it now.");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Could not load diary entry.");
+      }
+
+      const data = await response.json();
+      const loadedPages = normalizeDiaryPages(data, formatDateDDMMYYYY(normalizedDate));
+
+      setPages(loadedPages);
+      setFrameStyle(data?.frameStyle || data?.frameTheme || frameStyle);
+      setPageIndex(0);
+      setEditorLoadKey((key) => key + 1);
+      setMsg("Diary entry loaded. You can edit it now.");
+    } catch (error) {
+      console.error(error);
+      setMsg(error.message || "Could not load diary entry.");
+    } finally {
+      setLoadingEntry(false);
+    }
+  };
+
   return (
     <div className="Diary min-h-screen bg-emerald-50">
       <NavigationBar
@@ -194,6 +269,25 @@ export default function Diary() {
 
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
           <div className="rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
+              <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
+                <input
+                  type="text"
+                  value={lookupDate}
+                  onChange={(e) => setLookupDate(e.target.value)}
+                  placeholder="Find by date: 17.06.2026 or 06/17/2026"
+                  className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                />
+                <button
+                  type="button"
+                  onClick={handleLoadEntry}
+                  disabled={loadingEntry}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 transition"
+                >
+                  <Search className="h-4 w-4" />
+                  {loadingEntry ? "Loading..." : "Load"}
+                </button>
+              </div>
+
               <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <input
                   type="text"
