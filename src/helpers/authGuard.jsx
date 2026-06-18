@@ -23,3 +23,7 @@ export function AuthOnly({ children }) {
 
   return children;
 }
+
+export function AuthPOnly({ children }) {
+  return <AuthOnly>{children}</AuthOnly>;
+}

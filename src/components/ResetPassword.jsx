@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { forgotPasswordAction, resetPasswordAction } from "../actions/authActions";
+import { resetPasswordAction } from "../actions/authActions";
 
-import AuthButton from "./auth/AuthButton";
 import AuthAlert from "./auth/AuthAlert";
+import AuthButton from "./auth/AuthButton";
 import BaseInputField from "./auth/BaseInputField";
-import EmailIcon from "./icons/EmailIcon";
 import EyeIcon from "./icons/EyeIcon";
 
 export default function ResetPassword() {
@@ -13,46 +12,19 @@ export default function ResetPassword() {
   const email = searchParams.get("email");
   const token = searchParams.get("token");
 
-  const [forgotEmail, setForgotEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [showResetForm, setShowResetForm] = useState(Boolean(email || token));
   const [showPwd, setShowPwd] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
-  const [loadingForgot, setLoadingForgot] = useState(false);
-  const [loadingReset, setLoadingReset] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  const onForgotPassword = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setMsg("");
-    setLoadingForgot(true);
-
-    try {
-      if (!forgotEmail) {
-        setErr("Email is required.");
-        return;
-      }
-
-      const result = await forgotPasswordAction({ email: forgotEmail, setMsg, setErr });
-      if (result.success) {
-        setShowResetForm(true);
-      }
-    } catch (error) {
-      console.error(error);
-      setErr(error.message || "Failed to send reset email. Please try again.");
-    } finally {
-      setLoadingForgot(false);
-    }
-  };
 
   const onResetPassword = async (e) => {
     e.preventDefault();
     setErr("");
     setMsg("");
-    setLoadingReset(true);
+    setLoading(true);
 
     try {
       if (!email || !token) {
@@ -83,7 +55,7 @@ export default function ResetPassword() {
       console.error(error);
       setErr(error.message || "Failed to reset password. Please try again.");
     } finally {
-      setLoadingReset(false);
+      setLoading(false);
     }
   };
 
@@ -96,61 +68,33 @@ export default function ResetPassword() {
           </h1>
 
           <form
-            onSubmit={onForgotPassword}
+            onSubmit={onResetPassword}
             className="w-full bg-white shadow-xl rounded-2xl p-7 sm:p-10 space-y-6 mx-auto"
           >
-            <AuthAlert err={!showResetForm ? err : ""} msg={!showResetForm ? msg : ""} />
+            <AuthAlert err={err} msg={msg} />
 
             <BaseInputField
-              id="forgot-email"
-              type="email"
-              placeholder="Email Address"
-              inputClass="text-lg"
-              value={forgotEmail}
-              onChange={(e) => setForgotEmail(e.target.value)}
-              rightIcon={<EmailIcon />}
+              id="new-password"
+              type={showPwd ? "text" : "password"}
+              placeholder="New Password"
+              inputClass="text-lg tracking-widest font-mono"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              rightIcon={<EyeIcon isOpen={showPwd} onClick={() => setShowPwd((v) => !v)} />}
             />
 
-            <AuthButton loading={loadingForgot} label="Send" loadingLabel="Sending..." />
+            <AuthButton loading={loading} label="Send" loadingLabel="Resetting..." />
 
             <p className="text-center text-slate-600 pt-2 text-base">
-              Remembered password?{" "}
-              <Link to="/auth" className="text-orange-500 hover:text-orange-700 font-semibold">
-                Sign In
+              Need a new reset link?{" "}
+              <Link
+                to="/forgotten-password"
+                className="text-orange-500 hover:text-orange-700 font-semibold"
+              >
+                Send Reset Link
               </Link>
             </p>
           </form>
-
-          {showResetForm && (
-            <form
-              onSubmit={onResetPassword}
-              className="w-full bg-white shadow-xl rounded-2xl p-7 sm:p-10 space-y-6 mx-auto"
-            >
-              <AuthAlert err={err} msg={msg} />
-
-              <BaseInputField
-                id="reset-email"
-                type="email"
-                placeholder="Email Address"
-                inputClass="text-lg"
-                value={email || ""}
-                readOnly
-                rightIcon={<EmailIcon />}
-              />
-
-              <BaseInputField
-                id="new-password"
-                type={showPwd ? "text" : "password"}
-                placeholder="New Password"
-                inputClass="text-lg tracking-widest font-mono"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                rightIcon={<EyeIcon isOpen={showPwd} onClick={() => setShowPwd((v) => !v)} />}
-              />
-
-              <AuthButton loading={loadingReset} label="Send" loadingLabel="Resetting..." />
-            </form>
-          )}
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { RequireAuth, AuthOnly } from "./helpers/authGuard";
+import { RequireAuth, AuthOnly, AuthPOnly } from "./helpers/authGuard";
 
 
 import NoteApp from "./components/NoteApp";
 import Login from "./components/Login";
 import Subscribe from "./components/Subscribe";
+import ForgottenPassword from "./components/ForgottenPassword";
 import Diary from "./components/Diary";
 import Home from "./components/Home";
 import Calendar from "./components/Calendar";
@@ -48,13 +49,23 @@ export default function App() {
             </AuthOnly>
           }
         />
+        {/* Forgotten Password */}
+        <Route
+          path="/forgotten-password"
+          element={
+            <AuthPOnly>
+              <ForgottenPassword />
+            </AuthPOnly>
+          }
+        />
+
         {/* Reset Password */}
         <Route
-          path="/reset"
+          path="/reset-password"
           element={
-            <AuthOnly>
+            <AuthPOnly>
               <ResetPassword />
-            </AuthOnly>
+            </AuthPOnly>
           }
         />
 
@@ -92,5 +103,4 @@ export default function App() {
     </div>
   );
 }
-
 

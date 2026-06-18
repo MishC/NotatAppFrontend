@@ -138,7 +138,7 @@ export default function Subscribe() {
           </p>
           <p className="text-center text-slate-500 pt-2 text-base cursor-pointer">
 
-            Forgotten password? <Link to="/reset" className="text-orange-500 hover:text-orange-700 font-semibold">Send Reset Link</Link>
+            Forgotten password? <Link to="/forgotten-password" className="text-orange-500 hover:text-orange-700 font-semibold">Send Reset Link</Link>
           </p>
           <p
             className="text-center text-slate-500 pt-2 text-base cursor-pointer"
