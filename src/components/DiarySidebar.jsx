@@ -9,7 +9,7 @@ const promptOptions = [
 
 const frameOptions = [
   { key: "marker", label: "Marker", description: "Black frame with purple and white marker lines." },
-  { key: "dark", label: "Dark frame", description: "Clean black notebook frame without pattern." },
+  { key: "wood", label: "Wooden frame", description: "Warm wooden diary frame." },
   { key: "solid", label: "Solid color", description: "Clean bold color frame." },
 ];
 
