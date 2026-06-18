@@ -5,6 +5,8 @@ const API_VERIFY_2FA = `${API_PREFIX}/verify-2fa`;
 const API_REGISTER = `${API_PREFIX}/register`;
 const API_LOGOUT = `${API_PREFIX}/logout`;
 const API_REFRESH = `${API_PREFIX}/refresh`;
+const API_FORGOT_PASSWORD = `${API_PREFIX}/forgot-password`;
+const API_RESET_PASSWORD = `${API_PREFIX}/reset-password`;
 
 let refreshPromise = null;
 
@@ -125,4 +127,22 @@ export async function logoutApi() {
   }
 
   return true;
+}
+
+export function forgotPasswordApi(email) {
+  return apiJson(API_FORGOT_PASSWORD, {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function resetPasswordApi({ email, token, newPassword }) {
+  return apiJson(API_RESET_PASSWORD, {
+    method: "POST",
+    body: JSON.stringify({
+      email,
+      token,
+      newPassword,
+    }),
+  });
 }
