@@ -57,7 +57,7 @@ export default function Header({
 
         {showNav && (
           <div className="flex-1 flex justify-center">
-            <NavigationBar userName={userName} />
+            <NavigationBar userName={userName} sticky={false} />
           </div>
         )}
 

@@ -19,7 +19,7 @@ import {
 
 export default function NavigationBar({
   userName = "Guest",
-  sticky = false,
+  sticky = true,
   bgColor = "bg-white/70",
   isEmailVisible = false,
   isNavItemVisble = true,
@@ -27,11 +27,11 @@ export default function NavigationBar({
 
 
   const onLogout = useLogout();
+  const MotionDiv = motion.div;
 
 
   const navigate = useNavigate();
   const location = useLocation();
-  const isHome = location.pathname === "/";
 
   const [open, setOpen] = useState(false);
   const items = useMemo(
@@ -79,17 +79,17 @@ export default function NavigationBar({
           "backdrop-blur-xl", bgColor, "border-b border-[rgb(var(--border-soft))]"
         )}
       >
-        <motion.div
+        <MotionDiv
           layout
           className={clsx(
             "mx-auto px-4 py-3 flex items-center justify-between",
-            isHome ? "max-w-6xl" : "w-full"
+            "max-w-6xl"
           )}
         >
           {/* Left: Brand   ==Logo */}
 
 
-          <div className={clsx("flex", isHome ? "items-center gap-3" : "gap-30 min-w-0")}>
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => go("/")}
               className="
@@ -129,7 +129,7 @@ export default function NavigationBar({
 
 
                   {/* animated active pill */}
-                  <motion.div
+                  <MotionDiv
                     className="absolute top-1 bottom-1 rounded-[999px] bg-[rgb(var(--primary-soft))]"
                     layout
                     transition={{ type: "spring", stiffness: 520, damping: 36 }}
@@ -210,7 +210,7 @@ export default function NavigationBar({
                 <button
                   onClick={onLogout}
                   className={clsx(
-                    isHome ? "flex" : "hidden sm:flex",
+                    "hidden sm:flex",
                     "h-10 px-3 rounded-2xl ",
                     "bg-white/60 border border-black/10",
                     "hover:bg-white transition",
@@ -226,7 +226,7 @@ export default function NavigationBar({
               )}
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
 
         {/* Mobile collapse panel */}
         <MobileCollapseMenu

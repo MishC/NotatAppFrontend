@@ -49,13 +49,11 @@ export default function Calendar() {
 
   return (
     <div className="w-full m-0">
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
-        <NavigationBar
-          userName={user?.name}
-          isNavItemVisble={true}
-          isEmailVisible={false}
-        />
-      </div>
+      <NavigationBar
+        userName={user?.email || user?.name || "Guest"}
+        isNavItemVisble={true}
+        isEmailVisible={true}
+      />
 
       <div className={error || msg ? "p-5 rounded-xl" : "p-5"}>
         {error ? (
@@ -156,4 +154,3 @@ function SidebarEvent({ event }) {
     </li>
   )
 }
-

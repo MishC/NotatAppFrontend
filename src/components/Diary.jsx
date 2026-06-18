@@ -65,13 +65,11 @@ export default function Diary() {
 
   return (
     <div className="Diary min-h-screen bg-emerald-50">
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur">
-        <NavigationBar
-          userName={userName}
-          isNavItemVisble={true}
-          isEmailVisible={false}
-        />
-      </div>
+      <NavigationBar
+        userName={userName}
+        isNavItemVisble={true}
+        isEmailVisible={true}
+      />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8 md:py-12">
         <section className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
