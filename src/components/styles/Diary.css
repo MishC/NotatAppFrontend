@@ -181,10 +181,8 @@
 
 .diary-frame--wood {
   background:
-    radial-gradient(ellipse at 18% 22%, rgba(173, 118, 55, 0.22) 0 7px, transparent 8px 48px),
-    radial-gradient(ellipse at 74% 68%, rgba(194, 139, 71, 0.18) 0 6px, transparent 7px 44px),
-    repeating-linear-gradient(4deg, rgba(142, 91, 35, 0.14) 0 2px, transparent 3px 18px),
-    repeating-linear-gradient(92deg, rgba(255, 250, 224, 0.7) 0 8px, rgba(214, 158, 87, 0.2) 9px 12px, transparent 13px 31px),
+    radial-gradient(ellipse at 18% 22%, rgba(173, 118, 55, 0.16) 0 7px, transparent 8px 54px),
+    radial-gradient(ellipse at 74% 68%, rgba(194, 139, 71, 0.12) 0 6px, transparent 7px 50px),
     linear-gradient(90deg, #f6dfb2, #e8bd78 22%, #f4d9a6 48%, #dba762 72%, #f8e6bf);
   border: 5px solid #b78345;
 }
@@ -192,22 +190,14 @@
 .diary-frame--wood::before {
   inset: 12px;
   border-radius: 24px;
-  border: 3px solid rgba(150, 96, 42, 0.38);
+  border: 0;
   box-shadow:
     inset 0 0 0 2px rgba(255, 246, 215, 0.5),
     inset 0 0 28px rgba(135, 84, 32, 0.18);
 }
 
 .diary-frame--wood::after {
-  left: 18px;
-  right: 18px;
-  top: 18%;
-  height: 64%;
-  border-radius: 999px;
-  background:
-    repeating-linear-gradient(94deg, transparent 0 12px, rgba(122, 75, 28, 0.16) 13px 15px, transparent 16px 30px),
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), rgba(137, 88, 35, 0.12), transparent);
-  transform: rotate(-0.5deg);
+  display: none;
 }
 
 .diary-frame--solid {
