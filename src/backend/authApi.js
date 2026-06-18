@@ -12,9 +12,17 @@ let refreshPromise = null;
 
 ////
 function toMsg(body, status) {
-  return typeof body === "string"
-    ? body
-    : body?.message || body?.error || `HTTP error! status: ${status}`;
+  if (typeof body === "string") return body;
+
+  if (Array.isArray(body?.errors)) {
+    return body.errors.join("\n");
+  }
+
+  if (body?.errors && typeof body.errors === "object") {
+    return Object.values(body.errors).flat().join("\n");
+  }
+
+  return body?.message || body?.error || `HTTP error! status: ${status}`;
 }
 
 

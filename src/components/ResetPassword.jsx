@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { forgotPasswordAction, resetPasswordAction } from "../actions/authActions";
 
 import AuthButton from "./auth/AuthButton";
-import AuthTitle from "./auth/AuthTitle";
 import AuthAlert from "./auth/AuthAlert";
 import BaseInputField from "./auth/BaseInputField";
 import EmailIcon from "./icons/EmailIcon";
 import EyeIcon from "./icons/EyeIcon";
-
-import "./Login.css";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -21,18 +18,8 @@ export default function ResetPassword() {
   const [err, setErr] = useState("");
   const [loadingForgot, setLoadingForgot] = useState(false);
   const [loadingReset, setLoadingReset] = useState(false);
-  const [autoRunActive, setAutoRunActive] = useState(true);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const cleanupTimer = setTimeout(() => {
-      setAutoRunActive(false);
-    }, 2000);
-    return () => {
-      clearTimeout(cleanupTimer);
-    };
-  }, []);
 
   const onForgotPassword = async (e) => {
     e.preventDefault();
@@ -96,11 +83,9 @@ export default function ResetPassword() {
     <div className="ResetPassword min-h-screen bg-emerald-50">
       <div className="w-full min-h-screen flex flex-col items-center justify-center px-5 py-10 sm:px-8">
         <div className="w-full max-w-xl flex flex-col items-center gap-8">
-          <AuthTitle
-            smallText="Reset Password"
-            bigText="Reset Your Password"
-            autoRunActive={autoRunActive}
-          />
+          <h1 className="w-full text-center text-[32px] font-bold text-slate-800">
+            Reset Your Password
+          </h1>
 
           <form
             onSubmit={onForgotPassword}
