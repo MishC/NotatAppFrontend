@@ -88,7 +88,7 @@ export default function Home() {
 
       {/* Hero */}
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-              <div className=""><DateComponent /></div>
+              <div className="ml-2 mb-10"><DateComponent /></div>
 
         <div className="rounded-[2.25rem] border border-[rgb(var(--border-soft))] bg-white/60 shadow-sm p-7 md:p-10">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
