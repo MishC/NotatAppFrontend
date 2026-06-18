@@ -2,11 +2,11 @@ import { todayYYYYMMDD } from "./dateHelpers";
 import { useEffect } from "react";
 
 export function getNotesApiUrl() {
-  return import.meta.env.VITE_API_URL + "/api/notes";
+  return import.meta.env.VITE_API_URL + "/notes";
 }
 
 export function getFoldersApiUrl() {
-  return import.meta.env.VITE_API_URL + "/api/folders";
+  return import.meta.env.VITE_API_URL + "/folders";
 }
 
 export function validateNote(newNote, guest) {
