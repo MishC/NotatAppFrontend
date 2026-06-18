@@ -185,7 +185,7 @@
     url("/wood3.jpg");
   background-size: cover;
   background-position: center;
-  border: 5px solid #9b6a36;
+  border: 3px solid #9b6a36;
 }
 
 .diary-frame--wood::before {

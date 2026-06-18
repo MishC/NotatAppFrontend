@@ -2,22 +2,26 @@ import { createElement, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   AlignJustify,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   ChevronLeft,
   ChevronRight,
   Heading1,
   Image,
   Italic,
-  List,
   Plus,
   Quote,
+  Rows3,
   Save,
   Search,
   Smile,
   Sparkles,
+  Subscript,
+  Superscript,
   Trash2,
   Underline,
-  Upload,
 } from "lucide-react";
 
 import DiarySidebar from "./DiarySidebar";
@@ -28,6 +32,7 @@ import "./styles/Diary.css";
 
 const PAGE_MAX_HEIGHT = 650;
 const PAGE_FLIP_MS = 900;
+const FONT_SIZE_STEP = 2;
 const DEFAULT_ENTRY_TITLE = formatDateDDMMYYYY(todayYYYYMMDD());
 
 function getDiaryApiUrl(date) {
@@ -63,6 +68,16 @@ function removeEmptyHtmlLines(html) {
     .replace(/(?:\s|&nbsp;|<br\s*\/?>)+$/gi, "");
 }
 
+function getSelectionInsideEditor(editor) {
+  const selection = window.getSelection();
+
+  if (!selection || selection.rangeCount === 0 || !editor?.contains(selection.anchorNode)) {
+    return null;
+  }
+
+  return selection;
+}
+
 function ToolbarButton({ title, Icon, onClick }) {
   return (
     <button
@@ -92,6 +107,7 @@ export default function Diary() {
   const [editorLoadKey, setEditorLoadKey] = useState(0);
   const [showRuledLines, setShowRuledLines] = useState(false);
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
+  const [alignmentMenuOpen, setAlignmentMenuOpen] = useState(false);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -140,6 +156,66 @@ export default function Diary() {
     });
   };
 
+  const increaseFontSize = () => {
+    editorRef.current?.focus();
+    const selection = getSelectionInsideEditor(editorRef.current);
+    const anchorElement =
+      selection?.anchorNode?.nodeType === Node.ELEMENT_NODE
+        ? selection.anchorNode
+        : selection?.anchorNode?.parentElement;
+    const currentSize = anchorElement
+      ? Number.parseFloat(window.getComputedStyle(anchorElement).fontSize)
+      : 18;
+    const nextSize = Math.round(currentSize + FONT_SIZE_STEP);
+
+    if (!selection || selection.isCollapsed) {
+      document.execCommand("insertHTML", false, `<span style="font-size: ${nextSize}px;">&#8203;</span>`);
+      syncEditorToPage();
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const wrapper = document.createElement("span");
+    wrapper.style.fontSize = `${nextSize}px`;
+    wrapper.appendChild(range.extractContents());
+    range.insertNode(wrapper);
+
+    const nextRange = document.createRange();
+    nextRange.selectNodeContents(wrapper);
+    selection.removeAllRanges();
+    selection.addRange(nextRange);
+
+    syncEditorToPage();
+  };
+
+  const insertQuote = () => {
+    editorRef.current?.focus();
+    const selection = getSelectionInsideEditor(editorRef.current);
+    const selectedText = selection?.toString() || "";
+
+    if (!selection) {
+      document.execCommand("insertHTML", false, '<span style="font-style: italic;">„“</span>');
+      syncEditorToPage();
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const quoteNode = document.createElement("span");
+    quoteNode.style.fontStyle = "italic";
+    quoteNode.textContent = selectedText ? `„${selectedText}“` : "„“";
+
+    range.deleteContents();
+    range.insertNode(quoteNode);
+
+    const caretRange = document.createRange();
+    caretRange.setStart(quoteNode.firstChild, selectedText ? quoteNode.textContent.length : 1);
+    caretRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(caretRange);
+
+    syncEditorToPage();
+  };
+
   const syncEditorToPage = () => {
     updateCurrentPage({
       html: editorRef.current?.innerHTML || "",
@@ -174,6 +250,11 @@ export default function Diary() {
 
   const handleEditorKeyDown = (e) => {
     if (e.key !== "Enter") return;
+
+    if (e.target?.closest?.("li")) {
+      setTimeout(syncEditorToPage, 0);
+      return;
+    }
 
     e.preventDefault();
     document.execCommand("insertLineBreak");
@@ -386,17 +467,50 @@ export default function Diary() {
               </div>
 
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <ToolbarButton title="Heading" Icon={Heading1} onClick={() => runCommand("formatBlock", "h2")} />
+                <ToolbarButton title="Increase font size" Icon={Heading1} onClick={increaseFontSize} />
                 <ToolbarButton title="Bold" Icon={Bold} onClick={() => runCommand("bold")} />
                 <ToolbarButton title="Italic" Icon={Italic} onClick={() => runCommand("italic")} />
                 <ToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
-                <ToolbarButton title="List" Icon={List} onClick={() => runCommand("insertUnorderedList")} />
-                <ToolbarButton title="Quote" Icon={Quote} onClick={() => runCommand("formatBlock", "blockquote")} />
+                <ToolbarButton title="Superscript" Icon={Superscript} onClick={() => runCommand("superscript")} />
+                <ToolbarButton title="Subscript" Icon={Subscript} onClick={() => runCommand("subscript")} />
+                <div className="relative">
+                  <ToolbarButton
+                    title="Alignment"
+                    Icon={AlignJustify}
+                    onClick={() => {
+                      setAlignmentMenuOpen((value) => !value);
+                      setEmojiMenuOpen(false);
+                    }}
+                  />
+                  {alignmentMenuOpen && (
+                    <div className="absolute left-0 top-12 z-30 flex gap-1 rounded-2xl border border-emerald-100 bg-white/95 p-2 shadow-xl backdrop-blur">
+                      {[
+                        { title: "Align left", Icon: AlignLeft, command: "justifyLeft" },
+                        { title: "Align center", Icon: AlignCenter, command: "justifyCenter" },
+                        { title: "Align right", Icon: AlignRight, command: "justifyRight" },
+                      ].map(({ title, Icon, command }) => (
+                        <ToolbarButton
+                          key={command}
+                          title={title}
+                          Icon={Icon}
+                          onClick={() => {
+                            runCommand(command);
+                            setAlignmentMenuOpen(false);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <ToolbarButton title="Quote" Icon={Quote} onClick={insertQuote} />
                 <div className="relative">
                   <ToolbarButton
                     title="Emoji"
                     Icon={Smile}
-                    onClick={() => setEmojiMenuOpen((value) => !value)}
+                    onClick={() => {
+                      setEmojiMenuOpen((value) => !value);
+                      setAlignmentMenuOpen(false);
+                    }}
                   />
                   {emojiMenuOpen && (
                     <div className="absolute left-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
@@ -419,7 +533,6 @@ export default function Diary() {
                   )}
                 </div>
                 <ToolbarButton title="Image" Icon={Image} onClick={() => handlePrototypeAction("Image insert")} />
-                <ToolbarButton title="Upload from disk" Icon={Upload} onClick={() => handlePrototypeAction("File upload")} />
                 <select
                   defaultValue=""
                   onChange={(e) => {
@@ -457,7 +570,7 @@ export default function Diary() {
                   ].join(" ")}
                   title="Show writing lines"
                 >
-                  <AlignJustify className="h-4 w-4" />
+                  <Rows3 className="h-4 w-4" />
                 </button>
                 <ToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
               </div>
