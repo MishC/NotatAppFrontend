@@ -20,6 +20,20 @@
   overflow-y: auto;
 }
 
+.diary-editor-page--show-empty-lines {
+  background-image:
+    linear-gradient(to bottom, transparent calc(2rem - 1px), rgba(16, 185, 129, 0.16) calc(2rem - 1px), rgba(16, 185, 129, 0.16) 2rem);
+  background-size: 100% 2rem;
+}
+
+.diary-editor-page--show-empty-lines::after {
+  content: "↵";
+  display: inline-block;
+  margin-left: 0.25rem;
+  color: rgba(249, 115, 22, 0.65);
+  font-weight: 700;
+}
+
 .diary-book-flip {
   position: absolute;
   inset: 0;

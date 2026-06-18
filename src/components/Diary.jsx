@@ -14,6 +14,7 @@ import {
   Search,
   Smile,
   Sparkles,
+  Trash2,
   Underline,
   Upload,
 } from "lucide-react";
@@ -52,6 +53,15 @@ function normalizeDiaryPages(data, fallbackTitle) {
   ];
 }
 
+function removeEmptyHtmlLines(html) {
+  return String(html || "")
+    .replace(/<div>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>/gi, "")
+    .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
+    .replace(/(?:<br\s*\/?>\s*){2,}/gi, "<br>")
+    .replace(/^(?:\s|&nbsp;|<br\s*\/?>)+/gi, "")
+    .replace(/(?:\s|&nbsp;|<br\s*\/?>)+$/gi, "");
+}
+
 function ToolbarButton({ title, Icon, onClick }) {
   return (
     <button
@@ -79,6 +89,7 @@ export default function Diary() {
   const [lookupDate, setLookupDate] = useState("");
   const [loadingEntry, setLoadingEntry] = useState(false);
   const [editorLoadKey, setEditorLoadKey] = useState(0);
+  const [showEmptyLines, setShowEmptyLines] = useState(false);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -123,6 +134,38 @@ export default function Diary() {
       html: editorRef.current?.innerHTML || "",
       text: editorRef.current?.innerText || "",
     });
+  };
+
+  const syncEditorToPage = () => {
+    updateCurrentPage({
+      html: editorRef.current?.innerHTML || "",
+      text: editorRef.current?.innerText || "",
+    });
+  };
+
+  const trimEmptyLines = () => {
+    if (!editorRef.current) return;
+
+    const trimmedHtml = removeEmptyHtmlLines(editorRef.current.innerHTML);
+    editorRef.current.innerHTML = trimmedHtml;
+    syncEditorToPage();
+    setMsg("Empty lines removed.");
+  };
+
+  const deleteCurrentPage = () => {
+    if (pages.length === 1) {
+      setPages([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
+      setPageIndex(0);
+      setEditorLoadKey((key) => key + 1);
+      setMsg("Page cleared.");
+      return;
+    }
+
+    const nextIndex = pageIndex === pages.length - 1 ? pageIndex - 1 : pageIndex;
+    setPages((prev) => prev.filter((_, index) => index !== pageIndex));
+    setPageIndex(nextIndex);
+    setEditorLoadKey((key) => key + 1);
+    setMsg("Page deleted.");
   };
 
   const handleEditorKeyDown = (e) => {
@@ -348,6 +391,28 @@ export default function Diary() {
                 <ToolbarButton title="Emoji" Icon={Smile} onClick={() => insertText("✨")} />
                 <ToolbarButton title="Image" Icon={Image} onClick={() => handlePrototypeAction("Image insert")} />
                 <ToolbarButton title="Upload from disk" Icon={Upload} onClick={() => handlePrototypeAction("File upload")} />
+                <button
+                  type="button"
+                  onClick={trimEmptyLines}
+                  className="h-10 rounded-xl border border-emerald-100 bg-white/80 px-3 text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
+                  title="Remove all empty lines"
+                >
+                  Trim
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEmptyLines((value) => !value)}
+                  className={[
+                    "h-10 rounded-xl border px-3 text-sm font-semibold transition",
+                    showEmptyLines
+                      ? "border-orange-200 bg-orange-50 text-orange-700"
+                      : "border-emerald-100 bg-white/80 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700",
+                  ].join(" ")}
+                  title="Show empty lines"
+                >
+                  ↵
+                </button>
+                <ToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
               </div>
 
               <div className="mb-4 flex flex-wrap gap-2">
@@ -378,7 +443,10 @@ export default function Diary() {
                         suppressContentEditableWarning
                         onKeyDown={handleEditorKeyDown}
                         onInput={handleEditorInput}
-                        className="diary-editor-page w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                        className={[
+                          "diary-editor-page w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100",
+                          showEmptyLines ? "diary-editor-page--show-empty-lines" : "",
+                        ].join(" ")}
                       />
                     </div>
                   </div>
