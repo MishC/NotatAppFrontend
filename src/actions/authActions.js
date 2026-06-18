@@ -3,6 +3,8 @@ import {
   loginStartApi,
   verify2faApi,
   logoutApi,
+  forgotPasswordApi,
+  resetPasswordApi,
 } from "../backend/authApi";
 import { setAuthedUser, setUser, setGuest, resetAuth } from "../reducers/authSlice";
 
@@ -156,6 +158,50 @@ export function removeGuestMode(dispatch, navigate) {
     return { success: true };
   } catch (err) {
     const error = handleError(err);
+    return { success: false, error };
+  }
+
+}
+
+// FORGOT PASSWORD
+export async function forgotPasswordAction({ email, setMsg, setErr }) {
+  try {
+    await forgotPasswordApi(email);
+
+    if (typeof setMsg === "function") {
+      setMsg("If this email exists, a password reset link has been sent.");
+    }
+
+    return { success: true };
+  } catch (err) {
+    const error = handleError(err, setErr);
+    return { success: false, error };
+  }
+}
+
+// RESET PASSWORD
+export async function resetPasswordAction({
+  email,
+  token,
+  newPassword,
+  setMsg,
+  setErr,
+  navigate,
+}) {
+  try {
+    await resetPasswordApi({ email, token, newPassword });
+
+    if (typeof setMsg === "function") {
+      setMsg("Password has been reset. You can now log in.");
+    }
+
+    if (typeof navigate === "function") {
+      navigate("/auth");
+    }
+
+    return { success: true };
+  } catch (err) {
+    const error = handleError(err, setErr);
     return { success: false, error };
   }
 }
