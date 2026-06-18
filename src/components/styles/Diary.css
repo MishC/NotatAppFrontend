@@ -169,7 +169,6 @@
   background: linear-gradient(180deg, transparent, #a855f7 15%, #ffffff 52%, transparent);
   transform: rotate(3deg);
   box-shadow:
-    -44px -30px 0 -3px rgba(255, 255, 255, 0.75),
     -82px 28px 0 -2px rgba(192, 132, 252, 0.8);
 }
 
@@ -205,7 +204,6 @@
 .diary-frame--solid::before {
   inset: 10px;
   border-radius: 26px;
-  border: 2px solid rgba(255, 255, 255, 0.55);
 }
 
 .diary-frame--solid::after {

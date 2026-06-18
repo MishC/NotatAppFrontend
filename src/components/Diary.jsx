@@ -200,7 +200,7 @@ export default function Diary() {
                   value={entryTitle}
                   onChange={(e) => updateCurrentPage({ title: e.target.value })}
                   className="w-full rounded-xl border border-emerald-100 bg-white/80 px-4 py-3 text-2xl font-bold text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-                  placeholder="Entry title"
+                  placeholder="Enter "
                 />
 
                 <div className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-white/70 px-3 py-2 text-sm font-semibold text-emerald-700">
