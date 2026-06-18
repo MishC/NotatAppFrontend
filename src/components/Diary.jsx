@@ -1,6 +1,5 @@
 import { createElement, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   Bold,
   ChevronLeft,
@@ -23,8 +22,8 @@ import NavigationBar from "./NavigationBar";
 import "./styles/Diary.css";
 
 const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
-
-const MotionDiv = motion.div;
+const PAGE_MAX_HEIGHT = 1000;
+const PAGE_FLIP_MS = 820;
 
 function ToolbarButton({ title, Icon, onClick }) {
   return (
@@ -43,14 +42,16 @@ export default function Diary() {
   const user = useSelector((s) => s.auth.user);
   const editorRef = useRef(null);
   const pagesRef = useRef([]);
-  const hasPageTransitionRef = useRef(false);
+  const flipTimerRef = useRef(null);
   const [pages, setPages] = useState([{ title: "Today", html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageDirection, setPageDirection] = useState(1);
+  const [isPageFlipping, setIsPageFlipping] = useState(false);
+  const [flipHtml, setFlipHtml] = useState("");
   const [frameStyle, setFrameStyle] = useState("marker");
   const [msg, setMsg] = useState("");
 
-  const currentPage = pages[pageIndex];
+  const currentPage = pages[pageIndex] || pages[0];
   const entryTitle = currentPage.title;
   const entryText = currentPage.text;
   const userName = user?.name || user?.email || "Guest";
@@ -58,6 +59,12 @@ export default function Diary() {
   useEffect(() => {
     pagesRef.current = pages;
   }, [pages]);
+
+  useEffect(() => {
+    return () => {
+      if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -99,18 +106,47 @@ export default function Diary() {
     });
   };
 
+  const startPageTransition = (nextIndex, direction) => {
+    if (nextIndex < 0) return;
+    if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
+
+    setFlipHtml(editorRef.current?.innerHTML || pagesRef.current[pageIndex]?.html || "");
+    setPageDirection(direction);
+    setIsPageFlipping(true);
+    setPageIndex(nextIndex);
+
+    flipTimerRef.current = setTimeout(() => {
+      setIsPageFlipping(false);
+      setFlipHtml("");
+    }, PAGE_FLIP_MS);
+  };
+
   const goToPage = (nextIndex) => {
     if (nextIndex < 0 || nextIndex >= pages.length) return;
-    hasPageTransitionRef.current = true;
-    setPageDirection(nextIndex > pageIndex ? 1 : -1);
-    setPageIndex(nextIndex);
+    startPageTransition(nextIndex, nextIndex > pageIndex ? 1 : -1);
   };
 
   const addPage = () => {
-    hasPageTransitionRef.current = true;
-    setPageDirection(1);
+    const nextIndex = pages.length;
     setPages((prev) => [...prev, { title: `Page ${prev.length + 1}`, html: "", text: "" }]);
-    setPageIndex(pages.length);
+    startPageTransition(nextIndex, 1);
+  };
+
+  const handleEditorInput = (e) => {
+    const html = e.currentTarget.innerHTML;
+    const text = e.currentTarget.innerText;
+
+    updateCurrentPage({ html, text });
+
+    if (e.currentTarget.scrollHeight <= PAGE_MAX_HEIGHT) return;
+
+    const nextIndex = pageIndex + 1;
+    if (nextIndex >= pagesRef.current.length) {
+      setPages((prev) => [...prev, { title: `Page ${prev.length + 1}`, html: "", text: "" }]);
+    }
+
+    setMsg("Page limit reached. Continuing on the next page.");
+    startPageTransition(nextIndex, 1);
   };
 
   const handlePrototypeAction = (label) => {
@@ -233,59 +269,44 @@ export default function Diary() {
                 ))}
               </div>
 
-              <div className="diary-page-stage">
-                <AnimatePresence mode="wait" custom={pageDirection}>
-                  <MotionDiv
-                    key={pageIndex}
-                    className={`diary-frame diary-frame--${frameStyle}`}
-                    initial={
-                      hasPageTransitionRef.current
-                        ? {
-                            rotate: pageDirection > 0 ? -2 : 2,
-                            opacity: 0,
-                            x: pageDirection > 0 ? 36 : -36,
-                            y: 18,
-                            scale: 0.98,
-                          }
-                        : false
-                    }
-                    animate={{ rotate: 0, opacity: 1, x: 0, y: 0, scale: 1 }}
-                    exit={{
-                      rotate: pageDirection > 0 ? 2 : -2,
-                      opacity: 0,
-                      x: pageDirection > 0 ? -36 : 36,
-                      y: 18,
-                      scale: 0.98,
-                    }}
-                    transition={{ duration: 0.28, ease: "easeInOut" }}
-                    style={{
-                      transformOrigin: "right bottom",
-                    }}
-                  >
-                    <div className="diary-frame__inner">
-                      <div className="relative">
-                        {!entryText && (
-                          <div className="pointer-events-none absolute left-5 top-5 text-slate-400">
-                            Start writing your diary entry here...
-                          </div>
-                        )}
-                        <div
-                          ref={editorRef}
-                          contentEditable
-                          suppressContentEditableWarning
-                          onKeyDown={handleEditorKeyDown}
-                          onInput={(e) =>
-                            updateCurrentPage({
-                              html: e.currentTarget.innerHTML,
-                              text: e.currentTarget.innerText,
-                            })
-                          }
-                          className="min-h-[420px] w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
-                        />
-                      </div>
+              <div className={`diary-page-stage ${isPageFlipping ? "diary-page-stage--flipping" : ""}`}>
+                <div className={`diary-frame diary-frame--${frameStyle}`}>
+                  <div className="diary-frame__inner">
+                    <div className="relative">
+                      {!entryText && (
+                        <div className="pointer-events-none absolute left-5 top-5 text-slate-400">
+                          Start writing your diary entry here...
+                        </div>
+                      )}
+                      <div
+                        ref={editorRef}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onKeyDown={handleEditorKeyDown}
+                        onInput={handleEditorInput}
+                        className="diary-editor-page w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                      />
                     </div>
-                  </MotionDiv>
-                </AnimatePresence>
+                  </div>
+                </div>
+
+                {isPageFlipping && (
+                  <div
+                    className={[
+                      "diary-page-peel",
+                      pageDirection > 0 ? "diary-page-peel--forward" : "diary-page-peel--back",
+                    ].join(" ")}
+                    aria-hidden="true"
+                  >
+                    <div className="diary-page-peel__corner" />
+                    <div className="diary-page-peel__fold">
+                      <div
+                        className="diary-page-peel__content"
+                        dangerouslySetInnerHTML={{ __html: flipHtml }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
           </div>
 
