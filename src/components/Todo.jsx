@@ -129,14 +129,14 @@ function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
       const titleEl = wrapRef.current?.querySelector(".fc-toolbar-title");
       if (!titleEl) return;
 
-      titleEl.querySelector(".fc-week-title-label")?.remove();
+      titleEl.parentElement?.querySelector(".fc-week-title-label")?.remove();
 
       if (!label) return;
 
       const weekEl = document.createElement("span");
       weekEl.className = "fc-week-title-label";
       weekEl.textContent = label;
-      titleEl.appendChild(weekEl);
+      titleEl.parentElement?.insertBefore(weekEl, titleEl);
     });
   }, []);
 
