@@ -64,7 +64,14 @@ export default function NoteApp() {
   const overdueNotesCount = useMemo(
     () =>
       notes.filter(
-        (n) => n?.scheduledAt && Number(n.folderId) !== 5 && isOverdue(n.scheduledAt)
+        (n) => {
+          const ymd = String(n?.scheduledAt || "").slice(0, 10);
+          return (
+            /^\d{4}-\d{2}-\d{2}$/.test(ymd) &&
+            Number(n.folderId) !== 5 &&
+            isOverdue(ymd)
+          );
+        }
       ).length,
     [notes]
   );

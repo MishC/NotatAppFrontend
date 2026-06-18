@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import MobileCollapseMenu from "./MobileCollapseMenu";
 import { useLogout } from "../helpers/authhelpers";
+import "./styles/NavigationBar.css";
 
 
 
@@ -13,8 +14,6 @@ import {
   BookOpen,
   CalendarDays,
   LogOut,
-  Menu,
-  X
 } from "lucide-react";
 
 export default function NavigationBar({
@@ -64,6 +63,15 @@ export default function NavigationBar({
     setOpen(false);
   };
 
+  const onBrandClick = () => {
+    if (window.innerWidth < 640) {
+      setOpen((v) => !v);
+      return;
+    }
+
+    go("/");
+  };
+
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
@@ -91,14 +99,15 @@ export default function NavigationBar({
 
           <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => go("/")}
+              onClick={onBrandClick}
               className="
+              nav-brand-button
               flex items-center gap-3
               rounded-2xl px-2 py-2
               hover:bg-black/5 transition
               min-w-0 cursor-pointer
             "
-              title="Go Home"
+              title="Open navigation"
             >
               <div className="h-9 w-10 rounded-lg bg-[rgb(var(--primary))] shrink-0 flex items-center justify-center">
                 <img src="/vite.svg" alt="Logo" className="h-9 w-9 rounded-2xl" />
@@ -178,25 +187,8 @@ export default function NavigationBar({
             )} {/*isNavItemVisble end */}
           </div>
 
-          {/* Right: Mobile Menu collapse+ user + logout */}
+          {/* Right: user + logout */}
           <div className="flex items-center gap-2">
-            {/* Toggle menu*/}
-            {isNavItemVisble && <button
-              onClick={() => setOpen((v) => !v)}
-              className="
-              sm:hidden 
-              h-10 w-10 rounded-2xl
-              bg-white/60 border border-black/10
-              hover:bg-white transition
-              grid place-items-center
-            "
-              aria-label="Toggle menu"
-            >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-            }
-
-
             <div className="flex items-center gap-2 mr-2">
               {isEmailVisible && (<div className="hidden sm:flex items-center gap-2 bg-white/50 px-3 py-2">
 

@@ -4,16 +4,18 @@ import clsx from "clsx";
 import { LogOut } from "lucide-react";
 
 export default function MobileCollapseMenu({ open, items, activePath, onGo, onLogout, userName}) {
+  const MotionDiv = motion.div;
+
   return (
     <AnimatePresence initial={false}>
       {open && (
-        <motion.div
+        <MotionDiv
           key="mobile-collapse"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="sm:hidden border-t border-black/10 overflow-hidden"
+          className="mobile-collapse-panel sm:hidden border-t border-black/10 overflow-hidden"
         >
           <div className="px-4 py-3">
             <div className="rounded-3xl bg-white/70 border border-black/10 shadow-sm overflow-hidden backdrop-blur-xl">
@@ -55,7 +57,7 @@ export default function MobileCollapseMenu({ open, items, activePath, onGo, onLo
                 )}
             </div>
           </div>
-        </motion.div>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );
