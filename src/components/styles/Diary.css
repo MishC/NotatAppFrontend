@@ -181,29 +181,33 @@
 
 .diary-frame--wood {
   background:
-    radial-gradient(circle at 14% 16%, #e5e7eb 0 4px, #6b6257 5px 7px, transparent 8px),
-    radial-gradient(circle at 86% 16%, #e5e7eb 0 4px, #6b6257 5px 7px, transparent 8px),
-    radial-gradient(circle at 14% 84%, #e5e7eb 0 4px, #6b6257 5px 7px, transparent 8px),
-    radial-gradient(circle at 86% 84%, #e5e7eb 0 4px, #6b6257 5px 7px, transparent 8px),
-    repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.08) 0 8px, transparent 9px 28px),
-    linear-gradient(135deg, #7c4a24, #c98543 46%, #6a3f20);
-  border: 4px solid #4a2a16;
+    radial-gradient(ellipse at 22% 18%, rgba(82, 42, 16, 0.55) 0 8px, transparent 9px 42px),
+    radial-gradient(ellipse at 78% 72%, rgba(94, 50, 20, 0.42) 0 7px, transparent 8px 38px),
+    repeating-linear-gradient(8deg, rgba(67, 35, 14, 0.38) 0 3px, transparent 4px 16px),
+    repeating-linear-gradient(96deg, rgba(255, 236, 185, 0.14) 0 7px, transparent 8px 26px),
+    linear-gradient(135deg, #4a250e, #8b451c 28%, #b66a2c 48%, #6f3514 72%, #3b1d0b);
+  border: 5px solid #2b1306;
 }
 
 .diary-frame--wood::before {
-  inset: 10px;
-  border-radius: 26px;
-  border: 2px solid rgba(72, 36, 16, 0.35);
+  inset: 12px;
+  border-radius: 24px;
+  border: 3px solid rgba(43, 19, 6, 0.55);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 223, 165, 0.22),
+    inset 0 0 28px rgba(43, 19, 6, 0.32);
 }
 
 .diary-frame--wood::after {
-  left: 24px;
-  right: 24px;
-  top: 50%;
-  height: 2px;
+  left: 18px;
+  right: 18px;
+  top: 22%;
+  height: 55%;
   border-radius: 999px;
-  background: rgba(73, 42, 20, 0.28);
-  transform: rotate(-1deg);
+  background:
+    repeating-linear-gradient(96deg, transparent 0 10px, rgba(255, 220, 155, 0.13) 11px 13px, transparent 14px 24px),
+    linear-gradient(90deg, transparent, rgba(54, 26, 9, 0.28), transparent);
+  transform: rotate(-0.8deg);
 }
 
 .diary-frame--solid {
