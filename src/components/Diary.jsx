@@ -102,6 +102,8 @@ export default function Diary() {
     pagesRef.current = pages;
   }, [pages]);
 
+  useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
+
   useEffect(() => {
     return () => {
       if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
