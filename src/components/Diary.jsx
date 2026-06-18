@@ -42,6 +42,8 @@ function ToolbarButton({ title, Icon, onClick }) {
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
   const editorRef = useRef(null);
+  const pagesRef = useRef([]);
+  const hasPageTransitionRef = useRef(false);
   const [pages, setPages] = useState([{ title: "Today", html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageDirection, setPageDirection] = useState(1);
@@ -54,9 +56,13 @@ export default function Diary() {
   const userName = user?.name || user?.email || "Guest";
 
   useEffect(() => {
+    pagesRef.current = pages;
+  }, [pages]);
+
+  useEffect(() => {
     if (!editorRef.current) return;
-    editorRef.current.innerHTML = currentPage.html;
-  }, [currentPage.html, pageIndex]);
+    editorRef.current.innerHTML = pagesRef.current[pageIndex]?.html || "";
+  }, [pageIndex]);
 
   const updateCurrentPage = (updates) => {
     setPages((prev) =>
@@ -82,13 +88,26 @@ export default function Diary() {
     });
   };
 
+  const handleEditorKeyDown = (e) => {
+    if (e.key !== "Enter") return;
+
+    e.preventDefault();
+    document.execCommand("insertLineBreak");
+    updateCurrentPage({
+      html: editorRef.current?.innerHTML || "",
+      text: editorRef.current?.innerText || "",
+    });
+  };
+
   const goToPage = (nextIndex) => {
     if (nextIndex < 0 || nextIndex >= pages.length) return;
+    hasPageTransitionRef.current = true;
     setPageDirection(nextIndex > pageIndex ? 1 : -1);
     setPageIndex(nextIndex);
   };
 
   const addPage = () => {
+    hasPageTransitionRef.current = true;
     setPageDirection(1);
     setPages((prev) => [...prev, { title: `Page ${prev.length + 1}`, html: "", text: "" }]);
     setPageIndex(pages.length);
@@ -219,20 +238,28 @@ export default function Diary() {
                   <MotionDiv
                     key={pageIndex}
                     className={`diary-frame diary-frame--${frameStyle}`}
-                    initial={{
-                      rotateY: pageDirection > 0 ? -55 : 55,
-                      opacity: 0,
-                      x: pageDirection > 0 ? 36 : -36,
-                    }}
-                    animate={{ rotateY: 0, opacity: 1, x: 0 }}
+                    initial={
+                      hasPageTransitionRef.current
+                        ? {
+                            rotate: pageDirection > 0 ? -2 : 2,
+                            opacity: 0,
+                            x: pageDirection > 0 ? 36 : -36,
+                            y: 18,
+                            scale: 0.98,
+                          }
+                        : false
+                    }
+                    animate={{ rotate: 0, opacity: 1, x: 0, y: 0, scale: 1 }}
                     exit={{
-                      rotateY: pageDirection > 0 ? 55 : -55,
+                      rotate: pageDirection > 0 ? 2 : -2,
                       opacity: 0,
                       x: pageDirection > 0 ? -36 : 36,
+                      y: 18,
+                      scale: 0.98,
                     }}
-                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    transition={{ duration: 0.28, ease: "easeInOut" }}
                     style={{
-                      transformOrigin: pageDirection > 0 ? "left center" : "right center",
+                      transformOrigin: "right bottom",
                     }}
                   >
                     <div className="diary-frame__inner">
@@ -246,6 +273,7 @@ export default function Diary() {
                           ref={editorRef}
                           contentEditable
                           suppressContentEditableWarning
+                          onKeyDown={handleEditorKeyDown}
                           onInput={(e) =>
                             updateCurrentPage({
                               html: e.currentTarget.innerHTML,
