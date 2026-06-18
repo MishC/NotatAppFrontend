@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { forgotPasswordAction, resetPasswordAction } from "../actions/authActions";
 
 import AuthButton from "./auth/AuthButton";
@@ -9,10 +9,13 @@ import EmailIcon from "./icons/EmailIcon";
 import EyeIcon from "./icons/EyeIcon";
 
 export default function ResetPassword() {
-  const [email, setEmail] = useState("");
-  const [resetEmail, setResetEmail] = useState("");
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
+
+  const [forgotEmail, setForgotEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [showResetForm, setShowResetForm] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(Boolean(email || token));
   const [showPwd, setShowPwd] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
@@ -28,14 +31,13 @@ export default function ResetPassword() {
     setLoadingForgot(true);
 
     try {
-      if (!email) {
+      if (!forgotEmail) {
         setErr("Email is required.");
         return;
       }
 
-      const result = await forgotPasswordAction({ email, setMsg, setErr });
+      const result = await forgotPasswordAction({ email: forgotEmail, setMsg, setErr });
       if (result.success) {
-        setResetEmail(email);
         setShowResetForm(true);
       }
     } catch (error) {
@@ -53,13 +55,19 @@ export default function ResetPassword() {
     setLoadingReset(true);
 
     try {
-      if (!resetEmail || !newPassword) {
-        setErr("Email and new password are required.");
+      if (!email || !token) {
+        setErr("Invalid or missing password reset link.");
+        return;
+      }
+
+      if (!newPassword) {
+        setErr("New password is required.");
         return;
       }
 
       const result = await resetPasswordAction({
-        email: resetEmail,
+        email,
+        token,
         newPassword,
         setMsg,
         setErr,
@@ -98,8 +106,8 @@ export default function ResetPassword() {
               type="email"
               placeholder="Email Address"
               inputClass="text-lg"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
               rightIcon={<EmailIcon />}
             />
 
@@ -125,8 +133,8 @@ export default function ResetPassword() {
                 type="email"
                 placeholder="Email Address"
                 inputClass="text-lg"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
+                value={email || ""}
+                readOnly
                 rightIcon={<EmailIcon />}
               />
 
