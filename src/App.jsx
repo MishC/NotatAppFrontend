@@ -8,6 +8,7 @@ import Subscribe from "./components/Subscribe";
 import Diary from "./components/Diary";
 import Home from "./components/Home";
 import Calendar from "./components/Calendar";
+import ResetPassword from "./components/ResetPassword";
 
 
 import "./App.css";
@@ -16,7 +17,7 @@ export default function App() {
   
 
   return (
-    <div className="App mb-[250px]">
+    <div className="App mb-62.5">
       <Routes>
         {/* Main */}
         <Route
@@ -44,6 +45,15 @@ export default function App() {
           element={
             <AuthOnly>
               <Subscribe />
+            </AuthOnly>
+          }
+        />
+        {/* Reset Password */}
+        <Route
+          path="/reset"
+          element={
+            <AuthOnly>
+              <ResetPassword />
             </AuthOnly>
           }
         />

@@ -37,44 +37,45 @@ export default function Subscribe() {
   }, []);
 
   useEffect(() => {
-  if (!msg.startsWith("Registration successful")) return;
-  const t = setTimeout(() => navigate("/auth/login", { replace: true }), 1500);
-  return () => clearTimeout(t);
-}, [msg, navigate]);
+    if (!msg.startsWith("Registration successful")) return;
+    const t = setTimeout(() => navigate("/auth/login", { replace: true }), 1500);
+    return () => clearTimeout(t);
+  }, [msg, navigate]);
 
 
-//onSubmit registerAction
- const onSubscribe = async (e) => {
-  e.preventDefault();
-  setErr("");
-  setMsg("");
-  setLoading(true);
+  //onSubmit registerAction
+  const onSubscribe = async (e) => {
+    e.preventDefault();
+    setErr("");
+    setMsg("");
+    setLoading(true);
 
-  try {
-    if (!email || !pwd || !phone) {
-      setErr("All fields are required.");
-      return;
+    try {
+      if (!email || !pwd || !phone) {
+        setErr("All fields are required.");
+        return;
+      }
+
+      const result = await registerAction({ email, password: pwd, phone, setMsg, setErr });
+      if (!result.ok) {
+        setErr(result.error);
+        return;
+      }
+
+
+      setMsg("Registration successful! Redirecting to login...");
+
+      setTimeout(() => {
+        navigate("/auth", { replace: true });
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      setErr(error.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const result = await registerAction({ email, password: pwd, phone, setMsg, setErr });
-    if (!result.ok) {
-      setErr(result.error);
-      return;
-    }
-
-
-    setMsg("Registration successful! Redirecting to login...");
-
-    setTimeout(() => {
-      navigate("/auth",  { replace: true });
-    }, 1500);
-  } catch (error) {
-    console.error(error);
-    setErr(error.message || "Registration failed. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
 
 
   return (
@@ -134,6 +135,10 @@ export default function Subscribe() {
 
           <p className="text-center text-slate-600 pt-2 text-base">
             Already have an account? <Link to="/auth" className="text-orange-500 hover:text-orange-700 font-semibold">Sign In</Link>
+          </p>
+          <p className="text-center text-slate-500 pt-2 text-base cursor-pointer">
+
+            Forgotten password? <Link to="/reset" className="text-orange-500 hover:text-orange-700 font-semibold">Send Reset Link</Link>
           </p>
           <p
             className="text-center text-slate-500 pt-2 text-base cursor-pointer"
