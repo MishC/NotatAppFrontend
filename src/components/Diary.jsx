@@ -14,16 +14,11 @@ import {
   Upload,
 } from "lucide-react";
 
+import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import "./styles/Diary.css";
 
 const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
-
-const promptOptions = [
-  "What felt lighter today?",
-  "What do I want to remember from this week?",
-  "One small thing I can do tomorrow is...",
-];
 
 function ToolbarButton({ title, Icon, onClick }) {
   return (
@@ -43,6 +38,7 @@ export default function Diary() {
   const editorRef = useRef(null);
   const [entryTitle, setEntryTitle] = useState("Today");
   const [entryText, setEntryText] = useState("");
+  const [frameStyle, setFrameStyle] = useState("marker");
   const [msg, setMsg] = useState("");
 
   const userName = user?.name || user?.email || "Guest";
@@ -105,8 +101,8 @@ export default function Diary() {
         )}
 
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
-          <div className="diary-marker-frame">
-            <div className="diary-marker-frame__inner">
+          <div className={`diary-frame diary-frame--${frameStyle}`}>
+            <div className="diary-frame__inner">
               <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <input
                   type="text"
@@ -164,34 +160,12 @@ export default function Diary() {
             </div>
           </div>
 
-          <aside className="rounded-[24px] border border-emerald-200 bg-white/75 p-5 shadow-lg shadow-emerald-900/5">
-            <div className="mb-5">
-              <h2 className="text-lg font-bold text-slate-900">AI note starters</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Click a prompt to place it into the diary.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {promptOptions.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => insertText(`${prompt} `)}
-                  className="w-full rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-emerald-100 transition"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
-              <h3 className="font-bold text-slate-900">Media shelf</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                Images and disk files are ready as editor actions. Storage can be wired to the API later.
-              </p>
-            </div>
-          </aside>
+          <DiarySidebar
+            activeFrame={frameStyle}
+            onFrameChange={setFrameStyle}
+            onInsertPrompt={insertText}
+            onMessage={setMsg}
+          />
         </section>
       </main>
     </div>
