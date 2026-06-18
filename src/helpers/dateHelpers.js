@@ -21,4 +21,13 @@ export function isOverdue(ymd) {
   return String(ymd).slice(0, 10) < todayYYYYMMDD();
 }
 
+export function getIsoWeekNumber(dateInput) {
+  const date = new Date(dateInput);
+  const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNumber = utcDate.getUTCDay() || 7;
 
+  utcDate.setUTCDate(utcDate.getUTCDate() + 4 - dayNumber);
+
+  const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+  return Math.ceil(((utcDate - yearStart) / 86400000 + 1) / 7);
+}

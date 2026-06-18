@@ -6,7 +6,7 @@ import React, { useRef, useEffect, useMemo, useState, useCallback } from "react"
 
 import { createCalendarHandlers } from "../helpers/calendarHelpers";
 import { escapeHtml } from "../helpers/stringHelpers";
-import { isOverdue } from "../helpers/dateHelpers";
+import { getIsoWeekNumber, isOverdue } from "../helpers/dateHelpers";
 import { isMobile, isTablet } from "../helpers/screenHelpers";
 
 import "./styles/Calendar.css";
@@ -124,11 +124,34 @@ function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
     };
   }, []);
 
+  const updateWeekTitleLabel = useCallback((label) => {
+    requestAnimationFrame(() => {
+      const titleEl = wrapRef.current?.querySelector(".fc-toolbar-title");
+      if (!titleEl) return;
+
+      titleEl.querySelector(".fc-week-title-label")?.remove();
+
+      if (!label) return;
+
+      const weekEl = document.createElement("span");
+      weekEl.className = "fc-week-title-label";
+      weekEl.textContent = label;
+      titleEl.appendChild(weekEl);
+    });
+  }, []);
+
   const handleDatesSet = useCallback((arg) => {
     const v = arg?.view?.type || "listWeek";
     currentViewRef.current = v;
     localStorage.setItem(VIEW_KEY, v);
-  }, []);
+
+    if (v === "listWeek" && arg?.start) {
+      updateWeekTitleLabel(`Week ${getIsoWeekNumber(arg.start)}`);
+      return;
+    }
+
+    updateWeekTitleLabel("");
+  }, [updateWeekTitleLabel]);
 
   useEffect(() => {
     const api = calRef.current?.getApi?.();

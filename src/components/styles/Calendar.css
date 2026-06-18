@@ -136,6 +136,14 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
 }
 
   .fc .fc-toolbar-title { font-size: 1.2rem; }
+  .fc .fc-toolbar-title .fc-week-title-label {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+  }
   h2{font-size: 1.1rem; margin: 0; }
 
   /* Day cell borders */
