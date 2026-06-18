@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 import { useAutoClearMessage} from "../helpers/noteHelpers";
+import { isOverdue } from "../helpers/dateHelpers";
 
 import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
@@ -59,6 +60,14 @@ export default function NoteApp() {
     for (const n of filteredNotes) m.set(String(n.id), n);
     return m;
   }, [filteredNotes]);
+
+  const overdueNotesCount = useMemo(
+    () =>
+      notes.filter(
+        (n) => n?.scheduledAt && Number(n.folderId) !== 5 && isOverdue(n.scheduledAt)
+      ).length,
+    [notes]
+  );
 
   const events = useMemo(
     () =>
@@ -192,6 +201,7 @@ export default function NoteApp() {
               guest={guest}
               handleFolderClick={handleFolderClick}
               setError={setError}
+              overdueCount={overdueNotesCount}
             />
 
 

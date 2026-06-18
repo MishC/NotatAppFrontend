@@ -1,4 +1,4 @@
-import React,{ useEffect, useMemo, useState } from "react";
+import React,{ useMemo, useState } from "react";
 import Plus from "./icons/Plus"; 
 import FolderSettingsModal from "./modals/FolderSettingsModal"; 
 function Sidebar({
@@ -8,6 +8,7 @@ function Sidebar({
   guest = false,
   handleFolderClick,
   setError,
+  overdueCount = 0,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
 
@@ -91,12 +92,20 @@ const folder = folders.find(
 
           <span
             className={[
-              "block rounded-2xl transition-colors duration-200 ease-out",
+              "flex items-center justify-between gap-3 rounded-2xl transition-colors duration-200 ease-out",
               "hover:bg-black/[0.04] active:bg-black/[0.06]",
               "pr-10",
             ].join(" ")}
           >
-            {opt.name}
+            <span>{opt.name}</span>
+            {String(opt.id) === "1" && overdueCount > 0 && (
+              <span
+                className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-red-500 px-2 text-sm font-bold text-white shadow-sm"
+                title={`${overdueCount} overdue task${overdueCount === 1 ? "" : "s"}`}
+              >
+                !
+              </span>
+            )}
           </span>
 
           {opt.id>5&& (
