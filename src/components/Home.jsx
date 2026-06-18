@@ -148,18 +148,21 @@ export default function Home() {
             subtitle="Tasks, deadlines, folders, overdue, done."
             Icon={ClipboardList}
             onClick={() => navigate("/todo")}
+            cursor="pointer"
           />
           <FeatureCard
             title="Calendar"
             subtitle="FullCalendar view of your notes / tasks."
             Icon={CalendarDays}
             onClick={() => navigate("/calendar")}
+            cursor="pointer"
           />
           <FeatureCard
             title="Diary"
             subtitle="Daily writing, quick entries, reflection."
             Icon={BookOpen}
             onClick={() => navigate("/diary")}
+            cursor="pointer"
           />
         </div>
       </div>
