@@ -23,9 +23,9 @@ import {
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import { formatDateDDMMYYYY, parseDiaryDateInput, todayYYYYMMDD } from "../helpers/dateHelpers";
+import { diaryEmojiOptions } from "../helpers/diaryEmojiOptions";
 import "./styles/Diary.css";
 
-const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
 const PAGE_MAX_HEIGHT = 650;
 const PAGE_FLIP_MS = 900;
 const DEFAULT_ENTRY_TITLE = formatDateDDMMYYYY(todayYYYYMMDD());
@@ -91,6 +91,7 @@ export default function Diary() {
   const [loadingEntry, setLoadingEntry] = useState(false);
   const [editorLoadKey, setEditorLoadKey] = useState(0);
   const [showRuledLines, setShowRuledLines] = useState(false);
+  const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -391,7 +392,32 @@ export default function Diary() {
                 <ToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
                 <ToolbarButton title="List" Icon={List} onClick={() => runCommand("insertUnorderedList")} />
                 <ToolbarButton title="Quote" Icon={Quote} onClick={() => runCommand("formatBlock", "blockquote")} />
-                <ToolbarButton title="Emoji" Icon={Smile} onClick={() => insertText("✨")} />
+                <div className="relative">
+                  <ToolbarButton
+                    title="Emoji"
+                    Icon={Smile}
+                    onClick={() => setEmojiMenuOpen((value) => !value)}
+                  />
+                  {emojiMenuOpen && (
+                    <div className="absolute left-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
+                      <div className="grid grid-cols-8 gap-1">
+                        {diaryEmojiOptions.map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => {
+                              insertText(emoji);
+                              setEmojiMenuOpen(false);
+                            }}
+                            className="h-8 w-8 rounded-lg text-lg hover:bg-emerald-50 transition"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <ToolbarButton title="Image" Icon={Image} onClick={() => handlePrototypeAction("Image insert")} />
                 <ToolbarButton title="Upload from disk" Icon={Upload} onClick={() => handlePrototypeAction("File upload")} />
                 <select
@@ -437,7 +463,7 @@ export default function Diary() {
               </div>
 
               <div className="mb-4 flex flex-wrap gap-2">
-                {emojiOptions.map((emoji) => (
+                {diaryEmojiOptions.slice(0, 8).map((emoji) => (
                   <button
                     key={emoji}
                     type="button"
