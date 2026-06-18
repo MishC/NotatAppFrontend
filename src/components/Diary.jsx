@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import NavigationBar from "./NavigationBar";
+import "./styles/Diary.css";
 
 const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
 
@@ -104,8 +105,8 @@ export default function Diary() {
         )}
 
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
-          <div className="rounded-[28px] border border-emerald-200 bg-white/80 p-3 shadow-xl shadow-emerald-900/5">
-            <div className="rounded-[22px] border border-emerald-100 bg-gradient-to-b from-white to-emerald-50/60 p-4 md:p-6">
+          <div className="diary-marker-frame">
+            <div className="diary-marker-frame__inner">
               <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <input
                   type="text"
