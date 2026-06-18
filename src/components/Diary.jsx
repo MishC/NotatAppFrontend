@@ -94,6 +94,7 @@ function ToolbarButton({ title, Icon, onClick }) {
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
   const editorRef = useRef(null);
+  const imageInputRef = useRef(null);
   const pagesRef = useRef([]);
   const flipTimerRef = useRef(null);
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
@@ -154,6 +155,58 @@ export default function Diary() {
       html: editorRef.current?.innerHTML || "",
       text: editorRef.current?.innerText || "",
     });
+  };
+
+  const insertNodeInEditor = (node) => {
+    editorRef.current?.focus();
+    const selection = getSelectionInsideEditor(editorRef.current);
+
+    if (!selection) {
+      editorRef.current?.appendChild(node);
+      syncEditorToPage();
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    syncEditorToPage();
+  };
+
+  const handleImageButtonClick = () => {
+    setEmojiMenuOpen(false);
+    setAlignmentMenuOpen(false);
+    imageInputRef.current?.click();
+  };
+
+  const handleImageSelected = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setMsg("Please choose an image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = document.createElement("img");
+      image.src = reader.result;
+      image.alt = file.name;
+      image.className = "diary-editor-image";
+      image.draggable = false;
+
+      insertNodeInEditor(image);
+      setMsg("Image added to diary page.");
+    };
+    reader.onerror = () => setMsg("Could not load this image.");
+    reader.readAsDataURL(file);
   };
 
   const increaseFontSize = () => {
@@ -305,10 +358,6 @@ export default function Diary() {
 
     setMsg("Page limit reached. Continuing on the next page.");
     startPageTransition(nextIndex, 1);
-  };
-
-  const handlePrototypeAction = (label) => {
-    setMsg(`${label} is prepared in the editor UI. Backend storage can be connected later.`);
   };
 
   const handleSave = () => {
@@ -532,7 +581,14 @@ export default function Diary() {
                     </div>
                   )}
                 </div>
-                <ToolbarButton title="Image" Icon={Image} onClick={() => handlePrototypeAction("Image insert")} />
+                <ToolbarButton title="Image" Icon={Image} onClick={handleImageButtonClick} />
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelected}
+                  className="hidden"
+                />
                 <select
                   defaultValue=""
                   onChange={(e) => {

@@ -27,6 +27,17 @@
   background-position: 0 1.25rem;
 }
 
+.diary-editor-image,
+.diary-book-flip__content img {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  margin: 0.75rem 0;
+  border-radius: 1rem;
+  object-fit: contain;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
 .diary-book-flip {
   position: absolute;
   inset: 0;
