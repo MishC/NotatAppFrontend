@@ -23,7 +23,7 @@ import "./styles/Diary.css";
 
 const emojiOptions = ["✨", "🌿", "😊", "💡", "🎉", "❤️", "📌", "☕"];
 const PAGE_MAX_HEIGHT = 1000;
-const PAGE_FLIP_MS = 820;
+const PAGE_FLIP_MS = 900;
 
 function ToolbarButton({ title, Icon, onClick }) {
   return (
@@ -293,17 +293,18 @@ export default function Diary() {
                 {isPageFlipping && (
                   <div
                     className={[
-                      "diary-page-peel",
-                      pageDirection > 0 ? "diary-page-peel--forward" : "diary-page-peel--back",
+                      "diary-book-flip",
+                      pageDirection > 0 ? "diary-book-flip--forward" : "diary-book-flip--back",
                     ].join(" ")}
                     aria-hidden="true"
                   >
-                    <div className="diary-page-peel__corner" />
-                    <div className="diary-page-peel__fold">
-                      <div
-                        className="diary-page-peel__content"
-                        dangerouslySetInnerHTML={{ __html: flipHtml }}
-                      />
+                    <div className={`diary-frame diary-frame--${frameStyle} diary-book-flip__page`}>
+                      <div className="diary-frame__inner">
+                        <div
+                          className="diary-book-flip__content"
+                          dangerouslySetInnerHTML={{ __html: flipHtml }}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}

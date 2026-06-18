@@ -11,6 +11,7 @@
 .diary-page-stage {
   position: relative;
   overflow: hidden;
+  perspective: 1600px;
 }
 
 .diary-editor-page {
@@ -19,153 +20,106 @@
   overflow-y: auto;
 }
 
-.diary-page-peel {
+.diary-book-flip {
   position: absolute;
   inset: 0;
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
+  perspective: 1600px;
 }
 
-.diary-page-peel__corner {
+.diary-book-flip__page {
   position: absolute;
-  right: 18px;
-  bottom: 18px;
-  width: 0;
-  height: 0;
-  border-left: min(44vw, 320px) solid transparent;
-  border-top: min(44vw, 320px) solid rgba(255, 255, 255, 0.96);
-  filter: drop-shadow(-12px -14px 16px rgba(15, 23, 42, 0.24));
-  transform-origin: right bottom;
-  animation: diary-corner-peel 820ms ease-in-out forwards;
+  inset: 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
-.diary-page-peel__fold {
+.diary-book-flip__page::before {
+  content: "";
   position: absolute;
-  right: 18px;
-  bottom: 18px;
-  width: min(64vw, 520px);
-  height: min(52vw, 440px);
-  border-radius: 18px 18px 0 18px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background:
-    linear-gradient(125deg, rgba(255, 255, 255, 0.94), rgba(236, 253, 245, 0.96) 58%, rgba(203, 213, 225, 0.42)),
-    #ffffff;
-  box-shadow:
-    -18px -18px 28px rgba(15, 23, 42, 0.2),
-    inset 18px 0 20px rgba(148, 163, 184, 0.12);
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.2), transparent 24%, rgba(255, 255, 255, 0.15));
+  opacity: 0;
+  animation: diary-page-shadow 900ms ease-in-out forwards;
+}
+
+.diary-book-flip--forward .diary-book-flip__page {
+  transform-origin: left center;
+  animation: diary-book-flip-forward 900ms ease-in-out forwards;
+}
+
+.diary-book-flip--back .diary-book-flip__page {
+  transform-origin: right center;
+  animation: diary-book-flip-back 900ms ease-in-out forwards;
+}
+
+.diary-book-flip__content {
+  min-height: 260px;
+  max-height: 1000px;
   overflow: hidden;
-  transform-origin: right bottom;
-  animation: diary-fold-slide 820ms ease-in-out forwards;
-}
-
-.diary-page-peel__content {
-  width: 100%;
-  height: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgb(209 250 229);
+  background: white;
   padding: 1.25rem;
-  color: rgba(51, 65, 85, 0.34);
-  font-size: 1rem;
-  line-height: 1.6;
-  overflow: hidden;
+  color: rgb(51 65 85);
+  font-size: 1.125rem;
+  line-height: 2rem;
 }
 
-.diary-page-peel--back .diary-page-peel__corner {
-  left: 18px;
-  right: auto;
-  bottom: 18px;
-  border-left: 0;
-  border-right: min(44vw, 320px) solid transparent;
-  animation-name: diary-corner-peel-back;
-}
-
-.diary-page-peel--back .diary-page-peel__fold {
-  left: 18px;
-  right: auto;
-  transform-origin: left bottom;
-  animation-name: diary-fold-slide-back;
-}
-
-@keyframes diary-corner-peel {
+@keyframes diary-book-flip-forward {
   0% {
-    opacity: 0;
-    transform: translate(14px, 14px) scale(0.12) rotate(0deg);
-  }
-  34% {
     opacity: 1;
-    transform: translate(-16px, -34%) scale(1) rotate(-4deg);
+    transform: rotateY(0deg) translateX(0) scale(1);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
   }
-  66% {
-    opacity: 0.94;
-    transform: translate(-28px, -58%) scale(1.08) rotate(-8deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-62%, -64%) scale(0.88) rotate(-12deg);
-  }
-}
-
-@keyframes diary-fold-slide {
-  0% {
-    opacity: 0;
-    clip-path: polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%);
-    transform: translate(10px, 10px) rotate(0deg) scale(0.28);
-  }
-  42% {
+  45% {
     opacity: 1;
-    clip-path: polygon(28% 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(-12px, -34%) rotate(-2deg) scale(1);
+    transform: rotateY(-86deg) translateX(-2%) scale(0.99);
+    box-shadow: -34px 18px 36px rgba(15, 23, 42, 0.22);
   }
   72% {
-    opacity: 0.92;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(-34%, -44%) rotate(-3deg) scale(0.98);
+    opacity: 0.78;
+    transform: rotateY(-136deg) translateX(-16%) scale(0.97);
   }
   100% {
     opacity: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(-88%, -44%) rotate(-4deg) scale(0.9);
+    transform: rotateY(-178deg) translateX(-38%) scale(0.94);
   }
 }
 
-@keyframes diary-corner-peel-back {
+@keyframes diary-book-flip-back {
   0% {
-    opacity: 0;
-    transform: translate(-14px, 14px) scale(0.12) rotate(0deg);
-  }
-  34% {
     opacity: 1;
-    transform: translate(16px, -34%) scale(1) rotate(4deg);
+    transform: rotateY(0deg) translateX(0) scale(1);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
   }
-  66% {
-    opacity: 0.94;
-    transform: translate(28px, -58%) scale(1.08) rotate(8deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(62%, -64%) scale(0.88) rotate(12deg);
-  }
-}
-
-@keyframes diary-fold-slide-back {
-  0% {
-    opacity: 0;
-    clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
-    transform: translate(-10px, 10px) rotate(0deg) scale(0.28);
-  }
-  42% {
+  45% {
     opacity: 1;
-    clip-path: polygon(0 0, 72% 0, 100% 100%, 0 100%);
-    transform: translate(12px, -34%) rotate(2deg) scale(1);
+    transform: rotateY(86deg) translateX(2%) scale(0.99);
+    box-shadow: 34px 18px 36px rgba(15, 23, 42, 0.22);
   }
   72% {
-    opacity: 0.92;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(34%, -44%) rotate(3deg) scale(0.98);
+    opacity: 0.78;
+    transform: rotateY(136deg) translateX(16%) scale(0.97);
   }
   100% {
     opacity: 0;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    transform: translate(88%, -44%) rotate(4deg) scale(0.9);
+    transform: rotateY(178deg) translateX(38%) scale(0.94);
+  }
+}
+
+@keyframes diary-page-shadow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  40%,
+  70% {
+    opacity: 1;
   }
 }
 
