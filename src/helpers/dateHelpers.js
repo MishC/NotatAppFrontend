@@ -101,6 +101,12 @@ export function parseDiaryDateInput(input) {
     return toValidYMD(y, m, d);
   }
 
+  const dashedEuMatch = value.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (dashedEuMatch) {
+    const [, d, m, y] = dashedEuMatch;
+    return toValidYMD(y, m, d);
+  }
+
   const usMatch = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (usMatch) {
     const [, m, d, y] = usMatch;

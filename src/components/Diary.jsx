@@ -25,7 +25,6 @@ import {
   Trash2,
   Underline,
 } from "lucide-react";
-import todayYYYYMMDD from "../helpers/dateHelpers";
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import {
@@ -47,6 +46,7 @@ import "./styles/Diary.css";
 const PAGE_MAX_HEIGHT = 650;
 const PAGE_FLIP_MS = 900;
 const FONT_SIZE_STEP = 2;
+const DEFAULT_EDITOR_FONT_SIZE = 14;
 const DEFAULT_DIARY_DATE = todayYYYYMMDD();
 const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
 const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
@@ -170,7 +170,19 @@ function normalizeLoadedDiaryPages(entry, fallbackTitle) {
 }
 
 function removeEmptyHtmlLines(html) {
-  return String(html || "")
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+  const emptyTextPattern = /[\s\u200B\u00A0]/g;
+  const isEmptyElement = (element) =>
+    !element.querySelector("img") &&
+    !element.textContent.replace(emptyTextPattern, "") &&
+    !element.querySelector("br + *:not(br)");
+
+  [...container.querySelectorAll("span, div, p")].forEach((element) => {
+    if (isEmptyElement(element)) element.remove();
+  });
+
+  return container.innerHTML
     .replace(/<div>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>/gi, "")
     .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
     .replace(/(?:<br\s*\/?>\s*){2,}/gi, "<br>")
@@ -208,6 +220,7 @@ export default function Diary() {
   const imageInputRef = useRef(null);
   const pagesRef = useRef([]);
   const flipTimerRef = useRef(null);
+  const didAutoLoadRef = useRef(false);
   const API_URL_DIARY = getDiaryApiBase();
   const [diaryEntries, setDiaryEntries] = useState([]);
   const [loadedEntryId, setLoadedEntryId] = useState(null);
@@ -217,7 +230,7 @@ export default function Diary() {
   const [isPageFlipping, setIsPageFlipping] = useState(false);
   const [flipHtml, setFlipHtml] = useState("");
   const [frameStyle, setFrameStyle] = useState("marker");
-  const [lookupDate, setLookupDate] = useState("");
+  const [lookupDate, setLookupDate] = useState(DEFAULT_DIARY_DATE);
   const [diaryDate, setDiaryDate] = useState(DEFAULT_DIARY_DATE);
   const [titleFormat, setTitleFormat] = useState(DEFAULT_TITLE_FORMAT);
   const [loadingEntry, setLoadingEntry] = useState(false);
@@ -238,10 +251,9 @@ export default function Diary() {
 
   useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
 
-  useEffect(() => { 
+  useEffect(() => {
     return () => {
       if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
-      handleLoadEntry(todayYYYYMMDD());
     };
   }, []);
 
@@ -407,7 +419,7 @@ export default function Diary() {
     const resetSpan = document.createElement("span");
     const spacer = document.createTextNode("\u200B");
 
-    resetSpan.style.fontSize = "12px";
+    resetSpan.style.fontSize = `${DEFAULT_EDITOR_FONT_SIZE}px`;
     resetSpan.style.fontWeight = "400";
     resetSpan.style.fontStyle = "normal";
     resetSpan.style.textDecoration = "none";
@@ -425,8 +437,7 @@ export default function Diary() {
   };
 
   const trimEmptyLines = () => {
-    if (!editorRef.current) 
-      {removeEmptyHtmlLines(editorRef.current.innerText);};
+    if (!editorRef.current) return;
 
     const trimmedHtml = removeEmptyHtmlLines(editorRef.current.innerHTML);
     editorRef.current.innerHTML = trimmedHtml;
@@ -760,16 +771,23 @@ export default function Diary() {
     printWindow.print();
   };
 
-  const handleLoadEntry = async (normalizedDate=parseDiaryDateInput(todayYYYYMMDD())) => {
-    setMsg("");
-    const normalizedDate = parseDiaryDateInput(lookupDate);
+  const setEmptyDiaryPageForDate = (normalizedDate) => {
+    const title = formatDiaryTitleDate(normalizedDate, titleFormat);
 
+    setDiaryDate(normalizedDate);
+    setLoadedEntryId(null);
+    setPages([{ id: null, pageNumber: 1, title, html: "", text: "" }]);
+    setPageIndex(0);
+    setEditorLoadKey((key) => key + 1);
+  };
 
+  const loadDiaryByDate = async (normalizedDate, { showMessage = true } = {}) => {
     if (!normalizedDate) {
-      setMsg("Use date format like 20.01.2026, 01/20/2026, or 2026-01-20.");
+      setMsg("Use date format like 20.01.2026, 20-01-2026, 01/20/2026, or 2026-01-20.");
       return;
     }
 
+    setMsg("");
     setLoadingEntry(true);
     let loadedEntries = [];
 
@@ -785,18 +803,19 @@ export default function Diary() {
       setError: setMsg,
     });
 
-    if (!ok) return;
+    if (!ok) {
+      setEmptyDiaryPageForDate(normalizedDate);
+      return;
+    }
 
     const title = formatDiaryTitleDate(normalizedDate, titleFormat);
     const loadedEntry = loadedEntries[0];
 
     if (!loadedEntry) {
-      setDiaryDate(normalizedDate);
-      setLoadedEntryId(null);
-      setPages([{ id: null, pageNumber: 1, title, html: "", text: "" }]);
-      setPageIndex(0);
-      setEditorLoadKey((key) => key + 1);
-      setMsg("No diary entry found for this date. You can start writing it now.");
+      setEmptyDiaryPageForDate(normalizedDate);
+      if (showMessage) {
+        setMsg("No diary entry found for this date. You can start writing it now.");
+      }
       return;
     }
 
@@ -805,8 +824,23 @@ export default function Diary() {
     setPages(normalizeLoadedDiaryPages(loadedEntry, title));
     setPageIndex(0);
     setEditorLoadKey((key) => key + 1);
-    setMsg("Diary entry loaded. You can edit it now.");
+    if (showMessage) {
+      setMsg("Diary entry loaded. You can edit it now.");
+    }
   };
+
+  const handleLoadEntry = () => {
+    const normalizedDate = parseDiaryDateInput(lookupDate);
+    loadDiaryByDate(normalizedDate);
+  };
+
+  useEffect(() => {
+    if (didAutoLoadRef.current) return;
+
+    didAutoLoadRef.current = true;
+    loadDiaryByDate(DEFAULT_DIARY_DATE, { showMessage: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="Diary min-h-screen bg-emerald-50">
@@ -845,24 +879,26 @@ export default function Diary() {
 
         <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
           <div className="rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
-              <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
-                <input
-                  type="text"
-                  value={lookupDate}
-                  onChange={(e) => setLookupDate(e.target.value)}
-                  placeholder="Find by date: 20.01.2026 or 01/20/2026"
-                  className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-                />
-                <button
-                  type="button"
-                  onClick={handleLoadEntry}
-                  disabled={loadingEntry}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 transition"
-                >
-                  <Search className="h-4 w-4" />
-                  {loadingEntry ? "Loading..." : "Load"}
-                </button>
-              </div>
+              {!guest && (
+                <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
+                  <input
+                    type="text"
+                    value={lookupDate}
+                    onChange={(e) => setLookupDate(e.target.value)}
+                    placeholder="Find by date: 20.01.2026, 20-01-2026 or 01/20/2026"
+                    className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleLoadEntry}
+                    disabled={loadingEntry}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 transition"
+                  >
+                    <Search className="h-4 w-4" />
+                    {loadingEntry ? "Loading..." : "Load"}
+                  </button>
+                </div>
+              )}
 
               <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex w-full flex-col gap-2 md:flex-row">
