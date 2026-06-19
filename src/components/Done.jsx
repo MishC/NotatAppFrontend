@@ -69,7 +69,7 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
                 </td>
 
                 <td className="px-4 py-3">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-4">
                     <button
                       className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100"
                       onClick={() => onOpen?.(n)}

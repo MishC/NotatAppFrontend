@@ -15,6 +15,59 @@ export function formatDateDDMMYYYY(ymd) {
   return `${d}-${m}-${y}`;
 }
 
+export const DIARY_TITLE_DATE_FORMATS = [
+  { value: "ddmmyyyy", label: "17-06-2026" },
+  { value: "skLong", label: "4. januar 2026" },
+  { value: "enLong", label: "January of 4th, 2026" },
+];
+
+function toLocalDate(ymd) {
+  if (!ymd) return null;
+
+  const [year, month, day] = String(ymd).split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+function getOrdinalDay(day) {
+  const mod10 = day % 10;
+  const mod100 = day % 100;
+
+  if (mod10 === 1 && mod100 !== 11) return `${day}st`;
+  if (mod10 === 2 && mod100 !== 12) return `${day}nd`;
+  if (mod10 === 3 && mod100 !== 13) return `${day}rd`;
+  return `${day}th`;
+}
+
+export function formatDiaryTitleDate(ymd, format = "ddmmyyyy") {
+  const date = toLocalDate(ymd);
+  if (!date) return formatDateDDMMYYYY(ymd);
+
+  const year = date.getFullYear();
+  const day = date.getDate();
+
+  if (format === "skLong") {
+    const month = new Intl.DateTimeFormat("sk-SK", { month: "long" }).format(date);
+    return `${day}. ${month} ${year}`;
+  }
+
+  if (format === "enLong") {
+    const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+    return `${month} of ${getOrdinalDay(day)}, ${year}`;
+  }
+
+  return formatDateDDMMYYYY(ymd);
+}
+
 export function parseDiaryDateInput(input) {
   const value = String(input || "").trim();
   if (!value) return "";

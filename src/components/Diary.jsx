@@ -8,16 +8,17 @@ import {
   Bold,
   ChevronLeft,
   ChevronRight,
+  FileDown,
   Heading1,
   Image,
   Italic,
+  Music,
   Plus,
   Quote,
   Rows3,
   Save,
   Search,
   Smile,
-  Sparkles,
   Subscript,
   Superscript,
   Trash2,
@@ -26,14 +27,40 @@ import {
 
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
-import { formatDateDDMMYYYY, parseDiaryDateInput, todayYYYYMMDD } from "../helpers/dateHelpers";
+import {
+  DIARY_TITLE_DATE_FORMATS,
+  formatDiaryTitleDate,
+  parseDiaryDateInput,
+  todayYYYYMMDD,
+} from "../helpers/dateHelpers";
 import { diaryEmojiOptions } from "../helpers/diaryEmojiOptions";
 import "./styles/Diary.css";
 
 const PAGE_MAX_HEIGHT = 650;
 const PAGE_FLIP_MS = 900;
 const FONT_SIZE_STEP = 2;
-const DEFAULT_ENTRY_TITLE = formatDateDDMMYYYY(todayYYYYMMDD());
+const DEFAULT_DIARY_DATE = todayYYYYMMDD();
+const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
+const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
+
+function sanitizeFileName(value) {
+  const fileName = String(value || "diary-entry")
+    .trim()
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+
+  return fileName || "diary-entry";
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function getDiaryApiUrl(date) {
   const base = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
@@ -43,8 +70,8 @@ function getDiaryApiUrl(date) {
 
 function normalizeDiaryPages(data, fallbackTitle) {
   if (Array.isArray(data?.pages) && data.pages.length > 0) {
-    return data.pages.map((page, index) => ({
-      title: page.title || (index === 0 ? fallbackTitle : `Page ${index + 1}`),
+    return data.pages.map((page) => ({
+      title: page.title || fallbackTitle,
       html: page.html || page.content || "",
       text: page.text || "",
     }));
@@ -104,6 +131,8 @@ export default function Diary() {
   const [flipHtml, setFlipHtml] = useState("");
   const [frameStyle, setFrameStyle] = useState("marker");
   const [lookupDate, setLookupDate] = useState("");
+  const [diaryDate, setDiaryDate] = useState(DEFAULT_DIARY_DATE);
+  const [titleFormat, setTitleFormat] = useState(DEFAULT_TITLE_FORMAT);
   const [loadingEntry, setLoadingEntry] = useState(false);
   const [editorLoadKey, setEditorLoadKey] = useState(0);
   const [showRuledLines, setShowRuledLines] = useState(false);
@@ -287,7 +316,7 @@ export default function Diary() {
 
   const deleteCurrentPage = () => {
     if (pages.length === 1) {
-      setPages([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
+      setPages([{ title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" }]);
       setPageIndex(0);
       setEditorLoadKey((key) => key + 1);
       setMsg("Page cleared.");
@@ -339,7 +368,10 @@ export default function Diary() {
 
   const addPage = () => {
     const nextIndex = pages.length;
-    setPages((prev) => [...prev, { title: `Page ${prev.length + 1}`, html: "", text: "" }]);
+    setPages((prev) => [
+      ...prev,
+      { title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" },
+    ]);
     startPageTransition(nextIndex, 1);
   };
 
@@ -353,7 +385,10 @@ export default function Diary() {
 
     const nextIndex = pageIndex + 1;
     if (nextIndex >= pagesRef.current.length) {
-      setPages((prev) => [...prev, { title: `Page ${prev.length + 1}`, html: "", text: "" }]);
+      setPages((prev) => [
+        ...prev,
+        { title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" },
+      ]);
     }
 
     setMsg("Page limit reached. Continuing on the next page.");
@@ -362,6 +397,86 @@ export default function Diary() {
 
   const handleSave = () => {
     setMsg("Diary entry saved locally in the editor draft.");
+  };
+
+  const handleSongSuggestion = () => {
+    const text = editorRef.current?.innerText?.trim();
+
+    if (!text) {
+      setMsg("Write something first, then AI can choose a song from the diary text.");
+      return;
+    }
+
+    setMsg("AI song picker is ready to connect to the music recommendation API.");
+  };
+
+  const handleTitleFormatChange = (nextFormat) => {
+    const nextTitle = formatDiaryTitleDate(diaryDate, nextFormat);
+
+    setTitleFormat(nextFormat);
+    setPages((prev) => prev.map((page) => ({ ...page, title: nextTitle })));
+  };
+
+  const handleSaveAsPdf = () => {
+    syncEditorToPage();
+
+    const editorHtml = editorRef.current?.innerHTML || "";
+    const title = entryTitle || DEFAULT_ENTRY_TITLE;
+    const printWindow = window.open("", "_blank", "width=900,height=1100");
+
+    if (!printWindow) {
+      setMsg("Allow pop-ups to save this diary page as PDF.");
+      return;
+    }
+
+    printWindow.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>${escapeHtml(sanitizeFileName(title))}.pdf</title>
+          <style>
+            * { box-sizing: border-box; }
+            body {
+              margin: 0;
+              background: #ecfdf5;
+              color: #1f2937;
+              font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            }
+            .pdf-content {
+              max-width: 760px;
+              min-height: 100vh;
+              margin: 0 auto;
+              padding: 32px;
+              background: white;
+              font-size: 18px;
+              line-height: 2;
+              white-space: normal;
+              overflow-wrap: anywhere;
+            }
+            .pdf-content img {
+              display: block;
+              max-width: 100%;
+              max-height: 320px;
+              margin: 12px 0;
+              border-radius: 16px;
+              object-fit: contain;
+            }
+            @media print {
+              body { background: white; }
+              .pdf-content {
+                max-width: none;
+                margin: 0;
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body><main class="pdf-content">${editorHtml}</main></body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   };
 
   const handleLoadEntry = async () => {
@@ -381,7 +496,8 @@ export default function Diary() {
       });
 
       if (response.status === 404) {
-        const title = formatDateDDMMYYYY(normalizedDate);
+        const title = formatDiaryTitleDate(normalizedDate, titleFormat);
+        setDiaryDate(normalizedDate);
         setPages([{ title, html: "", text: "" }]);
         setPageIndex(0);
         setEditorLoadKey((key) => key + 1);
@@ -394,9 +510,10 @@ export default function Diary() {
       }
 
       const data = await response.json();
-      const loadedPages = normalizeDiaryPages(data, formatDateDDMMYYYY(normalizedDate));
+      const loadedPages = normalizeDiaryPages(data, formatDiaryTitleDate(normalizedDate, titleFormat));
 
       setPages(loadedPages);
+      setDiaryDate(normalizedDate);
       setFrameStyle(data?.frameStyle || data?.frameTheme || frameStyle);
       setPageIndex(0);
       setEditorLoadKey((key) => key + 1);
@@ -466,17 +583,26 @@ export default function Diary() {
               </div>
 
               <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <input
-                  type="text"
-                  value={entryTitle}
-                  onChange={(e) => updateCurrentPage({ title: e.target.value })}
-                  className="w-full rounded-xl border border-emerald-100 bg-white/80 px-4 py-3 text-2xl font-bold text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-                  placeholder="Enter "
-                />
-
-                <div className="flex items-center gap-2 rounded-xl border border-emerald-100 bg-white/70 px-3 py-2 text-sm font-semibold text-emerald-700">
-                  <Sparkles className="h-4 w-4" />
-                  AI notes
+                <div className="flex w-full flex-col gap-2 md:flex-row">
+                  <input
+                    type="text"
+                    value={entryTitle}
+                    readOnly
+                    className="w-full rounded-xl border border-emerald-100 bg-white/80 px-4 py-3 text-2xl font-bold text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                    aria-label="Diary title"
+                  />
+                  <select
+                    value={titleFormat}
+                    onChange={(e) => handleTitleFormatChange(e.target.value)}
+                    className="min-w-56 rounded-xl border border-emerald-100 bg-white/80 px-3 py-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
+                    aria-label="Diary title date format"
+                  >
+                    {DIARY_TITLE_DATE_FORMATS.map((format) => (
+                      <option key={format.value} value={format.value}>
+                        {format.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -552,35 +678,6 @@ export default function Diary() {
                   )}
                 </div>
                 <ToolbarButton title="Quote" Icon={Quote} onClick={insertQuote} />
-                <div className="relative">
-                  <ToolbarButton
-                    title="Emoji"
-                    Icon={Smile}
-                    onClick={() => {
-                      setEmojiMenuOpen((value) => !value);
-                      setAlignmentMenuOpen(false);
-                    }}
-                  />
-                  {emojiMenuOpen && (
-                    <div className="absolute left-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
-                      <div className="grid grid-cols-8 gap-1">
-                        {diaryEmojiOptions.map((emoji) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            onClick={() => {
-                              insertText(emoji);
-                              setEmojiMenuOpen(false);
-                            }}
-                            className="h-8 w-8 rounded-lg text-lg hover:bg-emerald-50 transition"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
                 <ToolbarButton title="Image" Icon={Image} onClick={handleImageButtonClick} />
                 <input
                   ref={imageInputRef}
@@ -629,19 +726,49 @@ export default function Diary() {
                   <Rows3 className="h-4 w-4" />
                 </button>
                 <ToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
-              </div>
-
-              <div className="mb-4 flex flex-wrap gap-2">
-                {diaryEmojiOptions.slice(0, 8).map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    onClick={() => insertText(emoji)}
-                    className="h-9 w-9 rounded-xl border border-emerald-100 bg-white/80 text-lg hover:bg-emerald-50 transition"
-                  >
-                    {emoji}
-                  </button>
-                ))}
+                <ToolbarButton title="Save as PDF" Icon={FileDown} onClick={handleSaveAsPdf} />
+                <ToolbarButton title="Suggest song" Icon={Music} onClick={handleSongSuggestion} />
+                <div className="relative">
+                  <ToolbarButton
+                    title="Emoji"
+                    Icon={Smile}
+                    onClick={() => {
+                      setEmojiMenuOpen((value) => !value);
+                      setAlignmentMenuOpen(false);
+                    }}
+                  />
+                  {emojiMenuOpen && (
+                    <div className="absolute right-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
+                      <div className="grid grid-cols-8 gap-1">
+                        {diaryEmojiOptions.map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => {
+                              insertText(emoji);
+                              setEmojiMenuOpen(false);
+                            }}
+                            className="h-8 w-8 rounded-lg text-lg hover:bg-emerald-50 transition"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="flex max-w-full flex-nowrap gap-2 overflow-x-auto pb-1">
+                  {diaryEmojiOptions.slice(0, 8).map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => insertText(emoji)}
+                      className="h-9 w-9 shrink-0 rounded-xl border border-emerald-100 bg-white/80 text-lg hover:bg-emerald-50 transition"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className={`diary-page-stage ${isPageFlipping ? "diary-page-stage--flipping" : ""}`}>
