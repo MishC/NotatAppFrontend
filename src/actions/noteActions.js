@@ -4,6 +4,7 @@ import {
   updateNoteApi,
   swapNotesApi,
   fetchNotesApi,
+  fetchOverdueNotesCountApi,
   fetchFoldersApi,
   updateFolderApi,
   
@@ -84,6 +85,19 @@ export function syncGuestAction({ guest, notes, folders }) {
   if (!guest) return;
   save("noteapp_guest_notes", notes);
   save("noteapp_guest_folders", folders);
+}
+
+export async function getOverdueNotesCountAction({ guest, API_URL, setError } = {}) {
+  if (guest) return 0;
+
+  try {
+    const payload = await fetchOverdueNotesCountApi({ API_URL });
+    return Number(payload?.numberOfOverdue ?? 0) || 0;
+  } catch (e) {
+    console.error(e);
+    setError?.(e.message || "Could not load overdue count.");
+    return 0;
+  }
 }
 
 /* 3) ADD NOTE */

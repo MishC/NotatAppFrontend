@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 import { useAutoClearMessage} from "../helpers/noteHelpers";
-import { isOverdue } from "../helpers/dateHelpers";
 
 import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
@@ -18,6 +17,7 @@ import {
   syncGuestAction,
   addNoteAction,
   deleteNoteAction,
+  getOverdueNotesCountAction,
   updateNoteAction,
   selectFolderAction,
   toggleModalAction,
@@ -35,6 +35,7 @@ export default function NoteApp() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [overdueNotesCount, setOverdueNotesCount] = useState(0);
 
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
@@ -61,21 +62,6 @@ export default function NoteApp() {
     return m;
   }, [filteredNotes]);
 
-  const overdueNotesCount = useMemo(
-    () =>
-      notes.filter(
-        (n) => {
-          const ymd = String(n?.scheduledAt || "").slice(0, 10);
-          return (
-            /^\d{4}-\d{2}-\d{2}$/.test(ymd) &&
-            Number(n.folderId) !== 5 &&
-            isOverdue(ymd)
-          );
-        }
-      ).length,
-    [notes]
-  );
-
   const events = useMemo(
     () =>
       filteredNotes
@@ -99,6 +85,12 @@ export default function NoteApp() {
   // -------------------------
 
   //Set Up notes and folders
+  const refreshOverdueNotesCount = useCallback(async () => {
+    const count = await getOverdueNotesCountAction({ guest, API_URL, setError });
+    setOverdueNotesCount(count);
+    return count;
+  }, [guest, API_URL]);
+
   useEffect(() => {
     initNotesAndFoldersAction({ 
       guest,
@@ -110,7 +102,8 @@ export default function NoteApp() {
       setLoading,
       setError,
     });
-  }, [guest, activeFolder, API_URL, API_URL2]);
+    refreshOverdueNotesCount();
+  }, [guest, activeFolder, API_URL, API_URL2, refreshOverdueNotesCount]);
 
 
 
@@ -134,19 +127,26 @@ export default function NoteApp() {
   }, []);
 
   const handleAddNote = useCallback(
-    (newNote) =>
-      addNoteAction({ guest, API_URL, notes, setNotes, setMsg, setError, newNote }),
-    [guest, API_URL, notes]
+    async (newNote) => {
+      const ok = await addNoteAction({ guest, API_URL, notes, setNotes, setMsg, setError, newNote });
+      if (ok) refreshOverdueNotesCount();
+      return ok;
+    },
+    [guest, API_URL, notes, refreshOverdueNotesCount]
   );
 
   const handleDeleteNote = useCallback(
-    (id) => deleteNoteAction({ guest, API_URL, id, setNotes, setMsg, setError }),
-    [guest, API_URL]
+    async (id) => {
+      const ok = await deleteNoteAction({ guest, API_URL, id, setNotes, setMsg, setError });
+      if (ok) refreshOverdueNotesCount();
+      return ok;
+    },
+    [guest, API_URL, refreshOverdueNotesCount]
   );
 
   const handleUpdateNote = useCallback(
-    (noteId, updatedFields) =>
-      updateNoteAction({
+    async (noteId, updatedFields) => {
+      const ok = await updateNoteAction({
         guest,
         API_URL,
         noteId,
@@ -160,8 +160,11 @@ export default function NoteApp() {
         setIsModalOpen,
         setSelectedNote,
         setMsg,
-      }),
-    [guest, API_URL, selectedNote, noteById, activeFolder]
+      });
+      if (ok) refreshOverdueNotesCount();
+      return ok;
+    },
+    [guest, API_URL, selectedNote, noteById, activeFolder, refreshOverdueNotesCount]
   );
 
   // -------------------------

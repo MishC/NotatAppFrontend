@@ -62,7 +62,6 @@ export default function DiaryEditor({
   setShowRuledLines,
   showRuledLines,
   titleFormat,
-  trimEmptyLines,
 }) {
   return (
     <div className="flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
@@ -210,14 +209,6 @@ export default function DiaryEditor({
           <option value="#2563eb">Blue</option>
           <option value="#7c3aed">Purple</option>
         </select>
-        <button
-          type="button"
-          onClick={trimEmptyLines}
-          className="h-10 rounded-xl border border-emerald-100 bg-white/80 px-3 text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
-          title="Remove all empty lines"
-        >
-          Trim
-        </button>
         <button
           type="button"
           onClick={() => setShowRuledLines((value) => !value)}

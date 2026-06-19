@@ -28,7 +28,6 @@ import {
   getSelectionInsideEditor,
   normalizeLoadedDiaryPages,
   prepareDiaryPageForBackend,
-  removeEmptyHtmlLines,
   sanitizeFileName,
 } from "../helpers/diaryHelpers";
 import "./styles/Diary.css";
@@ -265,15 +264,6 @@ export default function Diary() {
     caretRange.collapse(true);
     selection.removeAllRanges();
     selection.addRange(caretRange);
-  };
-
-  const trimEmptyLines = () => {
-    if (!editorRef.current) return;
-
-    const trimmedHtml = removeEmptyHtmlLines(editorRef.current.innerHTML);
-    editorRef.current.innerHTML = trimmedHtml;
-    syncEditorToPage();
-    setMsg("Empty lines removed.");
   };
 
   const deleteCurrentPage = () => {
@@ -757,7 +747,6 @@ export default function Diary() {
             setShowRuledLines={setShowRuledLines}
             showRuledLines={showRuledLines}
             titleFormat={titleFormat}
-            trimEmptyLines={trimEmptyLines}
           />
 
           <DiarySidebar

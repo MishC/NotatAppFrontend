@@ -136,27 +136,6 @@ export function normalizeLoadedDiaryPages(entry, fallbackTitle) {
   ];
 }
 
-export function removeEmptyHtmlLines(html) {
-  const container = document.createElement("div");
-  container.innerHTML = html || "";
-  const emptyTextPattern = /[\s\u200B\u00A0]/g;
-  const isEmptyElement = (element) =>
-    !element.querySelector("img") &&
-    !element.textContent.replace(emptyTextPattern, "") &&
-    !element.querySelector("br + *:not(br)");
-
-  [...container.querySelectorAll("span, div, p")].forEach((element) => {
-    if (isEmptyElement(element)) element.remove();
-  });
-
-  return container.innerHTML
-    .replace(/<div>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>/gi, "")
-    .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
-    .replace(/(?:<br\s*\/?>\s*){2,}/gi, "<br>")
-    .replace(/^(?:\s|&nbsp;|<br\s*\/?>)+/gi, "")
-    .replace(/(?:\s|&nbsp;|<br\s*\/?>)+$/gi, "");
-}
-
 export function getSelectionInsideEditor(editor) {
   const selection = window.getSelection();
 

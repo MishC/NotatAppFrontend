@@ -75,6 +75,11 @@ export async function fetchOverdueNotesApi({ API_URL } = {}) {
   return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
 }
 
+export async function fetchOverdueNotesCountApi({ API_URL } = {}) {
+  if (!API_URL) throw new Error("API_URL is required");
+  return apiRequest({ url: `${API_URL}/overdue/count`, method: "GET" });
+}
+
 export async function fetchAllNotesByFolderIdApi({ API_URL, folderId }) {
   if (!API_URL) throw new Error("API_URL is required");
   if (!folderId) throw new Error("Folder ID is required");
