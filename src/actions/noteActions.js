@@ -8,7 +8,7 @@ import {
   fetchOverdueNotesCountApi,
   fetchFoldersApi,
   updateFolderApi,
-  
+  fetchDoneNotesApi,
   createFolderApi, 
   deleteFolderApi
 } from "../backend/notesApi";
