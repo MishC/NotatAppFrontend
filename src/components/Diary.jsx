@@ -712,8 +712,20 @@ export default function Diary() {
   const handleSaveAsPdf = () => {
     syncEditorToPage();
 
-    const editorHtml = editorRef.current?.innerHTML || "";
+    const printablePages = pagesRef.current.map((page, index) => ({
+      ...page,
+      html: index === pageIndex ? editorRef.current?.innerHTML || "" : page.html || "",
+    }));
     const title = entryTitle || DEFAULT_ENTRY_TITLE;
+    const pagesHtml = printablePages
+      .map(
+        (page) => `
+          <section class="pdf-page">
+            <main class="pdf-content">${page.html || ""}</main>
+          </section>
+        `
+      )
+      .join("");
     const printWindow = window.open("", "_blank", "width=900,height=1100");
 
     if (!printWindow) {
@@ -727,19 +739,27 @@ export default function Diary() {
         <head>
           <title>${escapeHtml(sanitizeFileName(title))}.pdf</title>
           <style>
+            @page { size: A4; margin: 14mm; }
             * { box-sizing: border-box; }
             body {
               margin: 0;
-              background: #ecfdf5;
+              background: white;
               color: #1f2937;
               font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             }
-            .pdf-content {
-              max-width: 760px;
-              min-height: 100vh;
+            .pdf-page {
+              width: 210mm;
+              min-height: 297mm;
               margin: 0 auto;
-              padding: 32px;
+              padding: 14mm;
+              page-break-after: always;
               background: white;
+            }
+            .pdf-page:last-child {
+              page-break-after: auto;
+            }
+            .pdf-content {
+              min-height: calc(297mm - 28mm);
               font-size: 18px;
               line-height: 2;
               white-space: normal;
@@ -754,16 +774,21 @@ export default function Diary() {
               object-fit: contain;
             }
             @media print {
-              body { background: white; }
+              body { background: white; margin: 0; }
+              .pdf-page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
+              }
               .pdf-content {
-                max-width: none;
                 margin: 0;
                 padding: 0;
               }
             }
           </style>
         </head>
-        <body><main class="pdf-content">${editorHtml}</main></body>
+        <body>${pagesHtml}</body>
       </html>
     `);
     printWindow.document.close();
@@ -877,8 +902,8 @@ export default function Diary() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_280px]">
-          <div className="rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
+        <section className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1fr_280px] lg:items-stretch">
+          <div className="flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
               {!guest && (
                 <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
                   <input
@@ -1093,7 +1118,7 @@ export default function Diary() {
               <div className={`diary-page-stage ${isPageFlipping ? "diary-page-stage--flipping" : ""}`}>
                 <div className={`diary-frame diary-frame--${frameStyle}`}>
                   <div className="diary-frame__inner">
-                    <div className="relative">
+                    <div className="relative min-h-0 flex-1">
                       {!entryText && (
                         <div className="pointer-events-none absolute left-5 top-5 text-slate-400">
                           Start writing your diary entry here...
