@@ -77,6 +77,43 @@ export function parseDiaryDateInput(input) {
   const value = String(input || "").trim();
   if (!value) return "";
 
+  const monthsByName = {
+    january: 1,
+    jan: 1,
+    februar: 2,
+    february: 2,
+    feb: 2,
+    marec: 3,
+    march: 3,
+    mar: 3,
+    april: 4,
+    apr: 4,
+    maj: 5,
+    may: 5,
+    jun: 6,
+    june: 6,
+    jul: 7,
+    july: 7,
+    august: 8,
+    aug: 8,
+    september: 9,
+    sep: 9,
+    sept: 9,
+    oktober: 10,
+    october: 10,
+    oct: 10,
+    november: 11,
+    nov: 11,
+    december: 12,
+    dec: 12,
+  };
+
+  const normalizeMonthName = (month) =>
+    String(month || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
+
   const toValidYMD = (y, m, d) => {
     const year = Number(y);
     const month = Number(m);
@@ -110,6 +147,13 @@ export function parseDiaryDateInput(input) {
   if (dashedEuMatch) {
     const [, d, m, y] = dashedEuMatch;
     return toValidYMD(y, m, d);
+  }
+
+  const longMonthMatch = value.match(/^(\d{1,2})\.?\s*([a-zA-Z\u00C0-\u017F]+)\s+(\d{4})$/);
+  if (longMonthMatch) {
+    const [, d, monthName, y] = longMonthMatch;
+    const month = monthsByName[normalizeMonthName(monthName)];
+    if (month) return toValidYMD(y, month, d);
   }
 
   const usMatch = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);

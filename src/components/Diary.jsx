@@ -13,6 +13,7 @@ import {
   updateDiaryPageAction,
 } from "../actions/diaryAction";
 import {
+  formatDateDDMMYYYY,
   formatDiaryTitleDate,
   parseDiaryDateInput,
 } from "../helpers/dateHelpers";
@@ -50,7 +51,7 @@ export default function Diary() {
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [frameStyle, setFrameStyle] = useState("marker");
-  const [lookupDate, setLookupDate] = useState(DEFAULT_DIARY_DATE);
+  const [lookupDate, setLookupDate] = useState(formatDateDDMMYYYY(DEFAULT_DIARY_DATE));
   const [diaryDate, setDiaryDate] = useState(DEFAULT_DIARY_DATE);
   const [titleFormat, setTitleFormat] = useState(DEFAULT_TITLE_FORMAT);
   const [loadingEntry, setLoadingEntry] = useState(false);
@@ -651,10 +652,11 @@ export default function Diary() {
 
   const loadDiaryByDate = async (normalizedDate, { showMessage = true } = {}) => {
     if (!normalizedDate) {
-      setMsg("Use date format like 20.01.2026, 20-01-2026, or 01/20/2026.");
+      setMsg("Use date format like 20.01.2026, 20-01-2026, 19 June 2026, or 01/20/2026.");
       return;
     }
 
+    setLookupDate(formatDateDDMMYYYY(normalizedDate));
     setMsg("");
     setLoadingEntry(true);
     let loadedEntries = [];
