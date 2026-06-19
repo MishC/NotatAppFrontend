@@ -8,6 +8,7 @@ import {
   createDiaryEntryAction,
   createDiaryPageAction,
   initDiaryEntriesAction,
+  loadDiaryPageImageAction,
   updateDiaryEntryAction,
   updateDiaryPageAction,
 } from "../actions/diaryAction";
@@ -22,10 +23,12 @@ import {
   DEFAULT_TITLE_FORMAT,
   FONT_SIZE_STEP,
   PAGE_MAX_HEIGHT,
+  attachDiaryPageImageToHtml,
   createPagePixelTiles,
   escapeHtml,
   getDiaryApiBase,
   getSelectionInsideEditor,
+  htmlToText,
   normalizeLoadedDiaryPages,
   prepareDiaryPageForBackend,
   sanitizeFileName,
@@ -614,6 +617,38 @@ export default function Diary() {
     setEditorLoadKey((key) => key + 1);
   };
 
+  const normalizeLoadedDiaryPagesWithImages = async (entry, title) => {
+    const normalizedPages = normalizeLoadedDiaryPages(entry, title);
+
+    if (guest) return normalizedPages;
+
+    return Promise.all(
+      normalizedPages.map(async (page) => {
+        if (!page.id || !page.hasImage) return page;
+
+        const imageUrl = await loadDiaryPageImageAction({
+          API_URL_DIARY,
+          pageId: page.id,
+          setError: setMsg,
+        });
+
+        if (!imageUrl) return page;
+
+        const html = attachDiaryPageImageToHtml(
+          page.html,
+          imageUrl,
+          page.imageFileName || `Diary page ${page.pageNumber || ""} image`
+        );
+
+        return {
+          ...page,
+          html,
+          text: htmlToText(html),
+        };
+      })
+    );
+  };
+
   const loadDiaryByDate = async (normalizedDate, { showMessage = true } = {}) => {
     if (!normalizedDate) {
       setMsg("Use date format like 20.01.2026, 20-01-2026, 01/20/2026, or 2026-01-20.");
@@ -654,7 +689,8 @@ export default function Diary() {
 
     setDiaryDate(String(loadedEntry.date || normalizedDate).slice(0, 10));
     setLoadedEntryId(loadedEntry.id);
-    setPages(normalizeLoadedDiaryPages(loadedEntry, title));
+    const hydratedPages = await normalizeLoadedDiaryPagesWithImages(loadedEntry, title);
+    setPages(hydratedPages);
     setPageIndex(0);
     setEditorLoadKey((key) => key + 1);
     if (showMessage) {

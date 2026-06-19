@@ -53,6 +53,19 @@ export function htmlToText(html) {
   return container.innerText || "";
 }
 
+export function attachDiaryPageImageToHtml(html, imageUrl, alt = "Diary page image") {
+  if (!imageUrl) return html || "";
+
+  const imageHtml = `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(alt)}" class="diary-editor-image" draggable="false">`;
+  const content = html || "";
+
+  if (content.includes(DIARY_PAGE_IMAGE_PLACEHOLDER)) {
+    return content.replaceAll(DIARY_PAGE_IMAGE_PLACEHOLDER, imageHtml);
+  }
+
+  return `${content}${content ? "<br>" : ""}${imageHtml}`;
+}
+
 function getImageExtension(mimeType) {
   if (mimeType === "image/jpeg") return "jpg";
   if (mimeType === "image/png") return "png";
@@ -121,6 +134,8 @@ export function normalizeLoadedDiaryPages(entry, fallbackTitle) {
         title: fallbackTitle,
         html,
         text: htmlToText(html),
+        hasImage: page.hasImage ?? false,
+        imageFileName: page.imageFileName ?? null,
       };
     });
   }
