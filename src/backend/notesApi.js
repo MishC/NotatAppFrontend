@@ -69,6 +69,12 @@ export async function fetchNotesApi({ API_URL, activeFolder }) {
 
   return (await apiRequest({ url, method: "GET" })) || [];
 }
+// GET /api/notes/done
+
+export async function fetchDoneNotesApi({ API_URL } = {}) {
+  if (!API_URL) throw new Error("API_URL is required");
+  return apiRequest({ url: `${API_URL}/done`, method: "GET" });
+}
 
 export async function fetchOverdueNotesApi({ API_URL } = {}) {
   if (!API_URL) throw new Error("API_URL is required");

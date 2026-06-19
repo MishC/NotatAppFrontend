@@ -22,6 +22,7 @@ import {
   updateNoteAction,
   selectFolderAction,
   toggleModalAction,
+  getDoneNotesAction,
 } from "../actions/noteActions";
 
 
@@ -37,6 +38,8 @@ export default function NoteApp() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [overdueNotesCount, setOverdueNotesCount] = useState(0);
+  const [overdueNotes, setOverdueNotes] = useState([]);
+  const [doneNotes, setDoneNotes] = useState([]);
 
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
@@ -52,45 +55,23 @@ export default function NoteApp() {
   // Derived data (ORDER matters)
   // -------------------------
 
-  const filteredNotes = useMemo(() => {
-    if (!activeFolder) return notes;
-    return notes.filter((n) => n && String(n.folderId) === String(activeFolder));
-  }, [notes, activeFolder]);
-
-  const noteById = useMemo(() => {
-    const m = new Map();
-    for (const n of filteredNotes) m.set(String(n.id), n);
-    return m;
-  }, [filteredNotes]);
-
-  const events = useMemo(
-    () =>
-      filteredNotes
-        .filter((n) => !!n.scheduledAt)
-        .map((n) => {
-          const colorClass = getColorClassById(n.id);
-          return {
-            id: String(n.id),
-            title: n.title,
-            start: n.scheduledAt,
-            allDay: true,
-            extendedProps: { note: { ...n, colorClass } },
-            classNames: [n.folderId === 5 ? "fc-done-event" : ""],
-          };
-        }),
-    [filteredNotes]
-  );
+  const overdueNotes = getOverdueNotes({ guest, API_URL, setError });
 
   // -------------------------
   // Effects
   // -------------------------
 
   //Set Up notes and folders
-  const refreshOverdueNotesCount = useCallback(async () => {
-    const notes = await getOverdueNotesAction({ guest, API_URL, setError });
-    console.log("Overdue notes :", notes);
-    setOverdueNotesCount(notes?.length);
-        console.log("Overdue notes count:", notes.length);
+
+  const refreshNotes = useCallback(async () => {
+    const count = await getOverdueNotesCountAction({ guest, API_URL, setError });
+    setOverdueNotesCount(count);
+
+    const overdueNotes = await getOverdueNotesAction({ guest, API_URL, setError });
+    setOverdueNotes(overdueNotes);
+
+    const doneNotes = await getDoneNotesAction({ guest, API_URL, setError });
+    setDoneNotes(doneNotes);
 
     return count;
   }, [guest, API_URL]);
@@ -106,8 +87,9 @@ export default function NoteApp() {
       setLoading,
       setError,
     });
-    refreshOverdueNotesCount();
-  }, [guest, activeFolder, API_URL, API_URL2, refreshOverdueNotesCount]);
+    refreshNotes();
+
+  }, [guest, , API_URL, API_URL2, refreshNotes]);
 
 
 
@@ -133,19 +115,19 @@ export default function NoteApp() {
   const handleAddNote = useCallback(
     async (newNote) => {
       const ok = await addNoteAction({ guest, API_URL, notes, setNotes, setMsg, setError, newNote });
-      if (ok) refreshOverdueNotesCount();
+      if (ok) refreshNotes();
       return ok;
     },
-    [guest, API_URL, notes, refreshOverdueNotesCount]
+    [guest, API_URL, notes, refreshNotes]
   );
 
   const handleDeleteNote = useCallback(
     async (id) => {
       const ok = await deleteNoteAction({ guest, API_URL, id, setNotes, setMsg, setError });
-      if (ok) refreshOverdueNotesCount();
+      if (ok) refreshNotes();
       return ok;
     },
-    [guest, API_URL, refreshOverdueNotesCount]
+    [guest, API_URL, refreshNotes]
   );
 
   const handleUpdateNote = useCallback(
@@ -165,10 +147,10 @@ export default function NoteApp() {
         setSelectedNote,
         setMsg,
       });
-      if (ok) refreshOverdueNotesCount();
+      if (ok) refreshNotes();
       return ok;
     },
-    [guest, API_URL, selectedNote, noteById, activeFolder, refreshOverdueNotesCount]
+    [guest, API_URL, selectedNote, noteById, activeFolder, refreshNotes]
   );
 
   // -------------------------
@@ -231,14 +213,14 @@ export default function NoteApp() {
             <div className="relative flex  justify-center mx-auto sm:mr-20 sm:block overflow-visible calendar-container">
               {activeFolder === 5 ? (
                 <Done
-                  notes={filteredNotes}
+                  notes={doneNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
               ) : activeFolder === 1 ? (
                 <Overdues
-                  notes={filteredNotes}
+                  notes={overdueNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
