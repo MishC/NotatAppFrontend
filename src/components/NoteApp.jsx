@@ -55,8 +55,6 @@ export default function NoteApp() {
   // Derived data (ORDER matters)
   // -------------------------
 
-  const overdueNotes = getOverdueNotes({ guest, API_URL, setError });
-
   // -------------------------
   // Effects
   // -------------------------
