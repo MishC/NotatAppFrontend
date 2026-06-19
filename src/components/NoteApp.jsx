@@ -54,6 +54,23 @@ export default function NoteApp() {
   // -------------------------
   // Derived data (ORDER matters)
   // -------------------------
+  const noteById = useMemo(() => {
+    const map = {};
+    notes.forEach((n) => (map[n.id] = n));
+    return map;
+  }, [notes]);
+
+  const events = useMemo(() => {
+    if (!notes || notes.length === 0) return [];
+    return notes.map((n) => ({
+      id: n.id,
+      title: n.title,
+      date: n.scheduledAt,
+      colorClass: getColorClassById(n.folderId),
+    }));
+  }, [notes]);
+
+  
 
   // -------------------------
   // Effects
