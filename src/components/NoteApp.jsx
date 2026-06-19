@@ -86,10 +86,10 @@ export default function NoteApp() {
 
   //Set Up notes and folders
   const refreshOverdueNotesCount = useCallback(async () => {
-    const count = await getOverdueNotesCountAction({ guest, API_URL, setError });
-    console.log("Overdue notes count:", count);
-    setOverdueNotesCount(count);
-        console.log("Overdue notes count:", count);
+    const notes = await getOverdueNotesAction({ guest, API_URL, setError });
+    console.log("Overdue notes :", notes);
+    setOverdueNotesCount(notes?.length);
+        console.log("Overdue notes count:", notes.length);
 
     return count;
   }, [guest, API_URL]);

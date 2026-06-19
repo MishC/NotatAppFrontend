@@ -88,6 +88,7 @@ export function syncGuestAction({ guest, notes, folders }) {
   save("noteapp_guest_folders", folders);
 }
 
+/* 3) GET OVERDUE COUNT */
 export async function getOverdueNotesCountAction({ guest, API_URL, setError } = {}) {
   if (guest) return 0;
 
@@ -101,6 +102,23 @@ export async function getOverdueNotesCountAction({ guest, API_URL, setError } = 
     console.error(e);
     setError?.(e.message || "Could not load overdue count.");
     return 0;
+  }
+}
+
+/*4 GET OVERDUE NOTES */
+export async function getOverdueNotesAction({ guest, API_URL, setError } = {}) {
+  if (guest) return [];
+
+  try {
+    const overdueNotes = await fetchOverdueNotesApi({ API_URL });
+    if (Array.isArray(overdueNotes)) return overdueNotes;
+
+    setError?.("Unexpected response for overdue notes.");
+    return [];
+  } catch (e) {
+    console.error(e);
+    setError?.(e.message || "Could not load overdue notes.");
+    return [];
   }
 }
 

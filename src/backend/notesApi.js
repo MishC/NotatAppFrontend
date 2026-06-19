@@ -75,7 +75,7 @@ export async function fetchOverdueNotesApi({ API_URL } = {}) {
   return apiRequest({ url: `${API_URL}/overdues`, method: "GET" });
 }
 
-// GET /api/notes/overdue/count
+// GET /api/notes/overdues/count
 export async function fetchOverdueNotesCountApi({ API_URL } = {}) {
   if (!API_URL) throw new Error("API_URL is required");
   return apiRequest({ url: `${API_URL}/overdues/count`, method: "GET" });
