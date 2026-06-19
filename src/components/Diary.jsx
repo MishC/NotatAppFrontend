@@ -6,6 +6,7 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
+  CaseLower,
   ChevronLeft,
   ChevronRight,
   FileDown,
@@ -324,7 +325,7 @@ export default function Diary() {
     reader.readAsDataURL(file);
   };
 
-  const increaseFontSize = () => {
+  const changeFontSize = (direction) => {
     editorRef.current?.focus();
     const selection = getSelectionInsideEditor(editorRef.current);
     const anchorElement =
@@ -334,7 +335,7 @@ export default function Diary() {
     const currentSize = anchorElement
       ? Number.parseFloat(window.getComputedStyle(anchorElement).fontSize)
       : 18;
-    const nextSize = Math.round(currentSize + FONT_SIZE_STEP);
+    const nextSize = Math.max(8, Math.round(currentSize + FONT_SIZE_STEP * direction));
 
     if (!selection || selection.isCollapsed) {
       document.execCommand("insertHTML", false, `<span style="font-size: ${nextSize}px;">&#8203;</span>`);
@@ -355,6 +356,9 @@ export default function Diary() {
 
     syncEditorToPage();
   };
+
+  const increaseFontSize = () => changeFontSize(1);
+  const decreaseFontSize = () => changeFontSize(-1);
 
   const insertQuote = () => {
     editorRef.current?.focus();
@@ -391,6 +395,34 @@ export default function Diary() {
     });
   };
 
+  const insertDefaultLineBreak = () => {
+    editorRef.current?.focus();
+    const selection = getSelectionInsideEditor(editorRef.current);
+
+    if (!selection) return;
+
+    const range = selection.getRangeAt(0);
+    const lineBreak = document.createElement("br");
+    const resetSpan = document.createElement("span");
+    const spacer = document.createTextNode("\u200B");
+
+    resetSpan.style.fontSize = "12px";
+    resetSpan.style.fontWeight = "400";
+    resetSpan.style.fontStyle = "normal";
+    resetSpan.style.textDecoration = "none";
+    resetSpan.appendChild(spacer);
+
+    range.deleteContents();
+    range.insertNode(resetSpan);
+    range.insertNode(lineBreak);
+
+    const caretRange = document.createRange();
+    caretRange.setStart(spacer, 1);
+    caretRange.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(caretRange);
+  };
+
   const trimEmptyLines = () => {
     if (!editorRef.current) return;
 
@@ -419,13 +451,8 @@ export default function Diary() {
   const handleEditorKeyDown = (e) => {
     if (e.key !== "Enter") return;
 
-    if (e.target?.closest?.("li")) {
-      setTimeout(syncEditorToPage, 0);
-      return;
-    }
-
     e.preventDefault();
-    document.execCommand("insertLineBreak");
+    insertDefaultLineBreak();
     updateCurrentPage({
       html: editorRef.current?.innerHTML || "",
       text: editorRef.current?.innerText || "",
@@ -894,6 +921,7 @@ export default function Diary() {
 
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <ToolbarButton title="Increase font size" Icon={Heading1} onClick={increaseFontSize} />
+                <ToolbarButton title="Smaller letters" Icon={CaseLower} onClick={decreaseFontSize} />
                 <ToolbarButton title="Bold" Icon={Bold} onClick={() => runCommand("bold")} />
                 <ToolbarButton title="Italic" Icon={Italic} onClick={() => runCommand("italic")} />
                 <ToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
