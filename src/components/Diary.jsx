@@ -1,30 +1,7 @@
-import { createElement, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  AlignJustify,
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  CaseLower,
-  ChevronLeft,
-  ChevronRight,
-  FileDown,
-  Heading1,
-  Image,
-  Italic,
-  Music,
-  Plus,
-  Quote,
-  Rows3,
-  Save,
-  Search,
-  Smile,
-  Subscript,
-  Superscript,
-  Trash2,
-  Underline,
-} from "lucide-react";
+import { Save } from "lucide-react";
+import DiaryEditor from "./DiaryEditor";
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import {
@@ -35,183 +12,26 @@ import {
   updateDiaryPageAction,
 } from "../actions/diaryAction";
 import {
-  DIARY_TITLE_DATE_FORMATS,
   formatDiaryTitleDate,
   parseDiaryDateInput,
-  todayYYYYMMDD,
 } from "../helpers/dateHelpers";
-import { diaryEmojiOptions } from "../helpers/diaryEmojiOptions";
+import {
+  DEFAULT_DIARY_DATE,
+  DEFAULT_EDITOR_FONT_SIZE,
+  DEFAULT_ENTRY_TITLE,
+  DEFAULT_TITLE_FORMAT,
+  FONT_SIZE_STEP,
+  PAGE_MAX_HEIGHT,
+  createPagePixelTiles,
+  escapeHtml,
+  getDiaryApiBase,
+  getSelectionInsideEditor,
+  normalizeLoadedDiaryPages,
+  prepareDiaryPageForBackend,
+  removeEmptyHtmlLines,
+  sanitizeFileName,
+} from "../helpers/diaryHelpers";
 import "./styles/Diary.css";
-
-const PAGE_MAX_HEIGHT = 650;
-const PAGE_FLIP_MS = 900;
-const FONT_SIZE_STEP = 2;
-const DEFAULT_EDITOR_FONT_SIZE = 14;
-const DEFAULT_DIARY_DATE = todayYYYYMMDD();
-const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
-const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
-const DIARY_PAGE_IMAGE_PLACEHOLDER = "{{diary-page-image}}";
-
-function sanitizeFileName(value) {
-  const fileName = String(value || "diary-entry")
-    .trim()
-    .replace(/[^\w.-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .toLowerCase();
-
-  return fileName || "diary-entry";
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function getDiaryApiBase() {
-  const explicit = (import.meta.env.VITE_API_DIARY || "").replace(/\/$/, "");
-  if (explicit) return explicit;
-
-  const base = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-  const apiBase = base.endsWith("/api") ? base : `${base}/api`;
-  return `${apiBase}/diary`;
-}
-
-function htmlToText(html) {
-  const container = document.createElement("div");
-  container.innerHTML = html || "";
-  return container.innerText || "";
-}
-
-function getImageExtension(mimeType) {
-  if (mimeType === "image/jpeg") return "jpg";
-  if (mimeType === "image/png") return "png";
-  if (mimeType === "image/webp") return "webp";
-  return "png";
-}
-
-async function imageSrcToFile(src, fileName) {
-  if (!src || (!src.startsWith("data:") && !src.startsWith("blob:"))) {
-    return null;
-  }
-
-  const response = await fetch(src);
-  const blob = await response.blob();
-  const type = blob.type || "image/png";
-  const extension = getImageExtension(type);
-  const name = `${fileName || "diary-image"}.${extension}`;
-
-  return new File([blob], name, { type });
-}
-
-async function extractFirstImageFileFromHtml(html, pageNumber) {
-  const container = document.createElement("div");
-  container.innerHTML = html || "";
-
-  const image = container.querySelector("img[src]");
-  if (!image) return null;
-
-  const src = image.getAttribute("src");
-  const isLocalImageSrc = src?.startsWith("data:") || src?.startsWith("blob:");
-
-  if (!isLocalImageSrc) return null;
-
-  const fallbackName = `diary-page-${pageNumber || 1}`;
-  const rawName = image.getAttribute("alt") || fallbackName;
-  const fileName = rawName.replace(/\.[a-z0-9]+$/i, "").replace(/[^\w.-]+/g, "-");
-
-  return imageSrcToFile(src, fileName || fallbackName);
-}
-
-async function prepareDiaryPageForBackend(html, pageNumber) {
-  const container = document.createElement("div");
-  container.innerHTML = html || "";
-
-  const image = container.querySelector("img[src]");
-  if (!image) return { content: container.innerHTML, image: null };
-
-  const src = image.getAttribute("src");
-  const isLocalImageSrc = src?.startsWith("data:") || src?.startsWith("blob:");
-  if (!isLocalImageSrc) return { content: container.innerHTML, image: null };
-
-  const file = await extractFirstImageFileFromHtml(html, pageNumber);
-  image.replaceWith(document.createTextNode(DIARY_PAGE_IMAGE_PLACEHOLDER));
-
-  return { content: container.innerHTML, image: file };
-}
-
-function normalizeLoadedDiaryPages(entry, fallbackTitle) {
-  if (Array.isArray(entry?.pages) && entry.pages.length > 0) {
-    return entry.pages.map((page, index) => {
-      const html = page.content || page.html || "";
-
-      return {
-        id: page.id,
-        pageNumber: page.pageNumber ?? index + 1,
-        title: fallbackTitle,
-        html,
-        text: htmlToText(html),
-      };
-    });
-  }
-
-  return [
-    {
-      id: null,
-      pageNumber: 1,
-      title: fallbackTitle,
-      html: "",
-      text: "",
-    },
-  ];
-}
-
-function removeEmptyHtmlLines(html) {
-  const container = document.createElement("div");
-  container.innerHTML = html || "";
-  const emptyTextPattern = /[\s\u200B\u00A0]/g;
-  const isEmptyElement = (element) =>
-    !element.querySelector("img") &&
-    !element.textContent.replace(emptyTextPattern, "") &&
-    !element.querySelector("br + *:not(br)");
-
-  [...container.querySelectorAll("span, div, p")].forEach((element) => {
-    if (isEmptyElement(element)) element.remove();
-  });
-
-  return container.innerHTML
-    .replace(/<div>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>/gi, "")
-    .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
-    .replace(/(?:<br\s*\/?>\s*){2,}/gi, "<br>")
-    .replace(/^(?:\s|&nbsp;|<br\s*\/?>)+/gi, "")
-    .replace(/(?:\s|&nbsp;|<br\s*\/?>)+$/gi, "");
-}
-
-function getSelectionInsideEditor(editor) {
-  const selection = window.getSelection();
-
-  if (!selection || selection.rangeCount === 0 || !editor?.contains(selection.anchorNode)) {
-    return null;
-  }
-
-  return selection;
-}
-
-function ToolbarButton({ title, Icon, onClick }) {
-  return (
-    <button
-      type="button"
-      title={title}
-      onClick={onClick}
-      className="h-10 w-10 rounded-xl border border-emerald-100 bg-white/80 text-slate-700 grid place-items-center hover:bg-emerald-50 hover:text-emerald-700 transition"
-    >
-      {createElement(Icon, { className: "h-4 w-4" })}
-    </button>
-  );
-}
 
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
@@ -219,16 +39,14 @@ export default function Diary() {
   const editorRef = useRef(null);
   const imageInputRef = useRef(null);
   const pagesRef = useRef([]);
-  const flipTimerRef = useRef(null);
   const didAutoLoadRef = useRef(false);
+  const previousPageIndexRef = useRef(0);
+  const pixelTimerRef = useRef(null);
   const API_URL_DIARY = getDiaryApiBase();
   const [diaryEntries, setDiaryEntries] = useState([]);
   const [loadedEntryId, setLoadedEntryId] = useState(null);
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
-  const [pageDirection, setPageDirection] = useState(1);
-  const [isPageFlipping, setIsPageFlipping] = useState(false);
-  const [flipHtml, setFlipHtml] = useState("");
   const [frameStyle, setFrameStyle] = useState("marker");
   const [lookupDate, setLookupDate] = useState(DEFAULT_DIARY_DATE);
   const [diaryDate, setDiaryDate] = useState(DEFAULT_DIARY_DATE);
@@ -238,6 +56,7 @@ export default function Diary() {
   const [showRuledLines, setShowRuledLines] = useState(false);
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
   const [alignmentMenuOpen, setAlignmentMenuOpen] = useState(false);
+  const [pagePixels, setPagePixels] = useState([]);
   const [msg, setMsg] = useState("");
 
   const currentPage = pages[pageIndex] || pages[0];
@@ -252,15 +71,27 @@ export default function Diary() {
   useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
 
   useEffect(() => {
-    return () => {
-      if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!editorRef.current) return;
     editorRef.current.innerHTML = pagesRef.current[pageIndex]?.html || "";
   }, [pageIndex, editorLoadKey]);
+
+  useEffect(() => {
+    if (previousPageIndexRef.current === pageIndex) return;
+
+    if (pixelTimerRef.current) clearTimeout(pixelTimerRef.current);
+    setPagePixels(createPagePixelTiles());
+    previousPageIndexRef.current = pageIndex;
+
+    pixelTimerRef.current = setTimeout(() => {
+      setPagePixels([]);
+    }, 1200);
+  }, [pageIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (pixelTimerRef.current) clearTimeout(pixelTimerRef.current);
+    };
+  }, []);
 
   const updateCurrentPage = (updates) => {
     setPages((prev) =>
@@ -472,24 +303,10 @@ export default function Diary() {
     });
   };
 
-  const startPageTransition = (nextIndex, direction) => {
-    if (nextIndex < 0) return;
-    if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
-
-    setFlipHtml(editorRef.current?.innerHTML || pagesRef.current[pageIndex]?.html || "");
-    setPageDirection(direction);
-    setIsPageFlipping(true);
-    setPageIndex(nextIndex);
-
-    flipTimerRef.current = setTimeout(() => {
-      setIsPageFlipping(false);
-      setFlipHtml("");
-    }, PAGE_FLIP_MS);
-  };
-
   const goToPage = (nextIndex) => {
     if (nextIndex < 0 || nextIndex >= pages.length) return;
-    startPageTransition(nextIndex, nextIndex > pageIndex ? 1 : -1);
+    syncEditorToPage();
+    setPageIndex(nextIndex);
   };
 
   const addPage = () => {
@@ -504,7 +321,8 @@ export default function Diary() {
         text: "",
       },
     ]);
-    startPageTransition(nextIndex, 1);
+    syncEditorToPage();
+    setPageIndex(nextIndex);
   };
 
   const handleEditorInput = (e) => {
@@ -530,7 +348,7 @@ export default function Diary() {
     }
 
     setMsg("Page limit reached. Continuing on the next page.");
-    startPageTransition(nextIndex, 1);
+    setPageIndex(nextIndex);
   };
 
   const handleSave = async () => {
@@ -903,262 +721,44 @@ export default function Diary() {
         )}
 
         <section className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[1fr_280px] lg:items-stretch">
-          <div className="flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
-              {!guest && (
-                <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
-                  <input
-                    type="text"
-                    value={lookupDate}
-                    onChange={(e) => setLookupDate(e.target.value)}
-                    placeholder="Find by date: 20.01.2026, 20-01-2026 or 01/20/2026"
-                    className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleLoadEntry}
-                    disabled={loadingEntry}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 transition"
-                  >
-                    <Search className="h-4 w-4" />
-                    {loadingEntry ? "Loading..." : "Load"}
-                  </button>
-                </div>
-              )}
-
-              <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex w-full flex-col gap-2 md:flex-row">
-                  <input
-                    type="text"
-                    value={entryTitle}
-                    readOnly
-                    className="w-full rounded-xl border border-emerald-100 bg-white/80 px-4 py-3 text-2xl font-bold text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-                    aria-label="Diary title"
-                  />
-                  <select
-                    value={titleFormat}
-                    onChange={(e) => handleTitleFormatChange(e.target.value)}
-                    className="min-w-56 rounded-xl border border-emerald-100 bg-white/80 px-3 py-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
-                    aria-label="Diary title date format"
-                  >
-                    {DIARY_TITLE_DATE_FORMATS.map((format) => (
-                      <option key={format.value} value={format.value}>
-                        {format.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => goToPage(pageIndex - 1)}
-                    disabled={pageIndex === 0}
-                    className="h-10 w-10 rounded-xl border border-emerald-100 bg-white/80 text-slate-700 grid place-items-center hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 transition"
-                    title="Previous page"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-2 text-sm font-semibold text-emerald-800">
-                    Page {pageIndex + 1} / {pages.length}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => goToPage(pageIndex + 1)}
-                    disabled={pageIndex === pages.length - 1}
-                    className="h-10 w-10 rounded-xl border border-emerald-100 bg-white/80 text-slate-700 grid place-items-center hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-40 transition"
-                    title="Next page"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addPage}
-                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-100 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-emerald-50 transition"
-                >
-                  <Plus className="h-4 w-4" />
-                  New page
-                </button>
-              </div>
-
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <ToolbarButton title="Increase font size" Icon={Heading1} onClick={increaseFontSize} />
-                <ToolbarButton title="Smaller letters" Icon={CaseLower} onClick={decreaseFontSize} />
-                <ToolbarButton title="Bold" Icon={Bold} onClick={() => runCommand("bold")} />
-                <ToolbarButton title="Italic" Icon={Italic} onClick={() => runCommand("italic")} />
-                <ToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
-                <ToolbarButton title="Superscript" Icon={Superscript} onClick={() => runCommand("superscript")} />
-                <ToolbarButton title="Subscript" Icon={Subscript} onClick={() => runCommand("subscript")} />
-                <div className="relative">
-                  <ToolbarButton
-                    title="Alignment"
-                    Icon={AlignJustify}
-                    onClick={() => {
-                      setAlignmentMenuOpen((value) => !value);
-                      setEmojiMenuOpen(false);
-                    }}
-                  />
-                  {alignmentMenuOpen && (
-                    <div className="absolute left-0 top-12 z-30 flex gap-1 rounded-2xl border border-emerald-100 bg-white/95 p-2 shadow-xl backdrop-blur">
-                      {[
-                        { title: "Align left", Icon: AlignLeft, command: "justifyLeft" },
-                        { title: "Align center", Icon: AlignCenter, command: "justifyCenter" },
-                        { title: "Align right", Icon: AlignRight, command: "justifyRight" },
-                      ].map(({ title, Icon, command }) => (
-                        <ToolbarButton
-                          key={command}
-                          title={title}
-                          Icon={Icon}
-                          onClick={() => {
-                            runCommand(command);
-                            setAlignmentMenuOpen(false);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <ToolbarButton title="Quote" Icon={Quote} onClick={insertQuote} />
-                <ToolbarButton title="Image" Icon={Image} onClick={handleImageButtonClick} />
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelected}
-                  className="hidden"
-                />
-                <select
-                  defaultValue=""
-                  onChange={(e) => {
-                    if (!e.target.value) return;
-                    runCommand("foreColor", e.target.value);
-                    e.target.value = "";
-                  }}
-                  className="h-10 rounded-xl border border-emerald-100 bg-white/80 px-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
-                  title="Text color"
-                >
-                  <option value="">Text color</option>
-                  <option value="#111827">Black</option>
-                  <option value="#dc2626">Red</option>
-                  <option value="#ea580c">Orange</option>
-                  <option value="#059669">Green</option>
-                  <option value="#2563eb">Blue</option>
-                  <option value="#7c3aed">Purple</option>
-                </select>
-                <button
-                  type="button"
-                  onClick={trimEmptyLines}
-                  className="h-10 rounded-xl border border-emerald-100 bg-white/80 px-3 text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
-                  title="Remove all empty lines"
-                >
-                  Trim
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowRuledLines((value) => !value)}
-                  className={[
-                    "h-10 w-10 rounded-xl border grid place-items-center transition",
-                    showRuledLines
-                      ? "border-orange-200 bg-orange-50 text-orange-700"
-                      : "border-emerald-100 bg-white/80 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700",
-                  ].join(" ")}
-                  title="Show writing lines"
-                >
-                  <Rows3 className="h-4 w-4" />
-                </button>
-                <ToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
-                <ToolbarButton title="Save as PDF" Icon={FileDown} onClick={handleSaveAsPdf} />
-                <ToolbarButton title="Suggest song" Icon={Music} onClick={handleSongSuggestion} />
-                <div className="relative">
-                  <ToolbarButton
-                    title="Emoji"
-                    Icon={Smile}
-                    onClick={() => {
-                      setEmojiMenuOpen((value) => !value);
-                      setAlignmentMenuOpen(false);
-                    }}
-                  />
-                  {emojiMenuOpen && (
-                    <div className="absolute right-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
-                      <div className="grid grid-cols-8 gap-1">
-                        {diaryEmojiOptions.map((emoji) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            onClick={() => {
-                              insertText(emoji);
-                              setEmojiMenuOpen(false);
-                            }}
-                            className="h-8 w-8 rounded-lg text-lg hover:bg-emerald-50 transition"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="flex max-w-full flex-nowrap gap-2 overflow-x-auto pb-1">
-                  {diaryEmojiOptions.slice(0, 8).map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => insertText(emoji)}
-                      className="h-9 w-9 shrink-0 rounded-xl border border-emerald-100 bg-white/80 text-lg hover:bg-emerald-50 transition"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className={`diary-page-stage ${isPageFlipping ? "diary-page-stage--flipping" : ""}`}>
-                <div className={`diary-frame diary-frame--${frameStyle}`}>
-                  <div className="diary-frame__inner">
-                    <div className="relative min-h-0 flex-1">
-                      {!entryText && (
-                        <div className="pointer-events-none absolute left-5 top-5 text-slate-400">
-                          Start writing your diary entry here...
-                        </div>
-                      )}
-                      <div
-                        ref={editorRef}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onKeyDown={handleEditorKeyDown}
-                        onInput={handleEditorInput}
-                        className={[
-                          "diary-editor-page w-full rounded-2xl border border-emerald-100 bg-white px-5 py-5 text-lg leading-8 text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100",
-                          showRuledLines ? "diary-editor-page--ruled-lines" : "",
-                        ].join(" ")}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {isPageFlipping && (
-                  <div
-                    className={[
-                      "diary-book-flip",
-                      pageDirection > 0 ? "diary-book-flip--forward" : "diary-book-flip--back",
-                    ].join(" ")}
-                    aria-hidden="true"
-                  >
-                    <div className={`diary-frame diary-frame--${frameStyle} diary-book-flip__page`}>
-                      <div className="diary-frame__inner">
-                        <div
-                          className="diary-book-flip__content"
-                          dangerouslySetInnerHTML={{ __html: flipHtml }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-          </div>
+          <DiaryEditor
+            addPage={addPage}
+            alignmentMenuOpen={alignmentMenuOpen}
+            decreaseFontSize={decreaseFontSize}
+            deleteCurrentPage={deleteCurrentPage}
+            editorRef={editorRef}
+            emojiMenuOpen={emojiMenuOpen}
+            entryText={entryText}
+            entryTitle={entryTitle}
+            frameStyle={frameStyle}
+            goToPage={goToPage}
+            guest={guest}
+            handleEditorInput={handleEditorInput}
+            handleEditorKeyDown={handleEditorKeyDown}
+            handleImageButtonClick={handleImageButtonClick}
+            handleImageSelected={handleImageSelected}
+            handleLoadEntry={handleLoadEntry}
+            handleSaveAsPdf={handleSaveAsPdf}
+            handleSongSuggestion={handleSongSuggestion}
+            handleTitleFormatChange={handleTitleFormatChange}
+            imageInputRef={imageInputRef}
+            increaseFontSize={increaseFontSize}
+            insertQuote={insertQuote}
+            insertText={insertText}
+            loadingEntry={loadingEntry}
+            lookupDate={lookupDate}
+            pageIndex={pageIndex}
+            pagePixels={pagePixels}
+            pages={pages}
+            runCommand={runCommand}
+            setAlignmentMenuOpen={setAlignmentMenuOpen}
+            setEmojiMenuOpen={setEmojiMenuOpen}
+            setLookupDate={setLookupDate}
+            setShowRuledLines={setShowRuledLines}
+            showRuledLines={showRuledLines}
+            titleFormat={titleFormat}
+            trimEmptyLines={trimEmptyLines}
+          />
 
           <DiarySidebar
             activeFrame={frameStyle}
