@@ -6,7 +6,7 @@ export const PAGE_MAX_HEIGHT = 650;
 export const FONT_SIZE_STEP = 2;
 export const DEFAULT_EDITOR_FONT_SIZE = 14;
 export const DEFAULT_DIARY_DATE = todayYYYYMMDD();
-export const DEFAULT_TITLE_FORMAT = "yyyyMMdd";
+export const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
 export const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
 export const DIARY_PAGE_IMAGE_PLACEHOLDER = "{{diary-page-image}}";
 

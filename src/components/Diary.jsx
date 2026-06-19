@@ -651,7 +651,7 @@ export default function Diary() {
 
   const loadDiaryByDate = async (normalizedDate, { showMessage = true } = {}) => {
     if (!normalizedDate) {
-      setMsg("Use date format like 20.01.2026, 20-01-2026, 01/20/2026, or 2026-01-20.");
+      setMsg("Use date format like 20.01.2026, 20-01-2026, or 01/20/2026.");
       return;
     }
 
