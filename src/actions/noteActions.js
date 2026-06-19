@@ -4,6 +4,7 @@ import {
   updateNoteApi,
   swapNotesApi,
   fetchNotesApi,
+  fetchOverdueNotesApi,
   fetchOverdueNotesCountApi,
   fetchFoldersApi,
   updateFolderApi,
@@ -91,6 +92,9 @@ export async function getOverdueNotesCountAction({ guest, API_URL, setError } = 
   if (guest) return 0;
 
   try {
+    const overdueNotes = await fetchOverdueNotesApi({ API_URL });
+    if (Array.isArray(overdueNotes)) return overdueNotes.length;
+
     const payload = await fetchOverdueNotesCountApi({ API_URL });
     return Number(payload?.numberOfOverdue ?? 0) || 0;
   } catch (e) {

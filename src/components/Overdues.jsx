@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 
- function Overdues({ notes, onOpen, folders, onDelete }) {
+ function Overdues({ notes = [], onOpen, folders = [], onDelete }) {
   const [q, setQ] = useState("");
   
 

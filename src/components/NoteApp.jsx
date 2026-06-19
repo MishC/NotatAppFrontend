@@ -235,6 +235,7 @@ export default function NoteApp() {
               ) : activeFolder === 1 ? (
                 <Overdues
                   notes={filteredNotes}
+                  folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
