@@ -25,7 +25,7 @@ import {
   Trash2,
   Underline,
 } from "lucide-react";
-
+import todayYYYYMMDD from "../helpers/dateHelpers";
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import {
@@ -238,9 +238,10 @@ export default function Diary() {
 
   useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
 
-  useEffect(() => {
+  useEffect(() => { 
     return () => {
       if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
+      handleLoadEntry(todayYYYYMMDD());
     };
   }, []);
 
@@ -424,7 +425,8 @@ export default function Diary() {
   };
 
   const trimEmptyLines = () => {
-    if (!editorRef.current) return;
+    if (!editorRef.current) 
+      {removeEmptyHtmlLines(editorRef.current.innerText);};
 
     const trimmedHtml = removeEmptyHtmlLines(editorRef.current.innerHTML);
     editorRef.current.innerHTML = trimmedHtml;
@@ -680,6 +682,7 @@ export default function Diary() {
   const handleSongSuggestion = () => {
     const text = editorRef.current?.innerText?.trim();
 
+
     if (!text) {
       setMsg("Write something first, then AI can choose a song from the diary text.");
       return;
@@ -757,12 +760,13 @@ export default function Diary() {
     printWindow.print();
   };
 
-  const handleLoadEntry = async () => {
+  const handleLoadEntry = async (normalizedDate=parseDiaryDateInput(todayYYYYMMDD())) => {
     setMsg("");
     const normalizedDate = parseDiaryDateInput(lookupDate);
 
+
     if (!normalizedDate) {
-      setMsg("Use date format like 17.06.2026, 06/17/2026, or 2026-06-17.");
+      setMsg("Use date format like 20.01.2026, 01/20/2026, or 2026-01-20.");
       return;
     }
 
@@ -846,7 +850,7 @@ export default function Diary() {
                   type="text"
                   value={lookupDate}
                   onChange={(e) => setLookupDate(e.target.value)}
-                  placeholder="Find by date: 17.06.2026 or 06/17/2026"
+                  placeholder="Find by date: 20.01.2026 or 01/20/2026"
                   className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                 />
                 <button
