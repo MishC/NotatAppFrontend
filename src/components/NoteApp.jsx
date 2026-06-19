@@ -54,23 +54,36 @@ export default function NoteApp() {
   // -------------------------
   // Derived data (ORDER matters)
   // -------------------------
+ 
+  const filteredNotes = useMemo(() => {
+    if (!activeFolder) return notes;
+    return notes.filter((n) => n && String(n.folderId) === String(activeFolder));
+  }, [notes, activeFolder]);
+
   const noteById = useMemo(() => {
-    const map = {};
-    notes.forEach((n) => (map[n.id] = n));
-    return map;
-  }, [notes]);
+    const m = new Map();
+    for (const n of filteredNotes) m.set(String(n.id), n);
+    return m;
+  }, [filteredNotes]);
 
-  const events = useMemo(() => {
-    if (!notes || notes.length === 0) return [];
-    return notes.map((n) => ({
-      id: n.id,
-      title: n.title,
-      date: n.scheduledAt,
-      colorClass: getColorClassById(n.folderId),
-    }));
-  }, [notes]);
+  const events = useMemo(
+    () =>
+      filteredNotes
+        .filter((n) => !!n.scheduledAt)
+        .map((n) => {
+          const colorClass = getColorClassById(n.id);
+          return {
+            id: String(n.id),
+            title: n.title,
+            start: n.scheduledAt,
+            allDay: true,
+            extendedProps: { note: { ...n, colorClass } },
+            classNames: [n.folderId === 5 ? "fc-done-event" : ""],
+          };
+        }),
+    [filteredNotes]
+  );
 
-  
 
   // -------------------------
   // Effects
