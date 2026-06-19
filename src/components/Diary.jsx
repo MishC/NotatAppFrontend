@@ -28,6 +28,13 @@ import {
 import DiarySidebar from "./DiarySidebar";
 import NavigationBar from "./NavigationBar";
 import {
+  createDiaryEntryAction,
+  createDiaryPageAction,
+  initDiaryEntriesAction,
+  updateDiaryEntryAction,
+  updateDiaryPageAction,
+} from "../actions/diaryAction";
+import {
   DIARY_TITLE_DATE_FORMATS,
   formatDiaryTitleDate,
   parseDiaryDateInput,
@@ -42,6 +49,7 @@ const FONT_SIZE_STEP = 2;
 const DEFAULT_DIARY_DATE = todayYYYYMMDD();
 const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
 const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
+const DIARY_PAGE_IMAGE_PLACEHOLDER = "{{diary-page-image}}";
 
 function sanitizeFileName(value) {
   const fileName = String(value || "diary-entry")
@@ -62,26 +70,100 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-function getDiaryApiUrl(date) {
+function getDiaryApiBase() {
+  const explicit = (import.meta.env.VITE_API_DIARY || "").replace(/\/$/, "");
+  if (explicit) return explicit;
+
   const base = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   const apiBase = base.endsWith("/api") ? base : `${base}/api`;
-  return `${apiBase}/diary?date=${encodeURIComponent(date)}`;
+  return `${apiBase}/diary`;
 }
 
-function normalizeDiaryPages(data, fallbackTitle) {
-  if (Array.isArray(data?.pages) && data.pages.length > 0) {
-    return data.pages.map((page) => ({
-      title: page.title || fallbackTitle,
-      html: page.html || page.content || "",
-      text: page.text || "",
-    }));
+function htmlToText(html) {
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+  return container.innerText || "";
+}
+
+function getImageExtension(mimeType) {
+  if (mimeType === "image/jpeg") return "jpg";
+  if (mimeType === "image/png") return "png";
+  if (mimeType === "image/webp") return "webp";
+  return "png";
+}
+
+async function imageSrcToFile(src, fileName) {
+  if (!src || (!src.startsWith("data:") && !src.startsWith("blob:"))) {
+    return null;
+  }
+
+  const response = await fetch(src);
+  const blob = await response.blob();
+  const type = blob.type || "image/png";
+  const extension = getImageExtension(type);
+  const name = `${fileName || "diary-image"}.${extension}`;
+
+  return new File([blob], name, { type });
+}
+
+async function extractFirstImageFileFromHtml(html, pageNumber) {
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+
+  const image = container.querySelector("img[src]");
+  if (!image) return null;
+
+  const src = image.getAttribute("src");
+  const isLocalImageSrc = src?.startsWith("data:") || src?.startsWith("blob:");
+
+  if (!isLocalImageSrc) return null;
+
+  const fallbackName = `diary-page-${pageNumber || 1}`;
+  const rawName = image.getAttribute("alt") || fallbackName;
+  const fileName = rawName.replace(/\.[a-z0-9]+$/i, "").replace(/[^\w.-]+/g, "-");
+
+  return imageSrcToFile(src, fileName || fallbackName);
+}
+
+async function prepareDiaryPageForBackend(html, pageNumber) {
+  const container = document.createElement("div");
+  container.innerHTML = html || "";
+
+  const image = container.querySelector("img[src]");
+  if (!image) return { content: container.innerHTML, image: null };
+
+  const src = image.getAttribute("src");
+  const isLocalImageSrc = src?.startsWith("data:") || src?.startsWith("blob:");
+  if (!isLocalImageSrc) return { content: container.innerHTML, image: null };
+
+  const file = await extractFirstImageFileFromHtml(html, pageNumber);
+  image.replaceWith(document.createTextNode(DIARY_PAGE_IMAGE_PLACEHOLDER));
+
+  return { content: container.innerHTML, image: file };
+}
+
+function normalizeLoadedDiaryPages(entry, fallbackTitle) {
+  if (Array.isArray(entry?.pages) && entry.pages.length > 0) {
+    return entry.pages.map((page, index) => {
+      const html = page.content || page.html || "";
+
+      return {
+        id: page.id,
+        pageNumber: page.pageNumber ?? index + 1,
+        title: fallbackTitle,
+        html,
+        text: htmlToText(html),
+      };
+    });
   }
 
   return [
     {
-      title: data?.title || fallbackTitle,
-      html: data?.html || data?.content || "",
-      text: data?.text || "",
+      id: null,
+      pageNumber: 1,
+      title: fallbackTitle,
+      html: "",
+      text: "",
     },
   ];
 }
@@ -120,10 +202,14 @@ function ToolbarButton({ title, Icon, onClick }) {
 
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
+  const guest = useSelector((s) => s.auth.guest);
   const editorRef = useRef(null);
   const imageInputRef = useRef(null);
   const pagesRef = useRef([]);
   const flipTimerRef = useRef(null);
+  const API_URL_DIARY = getDiaryApiBase();
+  const [diaryEntries, setDiaryEntries] = useState([]);
+  const [loadedEntryId, setLoadedEntryId] = useState(null);
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageDirection, setPageDirection] = useState(1);
@@ -370,7 +456,13 @@ export default function Diary() {
     const nextIndex = pages.length;
     setPages((prev) => [
       ...prev,
-      { title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" },
+      {
+        id: null,
+        pageNumber: prev.length + 1,
+        title: formatDiaryTitleDate(diaryDate, titleFormat),
+        html: "",
+        text: "",
+      },
     ]);
     startPageTransition(nextIndex, 1);
   };
@@ -387,7 +479,13 @@ export default function Diary() {
     if (nextIndex >= pagesRef.current.length) {
       setPages((prev) => [
         ...prev,
-        { title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" },
+        {
+          id: null,
+          pageNumber: prev.length + 1,
+          title: formatDiaryTitleDate(diaryDate, titleFormat),
+          html: "",
+          text: "",
+        },
       ]);
     }
 
@@ -395,8 +493,161 @@ export default function Diary() {
     startPageTransition(nextIndex, 1);
   };
 
-  const handleSave = () => {
-    setMsg("Diary entry saved locally in the editor draft.");
+  const handleSave = async () => {
+    setMsg("");
+
+    if (guest) {
+      setMsg("Diary can be saved only when you are logged in.");
+      return;
+    }
+
+    const currentPages = await Promise.all(pagesRef.current.map(async (page, index) => {
+      const rawHtml = index === pageIndex ? editorRef.current?.innerHTML || "" : page.html || "";
+      const prepared = await prepareDiaryPageForBackend(rawHtml, index + 1);
+
+      return {
+        ...page,
+        html: rawHtml,
+        contentForApi: prepared.content,
+        text: index === pageIndex ? editorRef.current?.innerText || "" : page.text,
+        image: prepared.image,
+      };
+    }));
+    const title = formatDiaryTitleDate(diaryDate, titleFormat);
+
+    setLoadingEntry(true);
+    try {
+      if (!loadedEntryId) {
+        const createdEntry = await createDiaryEntryAction({
+          guest: false,
+          API_URL_DIARY,
+          diaryEntries,
+          setDiaryEntries,
+          setMsg,
+          setError: setMsg,
+          newEntry: {
+            title,
+            date: diaryDate,
+            content: currentPages[0]?.contentForApi || "",
+            image: currentPages[0]?.image,
+          },
+        });
+
+        if (!createdEntry) return;
+
+        const createdPages = createdEntry.pages || [];
+        const nextPages = currentPages.map((page, index) => ({
+          ...page,
+          id: createdPages[index]?.id ?? page.id ?? null,
+          pageNumber: createdPages[index]?.pageNumber ?? index + 1,
+          title,
+        }));
+
+        for (let index = 1; index < nextPages.length; index += 1) {
+          const createdPage = await createDiaryPageAction({
+            guest: false,
+            API_URL_DIARY,
+            entryId: createdEntry.id,
+            newPage: {
+              pageNumber: index + 1,
+              content: nextPages[index].contentForApi || "",
+              image: nextPages[index].image,
+            },
+            activeDate: null,
+            setDiaryEntries,
+            setLoading: setLoadingEntry,
+            setMsg,
+            setError: setMsg,
+          });
+
+          if (createdPage?.id) {
+            nextPages[index] = {
+              ...nextPages[index],
+              id: createdPage.id,
+              pageNumber: createdPage.pageNumber ?? index + 1,
+            };
+          }
+        }
+
+        setLoadedEntryId(createdEntry.id);
+        setPages(nextPages);
+        setEditorLoadKey((key) => key + 1);
+        setMsg("Diary saved.");
+        return;
+      }
+
+      await updateDiaryEntryAction({
+        guest: false,
+        API_URL_DIARY,
+        entryId: loadedEntryId,
+        updatedFields: { title, date: diaryDate },
+        selectedEntry:
+          diaryEntries.find((entry) => String(entry.id) === String(loadedEntryId)) || {
+            id: loadedEntryId,
+            title,
+            date: diaryDate,
+          },
+        activeDate: null,
+        setDiaryEntries,
+        setLoading: setLoadingEntry,
+        setError: setMsg,
+        setMsg,
+      });
+
+      const nextPages = [...currentPages];
+
+      for (let index = 0; index < nextPages.length; index += 1) {
+        const page = nextPages[index];
+
+        if (page.id) {
+          await updateDiaryPageAction({
+            guest: false,
+            API_URL_DIARY,
+            pageId: page.id,
+            updatedFields: {
+              pageNumber: index + 1,
+              content: page.contentForApi || "",
+              image: page.image,
+            },
+            activeDate: null,
+            setDiaryEntries,
+            setLoading: setLoadingEntry,
+            setError: setMsg,
+            setMsg,
+          });
+          continue;
+        }
+
+        const createdPage = await createDiaryPageAction({
+          guest: false,
+          API_URL_DIARY,
+          entryId: loadedEntryId,
+          newPage: {
+            pageNumber: index + 1,
+            content: page.contentForApi || "",
+            image: page.image,
+          },
+          activeDate: null,
+          setDiaryEntries,
+          setLoading: setLoadingEntry,
+          setMsg,
+          setError: setMsg,
+        });
+
+        if (createdPage?.id) {
+          nextPages[index] = {
+            ...page,
+            id: createdPage.id,
+            pageNumber: createdPage.pageNumber ?? index + 1,
+          };
+        }
+      }
+
+      setPages(nextPages.map((page, index) => ({ ...page, title, pageNumber: index + 1 })));
+      setMsg("Diary saved.");
+    } finally {
+      setLoadingEntry(false);
+    }
   };
 
   const handleSongSuggestion = () => {
@@ -489,41 +740,41 @@ export default function Diary() {
     }
 
     setLoadingEntry(true);
-    try {
-      const response = await fetch(getDiaryApiUrl(normalizedDate), {
-        method: "GET",
-        credentials: "include",
-      });
+    let loadedEntries = [];
 
-      if (response.status === 404) {
-        const title = formatDiaryTitleDate(normalizedDate, titleFormat);
-        setDiaryDate(normalizedDate);
-        setPages([{ title, html: "", text: "" }]);
-        setPageIndex(0);
-        setEditorLoadKey((key) => key + 1);
-        setMsg("No diary entry found for this date. You can start writing it now.");
-        return;
-      }
+    const ok = await initDiaryEntriesAction({
+      guest,
+      API_URL_DIARY,
+      date: normalizedDate,
+      setDiaryEntries: (entries) => {
+        loadedEntries = entries || [];
+        setDiaryEntries(entries || []);
+      },
+      setLoading: setLoadingEntry,
+      setError: setMsg,
+    });
 
-      if (!response.ok) {
-        throw new Error("Could not load diary entry.");
-      }
+    if (!ok) return;
 
-      const data = await response.json();
-      const loadedPages = normalizeDiaryPages(data, formatDiaryTitleDate(normalizedDate, titleFormat));
+    const title = formatDiaryTitleDate(normalizedDate, titleFormat);
+    const loadedEntry = loadedEntries[0];
 
-      setPages(loadedPages);
+    if (!loadedEntry) {
       setDiaryDate(normalizedDate);
-      setFrameStyle(data?.frameStyle || data?.frameTheme || frameStyle);
+      setLoadedEntryId(null);
+      setPages([{ id: null, pageNumber: 1, title, html: "", text: "" }]);
       setPageIndex(0);
       setEditorLoadKey((key) => key + 1);
-      setMsg("Diary entry loaded. You can edit it now.");
-    } catch (error) {
-      console.error(error);
-      setMsg(error.message || "Could not load diary entry.");
-    } finally {
-      setLoadingEntry(false);
+      setMsg("No diary entry found for this date. You can start writing it now.");
+      return;
     }
+
+    setDiaryDate(String(loadedEntry.date || normalizedDate).slice(0, 10));
+    setLoadedEntryId(loadedEntry.id);
+    setPages(normalizeLoadedDiaryPages(loadedEntry, title));
+    setPageIndex(0);
+    setEditorLoadKey((key) => key + 1);
+    setMsg("Diary entry loaded. You can edit it now.");
   };
 
   return (

@@ -57,7 +57,7 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
   return expectJson ? readBody(res) : null;
 }
 
-
+////////////////////////////////// NOTES API /////////////////////////////////////////////
 export async function fetchNotesApi({ API_URL, activeFolder }) {
   let url;
 
