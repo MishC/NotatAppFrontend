@@ -28,8 +28,8 @@ async function apiRequest({
   const headers = {};
 
   // IMPORTANT:
-  // Pri FormData nikdy nedávaj Content-Type ručne.
-  // Browser sám nastaví multipart/form-data; boundary=...
+  // FormData !Content-Type 
+  // Browser set up multipart/form-data; boundary=...
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
@@ -288,3 +288,5 @@ export async function deleteDiaryEntriesByDateApi({
 
   return true;
 }
+
+
