@@ -16,6 +16,7 @@ export function formatDateDDMMYYYY(ymd) {
 }
 
 export const DIARY_TITLE_DATE_FORMATS = [
+  { value: "yyyyMMdd", label: "2026-06-19" },
   { value: "ddmmyyyy", label: "17-06-2026" },
   { value: "skLong", label: "4. januar 2026" },
   { value: "enLong", label: "January of 4th, 2026" },
@@ -48,9 +49,9 @@ function getOrdinalDay(day) {
   return `${day}th`;
 }
 
-export function formatDiaryTitleDate(ymd, format = "ddmmyyyy") {
+export function formatDiaryTitleDate(ymd, format = "yyyyMMdd") {
   const date = toLocalDate(ymd);
-  if (!date) return formatDateDDMMYYYY(ymd);
+  if (!date) return ymd || "";
 
   const year = date.getFullYear();
   const day = date.getDate();
@@ -65,7 +66,11 @@ export function formatDiaryTitleDate(ymd, format = "ddmmyyyy") {
     return `${month} of ${getOrdinalDay(day)}, ${year}`;
   }
 
-  return formatDateDDMMYYYY(ymd);
+  if (format === "ddmmyyyy") {
+    return formatDateDDMMYYYY(ymd);
+  }
+
+  return ymd;
 }
 
 export function parseDiaryDateInput(input) {
