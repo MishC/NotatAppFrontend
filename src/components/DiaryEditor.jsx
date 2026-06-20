@@ -39,6 +39,7 @@ export default function DiaryEditor({
   goToPage,
   guest,
   handleEditorInput,
+  handleEditorClick,
   handleEditorKeyDown,
   handleImageButtonClick,
   handleImageSelected,
@@ -281,6 +282,7 @@ export default function DiaryEditor({
                 ref={editorRef}
                 contentEditable
                 suppressContentEditableWarning
+                onClick={handleEditorClick}
                 onKeyDown={handleEditorKeyDown}
                 onInput={handleEditorInput}
                 className={[

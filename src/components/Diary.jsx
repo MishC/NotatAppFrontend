@@ -42,6 +42,7 @@ export default function Diary() {
   const editorRef = useRef(null);
   const imageInputRef = useRef(null);
   const pagesRef = useRef([]);
+  const selectedImageWrapperRef = useRef(null);
   const didAutoLoadRef = useRef(false);
   const previousPageIndexRef = useRef(0);
   const pixelTimerRef = useRef(null);
@@ -102,8 +103,64 @@ export default function Diary() {
     );
   };
 
+  const getImageWrapperFromNode = (node) => {
+    const element =
+      node?.nodeType === Node.ELEMENT_NODE
+        ? node
+        : node?.parentElement;
+
+    if (!element) return null;
+
+    if (element.classList?.contains("diary-editor-image-wrap")) return element;
+
+    const image = element.matches?.(".diary-editor-image")
+      ? element
+      : element.closest?.(".diary-editor-image");
+
+    if (!image) return null;
+
+    const existingWrapper = image.closest(".diary-editor-image-wrap");
+    if (existingWrapper) return existingWrapper;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "diary-editor-image-wrap";
+    wrapper.style.textAlign = "center";
+    image.replaceWith(wrapper);
+    wrapper.appendChild(image);
+    return wrapper;
+  };
+
+  const applyImageAlignment = (command) => {
+    const alignmentByCommand = {
+      justifyLeft: "left",
+      justifyCenter: "center",
+      justifyRight: "right",
+    };
+    const alignment = alignmentByCommand[command];
+
+    if (!alignment) return false;
+
+    const selection = getSelectionInsideEditor(editorRef.current);
+    const selectedWrapper = selectedImageWrapperRef.current;
+    const selectionWrapper = getImageWrapperFromNode(selection?.anchorNode);
+    const wrapper =
+      selectedWrapper && editorRef.current?.contains(selectedWrapper)
+        ? selectedWrapper
+        : selectionWrapper;
+
+    if (!wrapper) return false;
+
+    wrapper.style.textAlign = alignment;
+    selectedImageWrapperRef.current = wrapper;
+    syncEditorToPage();
+    return true;
+  };
+
   const runCommand = (command, value = null) => {
     editorRef.current?.focus();
+
+    if (applyImageAlignment(command)) return;
+
     document.execCommand(command, false, value);
     updateCurrentPage({
       html: editorRef.current?.innerHTML || "",
@@ -140,6 +197,18 @@ export default function Diary() {
     syncEditorToPage();
   };
 
+  const createImageWrapper = (image) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "diary-editor-image-wrap";
+    wrapper.style.textAlign = "center";
+    wrapper.appendChild(image);
+    return wrapper;
+  };
+
+  const handleEditorClick = (e) => {
+    selectedImageWrapperRef.current = getImageWrapperFromNode(e.target);
+  };
+
   const handleImageButtonClick = () => {
     setEmojiMenuOpen(false);
     setAlignmentMenuOpen(false);
@@ -165,7 +234,9 @@ export default function Diary() {
       image.className = "diary-editor-image";
       image.draggable = false;
 
-      insertNodeInEditor(image);
+      const wrapper = createImageWrapper(image);
+      insertNodeInEditor(wrapper);
+      selectedImageWrapperRef.current = wrapper;
       setMsg("Image added to diary page.");
     };
     reader.onerror = () => setMsg("Could not load this image.");
@@ -762,6 +833,7 @@ export default function Diary() {
             goToPage={goToPage}
             guest={guest}
             handleEditorInput={handleEditorInput}
+            handleEditorClick={handleEditorClick}
             handleEditorKeyDown={handleEditorKeyDown}
             handleImageButtonClick={handleImageButtonClick}
             handleImageSelected={handleImageSelected}

@@ -63,7 +63,7 @@ export function attachDiaryPageImageToHtml(html, imageUrl, alt = "Diary page ima
     return content.replaceAll(DIARY_PAGE_IMAGE_PLACEHOLDER, imageHtml);
   }
 
-  return `${content}${content ? "<br>" : ""}${imageHtml}`;
+  return `${content}${content ? "<br>" : ""}<div class="diary-editor-image-wrap" style="text-align: center;">${imageHtml}</div>`;
 }
 
 function getImageExtension(mimeType) {

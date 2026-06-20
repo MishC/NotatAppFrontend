@@ -60,15 +60,26 @@
   background-position: 0 1.25rem;
 }
 
+.diary-editor-image-wrap {
+  margin: 0.75rem 0;
+  text-align: center;
+}
+
 .diary-editor-image,
 .diary-editor-page img {
   display: block;
   max-width: 100%;
   max-height: 320px;
-  margin: 0.75rem 0;
+  margin: 0.75rem auto;
   border-radius: 1rem;
   object-fit: contain;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
+.diary-editor-image-wrap .diary-editor-image,
+.diary-editor-image-wrap img {
+  display: inline-block;
+  margin: 0;
 }
 
 @keyframes diary-page-fade-in {
