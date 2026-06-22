@@ -29,7 +29,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
             <input
               value={form.title}
               onChange={updateField("title")}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[rgb(var(--orange))] focus:ring-2 focus:ring-[rgb(var(--hover-orange))]"
               autoFocus
             />
           </label>
@@ -40,7 +40,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
               value={form.content}
               onChange={updateField("content")}
               rows={3}
-              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[rgb(var(--orange))] focus:ring-2 focus:ring-[rgb(var(--hover-orange))]"
             />
           </label>
 
@@ -51,7 +51,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
                 type="datetime-local"
                 value={form.startTimeLocal}
                 onChange={updateField("startTimeLocal")}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[rgb(var(--orange))] focus:ring-2 focus:ring-[rgb(var(--hover-orange))]"
               />
             </label>
 
@@ -61,7 +61,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
                 type="datetime-local"
                 value={form.endTimeLocal}
                 onChange={updateField("endTimeLocal")}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[rgb(var(--orange))] focus:ring-2 focus:ring-[rgb(var(--hover-orange))]"
               />
             </label>
           </div>
@@ -72,7 +72,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
                 type="checkbox"
                 checked={form.isDone}
                 onChange={updateField("isDone")}
-                className="h-4 w-4 accent-orange-500"
+                className="h-4 w-4 accent-[rgb(var(--orange))]"
               />
               Done
             </label>
@@ -84,7 +84,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
             <button
               type="button"
               onClick={onDelete}
-              className="rounded-lg border border-red-200 px-4 py-2 font-semibold text-red-600 hover:bg-red-50"
+              className="rounded-lg border border-[rgb(var(--danger-soft))] px-4 py-2 font-semibold text-[rgb(var(--danger-action))] hover:bg-[rgb(var(--danger-soft))]"
             >
               Delete
             </button>
@@ -102,7 +102,7 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-orange-500 px-4 py-2 font-semibold text-white hover:bg-orange-600"
+              className="rounded-lg bg-[rgb(var(--orange))] px-4 py-2 font-semibold text-white hover:bg-[rgb(var(--orange-strong))]"
             >
               {mode === "create" ? "Create" : "Save"}
             </button>

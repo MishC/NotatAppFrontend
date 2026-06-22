@@ -1,13 +1,13 @@
 
 .animated-color-hover {
-  color: #1f2937; 
+  color: rgb(var(--text-soft));
   transition: color 0.1s ease-out;
   
   background: linear-gradient(
     90deg,
-    #1f2937 0%,        
-    #ff0000,            /* shiny*/
-    #1f2937 100%       
+    rgb(var(--text-soft)) 0%,
+    rgb(var(--danger-action)),
+    rgb(var(--text-soft)) 100%
   );
   
   background-size: 400% auto; 

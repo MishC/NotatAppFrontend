@@ -25,7 +25,7 @@ export default function CalendarSidebar({
             type="checkbox"
             checked={weekendsVisible}
             onChange={onWeekendsToggle}
-            className="h-4 w-4 accent-orange-500"
+            className="h-4 w-4 accent-[rgb(var(--orange))]"
           />
           Show weekends
         </label>
@@ -35,7 +35,7 @@ export default function CalendarSidebar({
             type="checkbox"
             checked={overdueOnly}
             onChange={onOverdueOnlyToggle}
-            className="h-4 w-4 accent-red-500"
+            className="h-4 w-4 accent-[rgb(var(--danger))]"
           />
           Only overdue
         </label>
@@ -64,11 +64,11 @@ function SidebarEvent({ event }) {
   const overdue = isCalendarEventOverdue(event);
 
   return (
-    <li className={overdue ? "rounded-lg bg-red-50 px-3 py-2 text-sm" : "rounded-lg bg-slate-50 px-3 py-2 text-sm"}>
-      <div className={overdue ? "font-semibold text-red-800" : "font-semibold text-slate-800"}>
+    <li className={overdue ? "rounded-lg bg-[rgb(var(--danger-soft))] px-3 py-2 text-sm" : "rounded-lg bg-slate-50 px-3 py-2 text-sm"}>
+      <div className={overdue ? "font-semibold text-[rgb(var(--danger-text))]" : "font-semibold text-slate-800"}>
         {event.title}
       </div>
-      <div className={overdue ? "text-red-600" : "text-slate-500"}>
+      <div className={overdue ? "text-[rgb(var(--danger-action))]" : "text-slate-500"}>
         {toDate(event.start)?.toLocaleString([], {
           month: "short",
           day: "numeric",
