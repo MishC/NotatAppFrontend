@@ -58,15 +58,15 @@ export default function DiarySidebar({
   };
 
   return (
-    <aside className="rounded-[24px] border border-emerald-200 bg-white/75 p-5 shadow-lg shadow-emerald-900/5">
-      <div className="mb-6">
+    <aside className="diary-sidebar border-0 bg-transparent p-0 shadow-none lg:rounded-[24px] lg:border lg:border-emerald-200 lg:bg-white/75 lg:p-5 lg:shadow-lg lg:shadow-emerald-900/5">
+      <div className="diary-sidebar-desktop-only mb-6">
         <h2 className="text-lg font-bold text-slate-900">AI note starters</h2>
         <p className="mt-1 text-sm text-slate-500">
           Click a prompt to place it into the diary.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="diary-sidebar-desktop-only space-y-3">
         {promptOptions.map((prompt) => (
           <button
             key={prompt}
@@ -79,7 +79,7 @@ export default function DiarySidebar({
         ))}
       </div>
 
-      <div className="mt-7 border-t border-emerald-100 pt-6">
+      <div className="diary-sidebar-desktop-only mt-7 border-t border-emerald-100 pt-6">
         <h2 className="text-lg font-bold text-slate-900">Diary frame</h2>
         <p className="mt-1 text-sm text-slate-500">
           Change the notebook frame.
@@ -105,7 +105,7 @@ export default function DiarySidebar({
         </div>
       </div>
 
-      <div className="mt-7 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
+      <div className="diary-ai-frame-generator mt-7 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
         <div className="flex items-center gap-2 font-bold text-slate-900">
           <Sparkles className="h-4 w-4 text-violet-600" />
           AI frame generator

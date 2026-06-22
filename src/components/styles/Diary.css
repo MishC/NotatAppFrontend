@@ -82,6 +82,22 @@
   margin: 0;
 }
 
+.diary-sidebar-desktop-only {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .diary-sidebar-desktop-only {
+    display: block;
+  }
+}
+
+@media (max-width: 1023px) {
+  .diary-ai-frame-generator {
+    margin-top: 0;
+  }
+}
+
 @keyframes diary-page-fade-in {
   0% {
     opacity: 0.52;
@@ -213,23 +229,64 @@
 }
 
 @media (max-width: 640px) {
+  .diary-sidebar {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .diary-sidebar-desktop-only {
+    display: none !important;
+  }
+
+  .diary-ai-frame-generator {
+    display: block;
+    margin-top: 0;
+  }
+
   .diary-frame {
     border-radius: 26px;
-    padding: 12px;
-    min-height: 360px;
+    flex: 1 1 auto;
+    padding: 5px;
+    width: 100%;
+    min-height: 400px;
+    height: 400px;
   }
 
   .diary-page-pixels {
-    inset: 12px;
+    inset: 5px;
     border-radius: 18px;
   }
 
+  .diary-editor-shell {
+    height: auto;
+    min-height: 0;
+    padding: 0.75rem;
+  }
+
+  .diary-editor-page-wrap {
+    display: flex;
+    min-height: 0;
+  }
+
   .diary-page-stage {
-    min-height: 360px;
+    display: flex;
+    height: 400px;
+    min-height: 400px;
     overflow-x: auto;
   }
 
   .diary-frame__inner {
     border-radius: 18px;
+    padding: 0.35rem;
+    background: rgb(var(--bg-surface));
+  }
+
+  .diary-editor-page {
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: 14px;
+    padding: 1rem;
   }
 }

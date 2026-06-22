@@ -65,7 +65,7 @@ export default function DiaryEditor({
   titleFormat,
 }) {
   return (
-    <div className="flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
+    <div className="diary-editor-shell flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
       {!guest && (
         <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 md:flex-row md:items-center">
           <input
@@ -272,7 +272,7 @@ export default function DiaryEditor({
       <div className="diary-page-stage">
         <div key={pageIndex} className={`diary-frame diary-frame--${frameStyle} diary-page-fade`}>
           <div className="diary-frame__inner">
-            <div className="relative min-h-0 flex-1">
+            <div className="diary-editor-page-wrap relative min-h-0 flex-1">
               {!entryText && (
                 <div className="pointer-events-none absolute left-5 top-5 text-slate-400">
                   Start writing your diary entry here...
