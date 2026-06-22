@@ -280,7 +280,7 @@ export default function NoteApp() {
                 <Todo
                   events={events}
                   onOpen={(note) => switchModalState(note)}
-                  onComplete={(note) => handleUpdateNote(note.id, { ...note, folderId: 5, isDone: true })}
+                  onComplete={(note) => handleUpdateNote(note.id, { isDone: true })}
                   onDelete={(note) => handleDeleteNote(note.id)}
                   onMoveDate={(note, ymd) => handleUpdateNote(note.id, { scheduledAt: ymd })}
                 />

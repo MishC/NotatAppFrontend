@@ -183,13 +183,14 @@ const nextScheduledAt =
           ? (updatedFields.scheduledAt.trim() || null)
           : updatedFields.scheduledAt)
       : (base?.scheduledAt ?? null);
-  const nextFolderId = normalizeFolderId(
-    updatedFields.folderId !== undefined ? updatedFields.folderId : base?.folderId
-  );
+  const hasFolderUpdate = updatedFields.folderId !== undefined;
+  const nextFolderId = hasFolderUpdate ? normalizeFolderId(updatedFields.folderId) : undefined;
   const nextIsDone =
     updatedFields.isDone !== undefined
       ? Boolean(updatedFields.isDone)
-      : nextFolderId === 5;
+      : hasFolderUpdate
+        ? nextFolderId === 5
+        : undefined;
 
   // Scheduleat cannot be past today
   if (nextScheduledAt && isOverdue(nextScheduledAt)) {
@@ -200,12 +201,14 @@ const nextScheduledAt =
   }
   
 if (guest) {
-    setNotes((prev) => updateNoteLocal(prev, noteId, {
+    const guestPatch = {
       ...updatedFields,
-      folderId: nextFolderId,
-      isDone: nextIsDone,
       scheduledAt: nextScheduledAt,
-    }));
+    };
+    if (hasFolderUpdate) guestPatch.folderId = nextFolderId;
+    if (nextIsDone !== undefined) guestPatch.isDone = nextIsDone;
+
+    setNotes((prev) => updateNoteLocal(prev, noteId, guestPatch));
     setMsg("Note updated (guest mode).");
     setIsModalOpen(false);
     setSelectedNote(null);
@@ -219,39 +222,16 @@ if (guest) {
   }
 
 
-  // IMPORTANT: folder/title/content optional, never read selectedNote directly
-  const payload = {
-    ...base,
-    ...updatedFields,
-    id: noteId,
-
-    // folderId optional:
-    // - if updatedFields.folderId exists -> use it
-    // - else use base.folderId
-    // - else null
-
-    folderId: nextFolderId,
-    isDone: nextIsDone,
-    // title optional
-    title:
-      updatedFields.title !== undefined
-        ? updatedFields.title
-        : (base.title ?? ""),
-
-    // content optional
-    content:
-      updatedFields.content !== undefined
-        ? updatedFields.content
-        : (base.content ?? ""),
-
-    // scheduledAt optional
-    scheduledAt:
-      nextScheduledAt,
-  };
+  const payload = { id: noteId };
+  if (updatedFields.title !== undefined) payload.title = updatedFields.title;
+  if (updatedFields.content !== undefined) payload.content = updatedFields.content;
+  if (updatedFields.scheduledAt !== undefined) payload.scheduledAt = nextScheduledAt;
+  if (hasFolderUpdate) payload.folderId = nextFolderId;
+  if (nextIsDone !== undefined) payload.isDone = nextIsDone;
 
   try {
     await updateNoteApi({ API_URL, noteId, payload });
-    setMsg(`Note "${payload.title}" updated successfully!`);
+    setMsg(`Note "${payload.title ?? base.title ?? ""}" updated successfully!`);
 
     setLoading(true);
     const list = await fetchNotesApi({ API_URL, activeFolder });
@@ -262,7 +242,7 @@ if (guest) {
     return true;
   } catch (e) {
     const msg = e?.message || "";
-    setError(msg.includes("Deadline") ? msg : `Error updating note "${payload.title}".`);
+    setError(msg.includes("Deadline") ? msg : `Error updating note "${payload.title ?? base.title ?? ""}".`);
     return false;
   } finally {
     setLoading(false);
