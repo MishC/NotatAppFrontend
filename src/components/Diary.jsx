@@ -586,9 +586,12 @@ export default function Diary() {
   };
 
   const handleTitleFormatChange = (nextFormat) => {
-    const nextTitle = formatDiaryTitleDate(diaryDate, nextFormat);
+    const normalizedLookupDate = parseDiaryDateInput(lookupDate);
+    const dateForFormat = normalizedLookupDate || diaryDate;
+    const nextTitle = formatDiaryTitleDate(dateForFormat, nextFormat);
 
     setTitleFormat(nextFormat);
+    setLookupDate(nextTitle);
     setPages((prev) => prev.map((page) => ({ ...page, title: nextTitle })));
   };
 
@@ -723,11 +726,11 @@ export default function Diary() {
 
   const loadDiaryByDate = async (normalizedDate, { showMessage = true } = {}) => {
     if (!normalizedDate) {
-      setMsg("Use date format like 20.01.2026, 20-01-2026, 19 June 2026, or 01/20/2026.");
+      setMsg("Use date format like DD-MM-YYYY, DD. Month YYYY, or Month of D(th), YYYY.");
       return;
     }
 
-    setLookupDate(formatDateDDMMYYYY(normalizedDate));
+    setLookupDate(formatDiaryTitleDate(normalizedDate, titleFormat));
     setMsg("");
     setLoadingEntry(true);
     let loadedEntries = [];
@@ -828,7 +831,6 @@ export default function Diary() {
             editorRef={editorRef}
             emojiMenuOpen={emojiMenuOpen}
             entryText={entryText}
-            entryTitle={entryTitle}
             frameStyle={frameStyle}
             goToPage={goToPage}
             guest={guest}

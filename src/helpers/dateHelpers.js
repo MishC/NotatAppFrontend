@@ -16,10 +16,9 @@ export function formatDateDDMMYYYY(ymd) {
 }
 
 export const DIARY_TITLE_DATE_FORMATS = [
-  { value: "yyyyMMdd", label: "2026-06-19" },
-  { value: "ddmmyyyy", label: "17-06-2026" },
-  { value: "skLong", label: "4. januar 2026" },
-  { value: "enLong", label: "January of 4th, 2026" },
+  { value: "ddmmyyyy", label: "DD-MM-YYYY" },
+  { value: "dayMonthYear", label: "DD. Month YYYY" },
+  { value: "monthOrdinalYear", label: "Month of D(th), YYYY" },
 ];
 
 function toLocalDate(ymd) {
@@ -49,19 +48,19 @@ function getOrdinalDay(day) {
   return `${day}th`;
 }
 
-export function formatDiaryTitleDate(ymd, format = "yyyyMMdd") {
+export function formatDiaryTitleDate(ymd, format = "ddmmyyyy") {
   const date = toLocalDate(ymd);
   if (!date) return ymd || "";
 
   const year = date.getFullYear();
   const day = date.getDate();
 
-  if (format === "skLong") {
-    const month = new Intl.DateTimeFormat("sk-SK", { month: "long" }).format(date);
+  if (format === "dayMonthYear" || format === "skLong") {
+    const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
     return `${day}. ${month} ${year}`;
   }
 
-  if (format === "enLong") {
+  if (format === "monthOrdinalYear" || format === "enLong") {
     const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
     return `${month} of ${getOrdinalDay(day)}, ${year}`;
   }
@@ -152,6 +151,13 @@ export function parseDiaryDateInput(input) {
   const longMonthMatch = value.match(/^(\d{1,2})\.?\s*([a-zA-Z\u00C0-\u017F]+)\s+(\d{4})$/);
   if (longMonthMatch) {
     const [, d, monthName, y] = longMonthMatch;
+    const month = monthsByName[normalizeMonthName(monthName)];
+    if (month) return toValidYMD(y, month, d);
+  }
+
+  const monthOrdinalMatch = value.match(/^([a-zA-Z\u00C0-\u017F]+)\s+of\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})$/i);
+  if (monthOrdinalMatch) {
+    const [, monthName, d, y] = monthOrdinalMatch;
     const month = monthsByName[normalizeMonthName(monthName)];
     if (month) return toValidYMD(y, month, d);
   }

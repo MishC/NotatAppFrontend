@@ -34,7 +34,6 @@ export default function DiaryEditor({
   editorRef,
   emojiMenuOpen,
   entryText,
-  entryTitle,
   frameStyle,
   goToPage,
   guest,
@@ -72,9 +71,21 @@ export default function DiaryEditor({
             type="text"
             value={lookupDate}
             onChange={(e) => setLookupDate(e.target.value)}
-            placeholder="Find by date: 20.01.2026, 20-01-2026 or 01/20/2026"
+            placeholder="DD-MM-YYYY | DD. Month YYYY | Month of D(th), YYYY"
             className="w-full rounded-xl border border-emerald-100 bg-white/90 px-4 py-3 text-base text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
           />
+          <select
+            value={titleFormat}
+            onChange={(e) => handleTitleFormatChange(e.target.value)}
+            className="min-w-56 rounded-xl border border-emerald-100 bg-white/90 px-3 py-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
+            aria-label="Diary load date format"
+          >
+            {DIARY_TITLE_DATE_FORMATS.map((format) => (
+              <option key={format.value} value={format.value}>
+                {format.label}
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             onClick={handleLoadEntry}
@@ -86,30 +97,6 @@ export default function DiaryEditor({
           </button>
         </div>
       )}
-
-      <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex w-full flex-col gap-2 md:flex-row">
-          <input
-            type="text"
-            value={entryTitle}
-            readOnly
-            className="w-full rounded-xl border border-emerald-100 bg-white/80 px-4 py-3 text-2xl font-bold text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-            aria-label="Diary title"
-          />
-          <select
-            value={titleFormat}
-            onChange={(e) => handleTitleFormatChange(e.target.value)}
-            className="min-w-56 rounded-xl border border-emerald-100 bg-white/80 px-3 py-3 text-sm font-semibold text-slate-700 outline-none hover:bg-emerald-50 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
-            aria-label="Diary title date format"
-          >
-            {DIARY_TITLE_DATE_FORMATS.map((format) => (
-              <option key={format.value} value={format.value}>
-                {format.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
