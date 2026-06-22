@@ -216,6 +216,10 @@ export default function Calendar() {
             loading={loading}
             overdueOnly={overdueOnly}
             onOverdueOnlyToggle={() => setOverdueOnly((value) => !value)}
+            onEventClick={(event) => {
+              const task = event.extendedProps?.task;
+              if (task) openEditModal(task);
+            }}
           />
 
           <div className="calendar-container min-w-0">
@@ -239,6 +243,12 @@ export default function Calendar() {
               dayMaxEvents
               nowIndicator
               weekends={weekendsVisible}
+              eventTimeFormat={{
+                hour: "numeric",
+                minute: "2-digit",
+                meridiem: "short",
+                omitZeroMinute: true,
+              }}
               events={events}
               select={handleDateSelect}
               eventContent={CalendarEventContent}

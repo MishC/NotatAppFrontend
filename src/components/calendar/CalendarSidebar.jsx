@@ -7,10 +7,18 @@ export default function CalendarSidebar({
   loading,
   overdueOnly,
   onOverdueOnlyToggle,
+  onEventClick,
 }) {
-  const listedEvents = overdueOnly
+  const filteredEvents = overdueOnly
     ? currentEvents.filter(isCalendarEventOverdue)
     : currentEvents;
+  const listedEvents = [...filteredEvents]
+    .sort((a, b) => {
+      const ad = toDate(a.start)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+      const bd = toDate(b.start)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+      return ad - bd;
+    })
+    .slice(0, 10);
 
   return (
     <aside className="Sidebar w-[90%] mx-auto sm:mt-10">
@@ -43,11 +51,11 @@ export default function CalendarSidebar({
 
       <div className="px-6">
         <h3 className="mb-2 text-sm font-semibold text-slate-600">
-          Visible events ({listedEvents.length})
+          Visible events ({listedEvents.length}/{filteredEvents.length})
         </h3>
         <ul>
           {listedEvents.map((event) => (
-            <SidebarEvent key={event.id} event={event} />
+            <SidebarEvent key={event.id} event={event} onClick={() => onEventClick?.(event)} />
           ))}
           {listedEvents.length === 0 && (
             <li className="py-3 text-sm text-slate-500">
@@ -60,11 +68,11 @@ export default function CalendarSidebar({
   );
 }
 
-function SidebarEvent({ event }) {
+function SidebarEvent({ event, onClick }) {
   const overdue = isCalendarEventOverdue(event);
 
   return (
-    <li className="relative cursor-pointer py-3 text-sm">
+    <li className="relative py-3 text-sm">
       <span
         className={[
           "absolute left-0 top-2 h-[70%] w-1 rounded-full",
@@ -72,7 +80,11 @@ function SidebarEvent({ event }) {
         ].join(" ")}
         aria-hidden="true"
       />
-      <div className="rounded-2xl pl-4 pr-3 transition-colors hover:bg-black/[0.04] active:bg-black/[0.06]">
+      <button
+        type="button"
+        onClick={onClick}
+        className="block w-full appearance-none rounded-2xl border-0 bg-transparent py-1 pl-4 pr-3 text-left font-inherit transition-colors hover:bg-black/[0.04] active:bg-black/[0.06]"
+      >
       <div className={overdue ? "font-semibold text-[rgb(var(--danger-text))]" : "font-semibold text-slate-800"}>
         {event.title}
       </div>
@@ -82,9 +94,10 @@ function SidebarEvent({ event }) {
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
+          hour12: true,
         })}
       </div>
-      </div>
+      </button>
     </li>
   );
 }
