@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
-export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
+export default function Done({ notes = [], folders = [], onOpen, onDelete }) {
   const [q, setQ] = useState("");
 
   // folderId -> label map
   const folderLabelById = useMemo(() => {
     const map = {};
     for (const f of folders) {
-      map[String(f.id)] = f.names;
+      map[String(f.id)] = f.name;
     }
     return map;
   }, [folders]);
@@ -19,9 +19,10 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
     if (!t) return notes;
 
     return notes.filter((n) => {
+      const scheduledAt = String(n.scheduledAt || "").slice(0, 10);
       const title = (n.title || "").toLowerCase();
-      const content = (n.content || "").toLowerCase();
-      return title.includes(t) || content.includes(t);
+      const formattedDate = formatDateDDMMYYYY(scheduledAt).toLowerCase();
+      return title.includes(t) || scheduledAt.includes(t) || formattedDate.includes(t);
     });
   }, [notes, q]);
 
@@ -31,8 +32,8 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search overdue…"
-          className="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-300"
+          placeholder="Search done by title or date…"
+          className="w-full sm:w-80 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
         />
       </div>
 
@@ -49,10 +50,10 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
 
           <tbody className="divide-y divide-slate-100">
             {rows.map((n) => (
-              <tr key={n.id} className="hover:bg-red-50/40">
+              <tr key={n.id} className="hover:bg-emerald-50/40">
                 <td className="px-4 py-3">
                   <button
-                    className="font-semibold text-slate-900 hover:text-red-600"
+                    className="font-semibold text-slate-900 hover:text-emerald-600"
                     onClick={() => onOpen?.(n)}
                     title="Open"
                   >
@@ -60,7 +61,7 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
                   </button>
                 </td>
 
-                <td className="px-4 py-3 font-semibold text-red-700">
+                <td className="px-4 py-3 font-semibold text-emerald-700">
                   {formatDateDDMMYYYY(n.scheduledAt)}
                 </td>
 
@@ -91,7 +92,7 @@ export default function Overdues({ notes = [], folders, onOpen, onDelete }) {
             {rows.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-slate-500" colSpan={4}>
-                  No overdue notes.
+                  No done notes.
                 </td>
               </tr>
             )}
