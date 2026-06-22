@@ -302,6 +302,11 @@ export async function swapNotesAction({
 
 /* 7) FOLDER SELECT */
 export function selectFolderAction(opt, setActiveFolder) {
+  if (opt === "all" || opt == null) {
+    setActiveFolder(null);
+    return true;
+  }
+
   setActiveFolder(opt.id);
   return true;
 }
@@ -428,5 +433,4 @@ export async function getDoneNotesAction({ guest, API_URL, setError } = {}) {
     return [];  
   }
 }
-
 
