@@ -158,6 +158,18 @@ button.fc-today-button.fc-button.fc-button-primary  {
   overflow: visible !important;
 }
 
+.fc .fc-view-harness,
+.fc .fc-view-harness-active,
+.fc .fc-timegrid,
+.fc .fc-timegrid-body,
+.fc .fc-timegrid-slots,
+.fc .fc-timegrid-cols,
+.fc .fc-timegrid .fc-scroller,
+.fc .fc-timegrid .fc-scroller-harness {
+  height: auto !important;
+  max-height: none !important;
+}
+
 .fc .fc-button-primary {
   background-color: var(--calendar-button);
   border-color: rgb(var(--bg-surface)) !important;

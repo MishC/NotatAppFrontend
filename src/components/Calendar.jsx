@@ -227,7 +227,13 @@ export default function Calendar() {
                 right: "dayGridMonth,timeGridWeek,timeGridDay",
               }}
               initialView="dayGridMonth"
+              height="auto"
+              contentHeight="auto"
+              expandRows={false}
               editable
+              eventDurationEditable
+              eventStartEditable
+              eventResizableFromStart
               selectable
               selectMirror
               dayMaxEvents
