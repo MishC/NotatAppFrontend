@@ -21,6 +21,7 @@ function buildCreateTaskPayload(task = {}) {
   return {
     title: String(task.title || "").trim(),
     content: task.content?.trim?.() || task.content || null,
+    isAllDay: Boolean(task.isAllDay),
     startTimeUtc: task.startTimeUtc || null,
     endTimeUtc: task.endTimeUtc || null,
   };
@@ -31,6 +32,7 @@ function buildUpdateTaskPayload(task = {}) {
 
   if (task.title !== undefined) payload.title = String(task.title || "").trim();
   if (task.content !== undefined) payload.content = task.content?.trim?.() || task.content || null;
+  if (task.isAllDay !== undefined) payload.isAllDay = Boolean(task.isAllDay);
   if (task.isDone !== undefined) payload.isDone = Boolean(task.isDone);
   if (task.startTimeUtc !== undefined) payload.startTimeUtc = task.startTimeUtc || null;
   if (task.endTimeUtc !== undefined) payload.endTimeUtc = task.endTimeUtc || null;

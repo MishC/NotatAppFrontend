@@ -216,29 +216,23 @@ export default function NoteApp() {
         isEmailVisible={true}
       />
 
-      <div className={error || msg ? "p-5 rounded-xl" : "p-2"}>
-        {error ? (
-          <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
-        ) : msg ? (
-          <div className="text-emerald-700 p-4 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div>
-        ) : (
-          <div>&nbsp;</div>
-        )}
-      </div>
+      <main className="mx-auto w-full max-w-7xl px-4 py-6">
+        <div className={error || msg ? "mb-5 rounded-xl" : "mb-5"}>
+          {error ? (
+            <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
+          ) : msg ? (
+            <div className="text-emerald-700 p-4 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div>
+          ) : (
+            <div>&nbsp;</div>
+          )}
+        </div>
 
-      {loading ? (
-        <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
-      ) : (
-        <div
-          className="
-        grid grid-cols-1
-        sm:grid-cols-[260px_1fr]
-        gap-4 md:gap-6
-        md:mt-12
-      "
-        >
+        {loading ? (
+          <p className="text-slate-800 mx-auto text-3xl text-center py-16">Loading...</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
           {/* LEFT COLUMN: Sidebar */}
-          <aside className="w-full min-w-[30%] ml-10">
+          <aside className="w-full min-w-0">
             <Sidebar
               folders={folders}
               setFolders={setFolders}
@@ -257,11 +251,11 @@ export default function NoteApp() {
           {/* RIGHT COLUMN: Subheader + Content */}
           <section className="w-full min-w-0">
             {/* Subheader is now aligned with content */}
-            <div className="mb-4 flex ml-[10%] sm:block sm:ml-0">
+            <div className="mb-4">
               <Subheader title={"ToDo"} setShowNoteModal={setShowNoteModal} />
             </div>
 
-            <div className="relative flex  justify-center mx-auto sm:mr-20 sm:block overflow-visible calendar-container">
+            <div className="relative min-w-0 overflow-visible calendar-container">
               {activeFolder === 5 ? (
                 <Done
                   notes={doneNotes}
@@ -287,8 +281,9 @@ export default function NoteApp() {
               )}
             </div>
           </section>
-        </div>
-      )}
+          </div>
+        )}
+      </main>
 
       {isModalOpen && selectedNote && (
         <EditNoteModal

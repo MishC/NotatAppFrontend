@@ -177,6 +177,7 @@ function Todo({ events, onOpen, onComplete, onDelete, onMoveDate }) {
         height="auto"
         contentHeight="auto"
         aspectRatio={aspectRatio}
+        expandRows={false}
 
         themeSystem="standard"
         firstDay={1}

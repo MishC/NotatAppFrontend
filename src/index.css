@@ -67,8 +67,11 @@
 
   /* Calendar */
   --calendar-border: 185 183 183;
+  --calendar-grid-border: 226 232 240;
   --calendar-button: oklch(70.5% 0.213 47.604);
   --calendar-button-hover: oklch(55.3% 0.195 38.402);
+  --calendar-month-cell-min-height: 118px;
+  --calendar-month-cell-min-height-mobile: 70px;
 
   /* Diary accents */
   --diary-emerald: 16 185 129;

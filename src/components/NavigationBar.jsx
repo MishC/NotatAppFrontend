@@ -90,8 +90,7 @@ export default function NavigationBar({
         <MotionDiv
           layout
           className={clsx(
-            "mx-auto px-4 py-3 flex items-center justify-between",
-            "max-w-6xl"
+            "w-full px-2.5 py-3 flex items-center justify-between"
           )}
         >
           {/* Left: Brand   ==Logo */}
@@ -124,7 +123,7 @@ export default function NavigationBar({
             {/* Center: Modern segmented nav */}
 
             {isNavItemVisble && (
-              <div className="hidden sm:flex items-center">
+              <div className="hidden sm:flex items-center ml-[50px]">
 
                 <div
                   className="
@@ -188,8 +187,8 @@ export default function NavigationBar({
           </div>
 
           {/* Right: user + logout */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 mr-2">
+          <div className="ml-auto mr-2.5 flex items-center gap-2">
+            <div className="flex items-center gap-2">
               {isEmailVisible && (<div className="hidden sm:flex items-center gap-2 bg-white/50 px-3 py-2">
 
                 <div className="h-2 w-2 rounded-full bg-[rgb(var(--success))]" />

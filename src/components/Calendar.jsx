@@ -21,6 +21,7 @@ import {
   formFromTask,
   getDefaultEndDate,
   payloadFromForm,
+  startOfNextLocalDay,
   taskToEvent,
   validateTaskForm,
 } from "../helpers/calendarTaskHelpers";
@@ -166,7 +167,8 @@ export default function Calendar() {
   const updateEventDates = async (changeInfo) => {
     const task = changeInfo.event.extendedProps.task;
     const start = changeInfo.event.start;
-    const end = changeInfo.event.end || getDefaultEndDate(start);
+    const isAllDay = Boolean(changeInfo.event.allDay);
+    const end = changeInfo.event.end || (isAllDay ? startOfNextLocalDay(start) : getDefaultEndDate(start));
 
     if (!task || !start || !end) {
       changeInfo.revert();
@@ -178,6 +180,7 @@ export default function Calendar() {
       API_URL,
       id: task.id,
       task: {
+        isAllDay,
         startTimeUtc: start.toISOString(),
         endTimeUtc: end.toISOString(),
       },
@@ -233,6 +236,7 @@ export default function Calendar() {
               initialView="dayGridMonth"
               height="auto"
               contentHeight="auto"
+              aspectRatio={1.6}
               expandRows={false}
               editable
               eventDurationEditable

@@ -66,6 +66,16 @@ export default function TaskEventModal({ form, mode, onChange, onClose, onDelete
             </label>
           </div>
 
+          <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.isAllDay}
+              onChange={updateField("isAllDay")}
+              className="h-4 w-4 accent-[rgb(var(--orange))]"
+            />
+            All day task
+          </label>
+
           {mode === "edit" && (
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input

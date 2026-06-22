@@ -38,6 +38,28 @@ export function addMinutes(date, minutes) {
   return new Date(date.getTime() + minutes * 60000);
 }
 
+export function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function startOfNextLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+}
+
+function isLocalMidnight(date) {
+  return date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0 && date.getMilliseconds() === 0;
+}
+
+function getAllDayDisplayEnd(start, end) {
+  const startDay = startOfLocalDay(start);
+  if (!end) return startOfNextLocalDay(startDay);
+
+  const endDay = startOfLocalDay(end);
+  if (isLocalMidnight(end) && endDay > startDay) return endDay;
+
+  return startOfNextLocalDay(end);
+}
+
 export function getDefaultEndDate(startDate) {
   return addMinutes(startDate, DEFAULT_EVENT_LENGTH_MINUTES);
 }
@@ -61,13 +83,14 @@ export function isCalendarEventOverdue(event) {
 export function taskToEvent(task) {
   const start = toDate(task.startTimeUtc);
   const end = toDate(task.endTimeUtc) || (start ? getDefaultEndDate(start) : null);
+  const isAllDay = Boolean(task.isAllDay);
 
   return {
     id: String(task.id),
     title: task.title || "(untitled task)",
-    start,
-    end,
-    allDay: false,
+    start: isAllDay && start ? startOfLocalDay(start) : start,
+    end: isAllDay && start ? getAllDayDisplayEnd(start, end) : end,
+    allDay: isAllDay,
     classNames: [
       isTaskOverdue(task) ? "fc-task-overdue" : "",
       task.isDone ? "fc-task-done" : "",
@@ -85,6 +108,7 @@ export function buildEmptyForm(startDate = createDateForSelectedDay(new Date()),
     content: "",
     startTimeLocal: toDatetimeLocalValue(start),
     endTimeLocal: toDatetimeLocalValue(end),
+    isAllDay: false,
     isDone: false,
   };
 }
@@ -98,17 +122,22 @@ export function formFromTask(task) {
     content: task.content || "",
     startTimeLocal: toDatetimeLocalValue(start),
     endTimeLocal: toDatetimeLocalValue(end),
+    isAllDay: Boolean(task.isAllDay),
     isDone: Boolean(task.isDone),
   };
 }
 
 export function payloadFromForm(form) {
-  const start = fromDatetimeLocalValue(form.startTimeLocal);
-  const end = fromDatetimeLocalValue(form.endTimeLocal);
+  const startValue = fromDatetimeLocalValue(form.startTimeLocal);
+  const endValue = fromDatetimeLocalValue(form.endTimeLocal);
+  const isAllDay = Boolean(form.isAllDay);
+  const start = isAllDay && startValue ? startOfLocalDay(startValue) : startValue;
+  const end = isAllDay && endValue ? startOfNextLocalDay(endValue) : endValue;
 
   return {
     title: form.title,
     content: form.content,
+    isAllDay,
     isDone: form.isDone,
     startTimeUtc: start?.toISOString() || null,
     endTimeUtc: end?.toISOString() || null,
