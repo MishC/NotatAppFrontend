@@ -96,6 +96,38 @@ button.fc-today-button.fc-button.fc-button-primary  { background: white; border:
   color: black;
 }
 
+.fc .fc-event.fc-task-overdue {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+.fc .fc-event.fc-task-done {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #166534 !important;
+}
+
+.fc-task-content {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.15rem;
+}
+
+.fc-task-time {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
+.fc-task-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .fc .fc-event.fc-note-overdue .fc-note-title {
   color: #991b1b !important; /* red-800 */
   font-weight: 700;

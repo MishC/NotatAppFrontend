@@ -1,51 +1,193 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import React, { useState } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import NavigationBar from "./NavigationBar";
-import { formatDate } from '@fullcalendar/core'
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import { INITIAL_EVENTS, createEventId } from "../helpers/event-utils.js"
+import CalendarEventContent from "./calendar/CalendarEventContent";
+import CalendarSidebar from "./calendar/CalendarSidebar";
+import TaskEventModal from "./calendar/TaskEventModal";
+import {
+  createTaskAction,
+  deleteTaskAction,
+  initCalendarTasksAction,
+  syncGuestCalendarTasksAction,
+  updateTaskAction,
+} from "../actions/calendarActions";
+import {
+  buildEmptyForm,
+  createDateForSelectedDay,
+  formFromTask,
+  getDefaultEndDate,
+  payloadFromForm,
+  taskToEvent,
+  validateTaskForm,
+} from "../helpers/calendarTaskHelpers";
+import "./styles/Calendar.css";
 
 export default function Calendar() {
-  const [error, setError] = useState(null);
-  const [msg, setMsg] = useState(null);
-  const [weekendsVisible, setWeekendsVisible] = useState(true)
-  const [currentEvents, setCurrentEvents] = useState([])
-
-  function handleWeekendsToggle() {
-    setWeekendsVisible(!weekendsVisible)
-  }
-
-  function handleDateSelect(selectInfo) {
-    let title = prompt('Please enter a new title for your event')
-    let calendarApi = selectInfo.view.calendar
-
-    calendarApi.unselect() // clear date selection
-
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay
-      })
-    }
-  }
-
-  function handleEventClick(clickInfo) {
-    if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-      clickInfo.event.remove()
-    }
-  }
-
-  function handleEvents(events) {
-    setCurrentEvents(events)
-  }
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
+  const API_URL = import.meta.env.VITE_API_TASKS || import.meta.env.VITE_API_URL;
+
+  const [tasks, setTasks] = useState([]);
+  const [currentEvents, setCurrentEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
+  const [weekendsVisible, setWeekendsVisible] = useState(true);
+  const [overdueOnly, setOverdueOnly] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [form, setForm] = useState(buildEmptyForm());
+  const [hasLoadedTasks, setHasLoadedTasks] = useState(false);
+
+  const events = useMemo(() => tasks.map(taskToEvent), [tasks]);
+
+  const loadTasks = useCallback(async () => {
+    const ok = await initCalendarTasksAction({
+      guest,
+      API_URL,
+      filter: "all",
+      setTasks,
+      setLoading,
+      setError,
+    });
+    if (ok) setHasLoadedTasks(true);
+    return ok;
+  }, [guest, API_URL]);
+
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  useEffect(() => {
+    if (!hasLoadedTasks) return;
+    syncGuestCalendarTasksAction({ guest, tasks });
+  }, [guest, hasLoadedTasks, tasks]);
+
+  useEffect(() => {
+    if (!error && !msg) return undefined;
+    const timer = setTimeout(() => {
+      setError("");
+      setMsg("");
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, [error, msg]);
+
+  const openCreateModal = (startDate, endDate) => {
+    setModalMode("create");
+    setSelectedTask(null);
+    setForm(buildEmptyForm(startDate, endDate));
+    setError("");
+    setModalOpen(true);
+  };
+
+  const openEditModal = (task) => {
+    setModalMode("edit");
+    setSelectedTask(task);
+    setForm(formFromTask(task));
+    setError("");
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleDateSelect = (selectInfo) => {
+    selectInfo.view.calendar.unselect();
+
+    if (selectInfo.allDay) {
+      const start = createDateForSelectedDay(selectInfo.start);
+      openCreateModal(start, getDefaultEndDate(start));
+      return;
+    }
+
+    openCreateModal(selectInfo.start, selectInfo.end || getDefaultEndDate(selectInfo.start));
+  };
+
+  const handleEventClick = (clickInfo) => {
+    const task = clickInfo.event.extendedProps.task;
+    if (task) openEditModal(task);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const validationError = validateTaskForm(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    const payload = payloadFromForm(form);
+
+    if (modalMode === "create") {
+      const created = await createTaskAction({
+        guest,
+        API_URL,
+        task: payload,
+        setTasks,
+        setMsg,
+        setError,
+      });
+      if (created) closeModal();
+      return;
+    }
+
+    const ok = await updateTaskAction({
+      guest,
+      API_URL,
+      id: selectedTask?.id,
+      task: payload,
+      setTasks,
+      setMsg,
+      setError,
+    });
+    if (ok) closeModal();
+  };
+
+  const handleDelete = async () => {
+    const ok = await deleteTaskAction({
+      guest,
+      API_URL,
+      id: selectedTask?.id,
+      setTasks,
+      setMsg,
+      setError,
+    });
+    if (ok) closeModal();
+  };
+
+  const updateEventDates = async (changeInfo) => {
+    const task = changeInfo.event.extendedProps.task;
+    const start = changeInfo.event.start;
+    const end = changeInfo.event.end || getDefaultEndDate(start);
+
+    if (!task || !start || !end) {
+      changeInfo.revert();
+      return;
+    }
+
+    const ok = await updateTaskAction({
+      guest,
+      API_URL,
+      id: task.id,
+      task: {
+        startTimeUtc: start.toISOString(),
+        endTimeUtc: end.toISOString(),
+      },
+      setTasks,
+      setMsg,
+      setError,
+    });
+
+    if (!ok) changeInfo.revert();
+  };
 
   return (
     <div className="w-full m-0">
@@ -55,102 +197,64 @@ export default function Calendar() {
         isEmailVisible={true}
       />
 
-      <div className={error || msg ? "p-5 rounded-xl" : "p-5"}>
-        {error ? (
-          <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
-        ) : msg ? (
-          <div className="text-emerald-700 p-4 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div>
-        ) : (
-          <div>&nbsp;</div>
-        )}
-      </div>
-
-
-
-      <div className='demo-app'>
-        <SidebarCalendar
-          weekendsVisible={weekendsVisible}
-          handleWeekendsToggle={handleWeekendsToggle}
-          currentEvents={currentEvents}
-        />
-        <div className='demo-app-main m-20'>
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            }}
-            initialView='dayGridMonth'
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={weekendsVisible}
-            initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-            select={handleDateSelect}
-            eventContent={renderEventContent} // custom render function
-            eventClick={handleEventClick}
-            eventsSet={handleEvents} // called after events are initialized/added/changed/removed
-          /* you can update a remote database when these fire:
-          eventAdd={function(){}}
-          eventChange={function(){}}
-          eventRemove={function(){}}
-          */
-          />
+      <main className="mx-auto w-full max-w-7xl px-4 py-6">
+        <div className={error || msg ? "mb-5 rounded-xl" : "mb-5"}>
+          {error ? (
+            <div className="text-red-700 p-4 bg-red-50 rounded-xl border border-red-200">{error}</div>
+          ) : msg ? (
+            <div className="text-emerald-700 p-4 bg-emerald-50 rounded-xl border border-emerald-200">{msg}</div>
+          ) : (
+            <div>&nbsp;</div>
+          )}
         </div>
-      </div>
 
+        <section className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
+          <CalendarSidebar
+            weekendsVisible={weekendsVisible}
+            onWeekendsToggle={() => setWeekendsVisible((value) => !value)}
+            currentEvents={currentEvents}
+            loading={loading}
+            overdueOnly={overdueOnly}
+            onOverdueOnlyToggle={() => setOverdueOnly((value) => !value)}
+          />
+
+          <div className="calendar-container min-w-0">
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={{
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+              }}
+              initialView="dayGridMonth"
+              editable
+              selectable
+              selectMirror
+              dayMaxEvents
+              nowIndicator
+              weekends={weekendsVisible}
+              events={events}
+              select={handleDateSelect}
+              eventContent={CalendarEventContent}
+              eventClick={handleEventClick}
+              eventDrop={updateEventDates}
+              eventResize={updateEventDates}
+              eventsSet={setCurrentEvents}
+            />
+          </div>
+        </section>
+      </main>
+
+      {modalOpen && (
+        <TaskEventModal
+          form={form}
+          mode={modalMode}
+          onChange={setForm}
+          onClose={closeModal}
+          onDelete={handleDelete}
+          onSubmit={handleSubmit}
+        />
+      )}
     </div>
-  )
-}
-function renderEventContent(eventInfo) {
-  return (
-    <>
-      <b>{eventInfo.timeText}</b>
-      <i>{eventInfo.event.title}</i>
-    </>
-  )
-}
-
-function SidebarCalendar({ weekendsVisible, handleWeekendsToggle, currentEvents }) {
-  return (
-    <div className='demo-app-sidebar text-left m-20 p-2 text-xl'>
-      <div className='demo-app-sidebar-section'>
-        <h2 className="text-xxl">Instructions</h2>
-        <ul className="text-xxl">
-          <li>Select dates and you will be prompted to create a new event</li>
-          <li>Drag, drop, and resize events</li>
-          <li>Click an event to delete it</li>
-        </ul>
-      </div>
-      <div className='demo-app-sidebar-section'>
-        <label>
-          <input
-            type='checkbox'
-            checked={weekendsVisible}
-            onChange={handleWeekendsToggle}
-          ></input>
-          toggle weekends
-        </label>
-      </div>
-      <div className='demo-app-sidebar-section'>
-        <h2>All Events ({currentEvents.length})</h2>
-        <ul>
-          {currentEvents.map((event) => (
-            <SidebarEvent key={event.id} event={event} />
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-function SidebarEvent({ event }) {
-  return (
-    <li key={event.id}>
-      <b>{formatDate(event.start, { year: 'numeric', month: 'short', day: 'numeric' })}</b>
-      <i>{event.title}</i>
-    </li>
-  )
+  );
 }
