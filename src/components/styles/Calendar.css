@@ -109,8 +109,21 @@ button.fc-today-button.fc-button.fc-button-primary  {
 
 /* make sure the event can be stacked */
 .fc .fc-daygrid-event-harness,
-.fc .fc-event {
+.fc .fc-daygrid-event {
   position: relative;
+}
+
+.fc .fc-timegrid-event {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.fc .fc-timegrid-event .fc-task-content {
+  align-items: flex-start;
+  height: 100%;
 }
 
 /* when menu is open, lift THIS event above all other events */
