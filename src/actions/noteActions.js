@@ -183,6 +183,13 @@ const nextScheduledAt =
           ? (updatedFields.scheduledAt.trim() || null)
           : updatedFields.scheduledAt)
       : (base?.scheduledAt ?? null);
+  const nextFolderId = normalizeFolderId(
+    updatedFields.folderId !== undefined ? updatedFields.folderId : base?.folderId
+  );
+  const nextIsDone =
+    updatedFields.isDone !== undefined
+      ? Boolean(updatedFields.isDone)
+      : nextFolderId === 5;
 
   // Scheduleat cannot be past today
   if (nextScheduledAt && isOverdue(nextScheduledAt)) {
@@ -193,7 +200,12 @@ const nextScheduledAt =
   }
   
 if (guest) {
-    setNotes((prev) => updateNoteLocal(prev, noteId, { ...updatedFields, scheduledAt: nextScheduledAt }));
+    setNotes((prev) => updateNoteLocal(prev, noteId, {
+      ...updatedFields,
+      folderId: nextFolderId,
+      isDone: nextIsDone,
+      scheduledAt: nextScheduledAt,
+    }));
     setMsg("Note updated (guest mode).");
     setIsModalOpen(false);
     setSelectedNote(null);
@@ -218,9 +230,8 @@ if (guest) {
     // - else use base.folderId
     // - else null
 
-    folderId: normalizeFolderId(
-      updatedFields.folderId !== undefined ? updatedFields.folderId : base.folderId
-    ),
+    folderId: nextFolderId,
+    isDone: nextIsDone,
     // title optional
     title:
       updatedFields.title !== undefined
@@ -407,7 +418,9 @@ export async function getOverdueNotesAction({ guest, API_URL, setError } = {}) {
 
   try {
     const overdueNotes = await fetchOverdueNotesApi({ API_URL });
-    if (Array.isArray(overdueNotes)) return overdueNotes;
+    if (Array.isArray(overdueNotes)) {
+      return overdueNotes.map((note) => ({ ...note, folderId: 1, isDone: false }));
+    }
 
     setError?.("Unexpected response for overdue notes.");
     return [];
@@ -423,7 +436,9 @@ export async function getDoneNotesAction({ guest, API_URL, setError } = {}) {
 
   try {
     const doneNotes = await fetchDoneNotesApi({ API_URL });
-    if (Array.isArray(doneNotes)) return doneNotes;
+    if (Array.isArray(doneNotes)) {
+      return doneNotes.map((note) => ({ ...note, folderId: 5, isDone: true }));
+    }
 
     setError?.("Unexpected response for done notes.");
     return [];
@@ -433,4 +448,3 @@ export async function getDoneNotesAction({ guest, API_URL, setError } = {}) {
     return [];  
   }
 }
-

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 import { useAutoClearMessage} from "../helpers/noteHelpers";
-import { formatDateDDMMYYYY, isOverdue } from "../helpers/dateHelpers";
+import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
@@ -80,16 +80,6 @@ export default function NoteApp() {
     if (activeFolder) return byFolder;
     return byFolder.filter((n) => noteMatchesTodoSearch(n, todoSearch));
   }, [notes, activeFolder, todoSearch, noteMatchesTodoSearch]);
-
-  const visibleOverdueNotes = useMemo(
-    () => overdueNotes.filter((n) => n && !n.isDone && isOverdue(String(n.scheduledAt || "").slice(0, 10))),
-    [overdueNotes]
-  );
-
-  const visibleDoneNotes = useMemo(
-    () => doneNotes.filter((n) => n && !isOverdue(String(n.scheduledAt || "").slice(0, 10))),
-    [doneNotes]
-  );
 
   const noteById = useMemo(() => {
     const m = new Map();
@@ -274,14 +264,14 @@ export default function NoteApp() {
             <div className="relative flex  justify-center mx-auto sm:mr-20 sm:block overflow-visible calendar-container">
               {activeFolder === 5 ? (
                 <Done
-                  notes={visibleDoneNotes}
+                  notes={doneNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
               ) : activeFolder === 1 ? (
                 <Overdues
-                  notes={visibleOverdueNotes}
+                  notes={overdueNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
@@ -290,7 +280,7 @@ export default function NoteApp() {
                 <Todo
                   events={events}
                   onOpen={(note) => switchModalState(note)}
-                  onComplete={(note) => handleUpdateNote(note.id, { ...note, folderId: 5 })}
+                  onComplete={(note) => handleUpdateNote(note.id, { ...note, folderId: 5, isDone: true })}
                   onDelete={(note) => handleDeleteNote(note.id)}
                   onMoveDate={(note, ymd) => handleUpdateNote(note.id, { scheduledAt: ymd })}
                 />
