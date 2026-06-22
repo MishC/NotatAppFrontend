@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { getColorClassById } from "../helpers/colors";
 import { useAutoClearMessage} from "../helpers/noteHelpers";
+import { formatDateDDMMYYYY, isOverdue } from "../helpers/dateHelpers";
 
 import EditNoteModal from "./modals/EditNoteModal";
 import NoteFormModal from "./modals/NoteFormModal";
@@ -40,6 +41,7 @@ export default function NoteApp() {
   const [overdueNotesCount, setOverdueNotesCount] = useState(0);
   const [overdueNotes, setOverdueNotes] = useState([]);
   const [doneNotes, setDoneNotes] = useState([]);
+  const [todoSearch, setTodoSearch] = useState("");
 
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
@@ -55,10 +57,39 @@ export default function NoteApp() {
   // Derived data (ORDER matters)
   // -------------------------
  
+  const noteMatchesTodoSearch = useCallback((note, query) => {
+    const term = query.trim().toLowerCase();
+    if (!term) return true;
+
+    const scheduledAt = String(note?.scheduledAt || "").slice(0, 10);
+    const formattedDate = formatDateDDMMYYYY(scheduledAt);
+    const values = [
+      note?.title,
+      scheduledAt,
+      formattedDate,
+    ];
+
+    return values.some((value) => String(value || "").toLowerCase().includes(term));
+  }, []);
+
   const filteredNotes = useMemo(() => {
-    if (!activeFolder) return notes;
-    return notes.filter((n) => n && String(n.folderId) === String(activeFolder));
-  }, [notes, activeFolder]);
+    const byFolder = !activeFolder
+      ? notes
+      : notes.filter((n) => n && String(n.folderId) === String(activeFolder));
+
+    if (activeFolder) return byFolder;
+    return byFolder.filter((n) => noteMatchesTodoSearch(n, todoSearch));
+  }, [notes, activeFolder, todoSearch, noteMatchesTodoSearch]);
+
+  const visibleOverdueNotes = useMemo(
+    () => overdueNotes.filter((n) => n && !n.isDone && isOverdue(String(n.scheduledAt || "").slice(0, 10))),
+    [overdueNotes]
+  );
+
+  const visibleDoneNotes = useMemo(
+    () => doneNotes.filter((n) => n && !isOverdue(String(n.scheduledAt || "").slice(0, 10))),
+    [doneNotes]
+  );
 
   const noteById = useMemo(() => {
     const m = new Map();
@@ -117,7 +148,7 @@ export default function NoteApp() {
     });
     refreshNotes();
 
-  }, [guest, , API_URL, API_URL2, refreshNotes]);
+  }, [guest, API_URL, API_URL2, activeFolder, refreshNotes]);
 
 
 
@@ -226,6 +257,8 @@ export default function NoteApp() {
               handleFolderClick={handleFolderClick}
               setError={setError}
               overdueCount={overdueNotesCount}
+              todoSearch={todoSearch}
+              setTodoSearch={setTodoSearch}
             />
 
 
@@ -241,14 +274,14 @@ export default function NoteApp() {
             <div className="relative flex  justify-center mx-auto sm:mr-20 sm:block overflow-visible calendar-container">
               {activeFolder === 5 ? (
                 <Done
-                  notes={doneNotes}
+                  notes={visibleDoneNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
                 />
               ) : activeFolder === 1 ? (
                 <Overdues
-                  notes={overdueNotes}
+                  notes={visibleOverdueNotes}
                   folders={folders}
                   onOpen={(n) => switchModalState(n)}
                   onDelete={(n) => handleDeleteNote(n.id)}
