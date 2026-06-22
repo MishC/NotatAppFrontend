@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -27,10 +27,49 @@ import {
 } from "../helpers/calendarTaskHelpers";
 import "./styles/Calendar.css";
 
+function getLocalDateKey(date) {
+  if (!date) return "";
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function getTaskDateKeys(task) {
+  const start = task?.startTimeUtc ? new Date(task.startTimeUtc) : null;
+  const end = task?.endTimeUtc ? new Date(task.endTimeUtc) : null;
+  if (!start || Number.isNaN(start.getTime())) return [];
+
+  if (!end || Number.isNaN(end.getTime())) return [getLocalDateKey(start)];
+
+  const keys = [];
+  const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+  if (task.isAllDay && end.getHours() === 0 && end.getMinutes() === 0 && last > cursor) {
+    last.setDate(last.getDate() - 1);
+  }
+
+  while (cursor <= last) {
+    keys.push(getLocalDateKey(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return keys;
+}
+
+function setDayCellActionLabel(el, label) {
+  const baseLabel = (el.getAttribute("aria-label") || "").replace(/\. (Create|Edit) Event$/, "");
+  el.title = label;
+  el.setAttribute("aria-label", baseLabel ? `${baseLabel}. ${label}` : label);
+}
+
 export default function Calendar() {
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
   const API_URL = import.meta.env.VITE_API_TASKS || import.meta.env.VITE_API_URL;
+  const calendarWrapRef = useRef(null);
 
   const [tasks, setTasks] = useState([]);
   const [currentEvents, setCurrentEvents] = useState([]);
@@ -45,6 +84,7 @@ export default function Calendar() {
   const [hasLoadedTasks, setHasLoadedTasks] = useState(false);
 
   const events = useMemo(() => tasks.map(taskToEvent), [tasks]);
+  const eventDateKeys = useMemo(() => new Set(tasks.flatMap(getTaskDateKeys)), [tasks]);
 
   const loadTasks = useCallback(async () => {
     const ok = await initCalendarTasksAction({
@@ -109,6 +149,24 @@ export default function Calendar() {
 
     openCreateModal(selectInfo.start, selectInfo.end || getDefaultEndDate(selectInfo.start));
   };
+
+  const handleDayCellDidMount = useCallback((cellInfo) => {
+    if (cellInfo.isDisabled) return;
+
+    const dateKey = getLocalDateKey(cellInfo.date);
+    setDayCellActionLabel(cellInfo.el, eventDateKeys.has(dateKey) ? "Edit Event" : "Create Event");
+  }, [eventDateKeys]);
+
+  useEffect(() => {
+    const root = calendarWrapRef.current;
+    if (!root) return;
+
+    root.querySelectorAll(".fc-daygrid-day[data-date], .fc-timegrid-col[data-date]").forEach((el) => {
+      const dateKey = el.getAttribute("data-date");
+      if (!dateKey) return;
+      setDayCellActionLabel(el, eventDateKeys.has(dateKey) ? "Edit Event" : "Create Event");
+    });
+  }, [currentEvents, eventDateKeys]);
 
   const handleEventClick = (clickInfo) => {
     const task = clickInfo.event.extendedProps.task;
@@ -222,7 +280,7 @@ export default function Calendar() {
             }}
           />
 
-          <div className="calendar-container min-w-0">
+          <div ref={calendarWrapRef} className="calendar-container calendar-task-grid min-w-0">
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               headerToolbar={{
@@ -252,6 +310,7 @@ export default function Calendar() {
               }}
               events={events}
               select={handleDateSelect}
+              dayCellDidMount={handleDayCellDidMount}
               eventContent={CalendarEventContent}
               eventClick={handleEventClick}
               eventDrop={updateEventDates}
