@@ -9,6 +9,7 @@ export const DEFAULT_DIARY_DATE = todayYYYYMMDD();
 export const DEFAULT_TITLE_FORMAT = "ddmmyyyy";
 export const DEFAULT_ENTRY_TITLE = formatDiaryTitleDate(DEFAULT_DIARY_DATE, DEFAULT_TITLE_FORMAT);
 export const DIARY_PAGE_IMAGE_PLACEHOLDER = "{{diary-page-image}}";
+export const DIARY_IMAGE_ALIGN_CLASSES = ["diary-align-left", "diary-align-center", "diary-align-right"];
 
 export function sanitizeFileName(value) {
   const fileName = String(value || "diary-entry")
@@ -53,17 +54,41 @@ export function htmlToText(html) {
   return container.innerText || "";
 }
 
+function ensureDiaryImagesWrapped(container) {
+  container.querySelectorAll("img").forEach((image) => {
+    image.classList.add("diary-editor-image");
+    image.draggable = false;
+
+    const existingWrapper = image.closest(".diary-editor-image-wrap");
+    if (existingWrapper) {
+      existingWrapper.classList.add("diary-editor-image-wrap");
+      return;
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "diary-editor-image-wrap diary-align-center";
+    wrapper.style.textAlign = "center";
+    image.replaceWith(wrapper);
+    wrapper.appendChild(image);
+  });
+}
+
 export function attachDiaryPageImageToHtml(html, imageUrl, alt = "Diary page image") {
   if (!imageUrl) return html || "";
 
   const imageHtml = `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(alt)}" class="diary-editor-image" draggable="false">`;
   const content = html || "";
+  const container = document.createElement("div");
 
   if (content.includes(DIARY_PAGE_IMAGE_PLACEHOLDER)) {
-    return content.replaceAll(DIARY_PAGE_IMAGE_PLACEHOLDER, imageHtml);
+    container.innerHTML = content.replaceAll(DIARY_PAGE_IMAGE_PLACEHOLDER, imageHtml);
+    ensureDiaryImagesWrapped(container);
+    return container.innerHTML;
   }
 
-  return `${content}${content ? "<br>" : ""}<div class="diary-editor-image-wrap" style="text-align: center;">${imageHtml}</div>`;
+  container.innerHTML = `${content}${content ? "<br>" : ""}<div class="diary-editor-image-wrap diary-align-center" style="text-align: center;">${imageHtml}</div>`;
+  ensureDiaryImagesWrapped(container);
+  return container.innerHTML;
 }
 
 function getImageExtension(mimeType) {
@@ -109,6 +134,7 @@ async function extractFirstImageFileFromHtml(html, pageNumber) {
 export async function prepareDiaryPageForBackend(html, pageNumber) {
   const container = document.createElement("div");
   container.innerHTML = html || "";
+  ensureDiaryImagesWrapped(container);
 
   const image = container.querySelector("img[src]");
   if (!image) return { content: container.innerHTML, image: null };

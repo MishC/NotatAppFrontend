@@ -22,6 +22,7 @@ import {
   DEFAULT_EDITOR_FONT_SIZE,
   DEFAULT_ENTRY_TITLE,
   DEFAULT_TITLE_FORMAT,
+  DIARY_IMAGE_ALIGN_CLASSES,
   FONT_SIZE_STEP,
   PAGE_MAX_HEIGHT,
   attachDiaryPageImageToHtml,
@@ -123,7 +124,7 @@ export default function Diary() {
     if (existingWrapper) return existingWrapper;
 
     const wrapper = document.createElement("div");
-    wrapper.className = "diary-editor-image-wrap";
+    wrapper.className = "diary-editor-image-wrap diary-align-center";
     wrapper.style.textAlign = "center";
     image.replaceWith(wrapper);
     wrapper.appendChild(image);
@@ -150,6 +151,8 @@ export default function Diary() {
 
     if (!wrapper) return false;
 
+    wrapper.classList.remove(...DIARY_IMAGE_ALIGN_CLASSES);
+    wrapper.classList.add(`diary-align-${alignment}`);
     wrapper.style.textAlign = alignment;
     selectedImageWrapperRef.current = wrapper;
     syncEditorToPage();
@@ -199,7 +202,7 @@ export default function Diary() {
 
   const createImageWrapper = (image) => {
     const wrapper = document.createElement("div");
-    wrapper.className = "diary-editor-image-wrap";
+    wrapper.className = "diary-editor-image-wrap diary-align-center";
     wrapper.style.textAlign = "center";
     wrapper.appendChild(image);
     return wrapper;
@@ -322,8 +325,9 @@ export default function Diary() {
     const range = selection.getRangeAt(0);
     const lineBreak = document.createElement("br");
     const resetSpan = document.createElement("span");
-    const spacer = document.createTextNode("\u200B");
+    const spacer = document.createTextNode("\u00A0");
 
+    resetSpan.dataset.diaryEmptyLine = "true";
     resetSpan.style.fontSize = `${DEFAULT_EDITOR_FONT_SIZE}px`;
     resetSpan.style.fontWeight = "400";
     resetSpan.style.fontStyle = "normal";

@@ -65,6 +65,18 @@
   text-align: center;
 }
 
+.diary-editor-image-wrap.diary-align-left {
+  text-align: left;
+}
+
+.diary-editor-image-wrap.diary-align-center {
+  text-align: center;
+}
+
+.diary-editor-image-wrap.diary-align-right {
+  text-align: right;
+}
+
 .diary-editor-image,
 .diary-editor-page img {
   display: block;
