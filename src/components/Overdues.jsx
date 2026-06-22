@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
 
 
  function Overdues({ notes = [], onOpen, folders = [], onDelete }) {
   const [q, setQ] = useState("");
-  
 
-  const [localNotes, setLocalNotes] = useState(Array.isArray(notes) ? notes : []);
+  const rows = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return notes;
 
- 
-  useEffect(() => {
-    if (Array.isArray(notes)) setLocalNotes(notes);
-  }, [notes]);
+    return notes.filter((n) => {
+      const scheduledAt = String(n.scheduledAt || "").slice(0, 10);
+      const values = [
+        n.title,
+        scheduledAt,
+        formatDateDDMMYYYY(scheduledAt),
+      ];
 
- 
+      return values.some((value) => String(value || "").toLowerCase().includes(term));
+    });
+  }, [notes, q]);
 
   return (
     <div className="w-[80%] mt-6 mx-auto sm:mx-0">
@@ -38,7 +44,7 @@ import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
           </thead>
 
           <tbody className="divide-y divide-slate-100">
-            {notes.map((n) => (
+            {rows.map((n) => (
               <tr key={n.id} className="hover:bg-red-50/40">
                 <td className="px-4 py-3">
                   <button
@@ -81,7 +87,7 @@ import { formatDateDDMMYYYY } from "../helpers/dateHelpers";
               </tr>
             ))}
 
-            {notes.length === 0 && (
+            {rows.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-slate-500" colSpan={4}>
                   No overdue notes.

@@ -9,6 +9,8 @@ function Sidebar({
   handleFolderClick,
   setError,
   overdueCount = 0,
+  todoSearch = "",
+  setTodoSearch,
 }) {
   const [openFolderId, setOpenFolderId] = useState(null); //toggle FolderSettingsModal
   const overdueTotal = Number(overdueCount) || 0;
@@ -64,6 +66,16 @@ const folder = folders.find(
         </span>
 
       </div>
+      {activeFolder === null && (
+        <div className="px-6 pb-4">
+          <input
+            value={todoSearch}
+            onChange={(e) => setTodoSearch?.(e.target.value)}
+            placeholder="Search by title or date..."
+            className="w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm text-slate-700 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+          />
+        </div>
+      )}
 {!guest &&
   sortedFolders.map((opt) => {
       const isActive = String(activeFolder) === String(opt.id);
