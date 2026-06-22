@@ -5,14 +5,13 @@ export default function CalendarSidebar({
   onWeekendsToggle,
   currentEvents,
   loading,
-  overdueOnly,
-  onOverdueOnlyToggle,
   onEventClick,
 }) {
-  const filteredEvents = overdueOnly
-    ? currentEvents.filter(isCalendarEventOverdue)
-    : currentEvents;
-  const listedEvents = [...filteredEvents]
+  const upcomingEvents = currentEvents.filter((event) => {
+    const task = event.extendedProps?.task;
+    return !task?.isDone && !isCalendarEventOverdue(event);
+  });
+  const listedEvents = [...upcomingEvents]
     .sort((a, b) => {
       const ad = toDate(a.start)?.getTime() ?? Number.MAX_SAFE_INTEGER;
       const bd = toDate(b.start)?.getTime() ?? Number.MAX_SAFE_INTEGER;
@@ -37,21 +36,11 @@ export default function CalendarSidebar({
           />
           Show weekends
         </label>
-
-        <label className="flex items-center gap-2 rounded-2xl py-2 transition-colors hover:bg-black/[0.04]">
-          <input
-            type="checkbox"
-            checked={overdueOnly}
-            onChange={onOverdueOnlyToggle}
-            className="h-4 w-4 accent-[rgb(var(--danger))]"
-          />
-          Only overdue
-        </label>
       </div>
 
       <div className="px-6">
         <h3 className="mb-2 text-sm font-semibold text-slate-600">
-          Visible events ({listedEvents.length}/{filteredEvents.length})
+          Upcoming events ({listedEvents.length}/{upcomingEvents.length})
         </h3>
         <ul>
           {listedEvents.map((event) => (
@@ -59,7 +48,7 @@ export default function CalendarSidebar({
           ))}
           {listedEvents.length === 0 && (
             <li className="py-3 text-sm text-slate-500">
-              No events visible.
+              No upcoming events.
             </li>
           )}
         </ul>

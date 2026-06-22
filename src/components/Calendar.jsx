@@ -38,7 +38,6 @@ export default function Calendar() {
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [weekendsVisible, setWeekendsVisible] = useState(true);
-  const [overdueOnly, setOverdueOnly] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [selectedTask, setSelectedTask] = useState(null);
@@ -217,8 +216,6 @@ export default function Calendar() {
             onWeekendsToggle={() => setWeekendsVisible((value) => !value)}
             currentEvents={currentEvents}
             loading={loading}
-            overdueOnly={overdueOnly}
-            onOverdueOnlyToggle={() => setOverdueOnly((value) => !value)}
             onEventClick={(event) => {
               const task = event.extendedProps?.task;
               if (task) openEditModal(task);
