@@ -200,14 +200,21 @@ export function getSafeSongLink(link) {
   }
 }
 
-export function buildSongRecommendationHtml(songs, style) {
+export function getSongSearchLink(song) {
+  const label = getSongLabel(song);
+  if (!label || label === "Recommended song") return "";
+
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
+}
+
+export function buildSongRecommendationHtml(songs) {
   const items = songs
     .map((song) => {
       const label = getSongLabel(song);
-      const link = getSafeSongLink(song?.link);
+      const link = getSafeSongLink(song?.link) || getSongSearchLink(song);
 
       if (link) {
-        return `<li><a href="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></li>`;
+        return `<li><a href="${escapeHtml(link)}" title="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></li>`;
       }
 
       return `<li>${escapeHtml(label)}</li>`;
@@ -216,7 +223,7 @@ export function buildSongRecommendationHtml(songs, style) {
 
   return [
     '<div class="diary-song-recommendation">',
-    `<strong>Song recommendation${style ? ` - ${escapeHtml(style)}` : ""}</strong>`,
+    "<strong>Song of the day</strong>",
     `<ul>${items}</ul>`,
     "</div>",
   ].join("");
@@ -228,10 +235,9 @@ export function mergeSongRecommendationIntoPages({
   currentHtml,
   currentText,
   songs,
-  style,
 }) {
   const lastIndex = Math.max(0, pages.length - 1);
-  const htmlToInsert = buildSongRecommendationHtml(songs, style);
+  const htmlToInsert = buildSongRecommendationHtml(songs);
   const nextPages = pages.map((page, index) => {
     const pageHtml = index === pageIndex ? currentHtml : page.html || "";
     const separator = pageHtml ? "<br>" : "";

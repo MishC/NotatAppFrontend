@@ -156,6 +156,13 @@ export default function Diary() {
   };
 
   const handleEditorClick = (e) => {
+    const link = e.target.closest?.(".diary-song-recommendation a[href]");
+    if (link) {
+      e.preventDefault();
+      window.open(link.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     selectedImageWrapperRef.current = getImageWrapperFromNode(e.target);
   };
 
@@ -204,7 +211,7 @@ export default function Diary() {
     });
   };
 
-  const insertSongsOnLastPage = (songs, style) => {
+  const insertSongsOnLastPage = (songs) => {
     if (!songs.length) return;
 
     const currentHtml = editorRef.current?.innerHTML || "";
@@ -215,7 +222,6 @@ export default function Diary() {
       currentHtml,
       currentText,
       songs,
-      style,
     });
 
     setPages(nextPages);

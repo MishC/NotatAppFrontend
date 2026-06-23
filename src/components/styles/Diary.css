@@ -107,6 +107,7 @@
 
 .diary-song-recommendation a {
   color: rgb(var(--link));
+  cursor: pointer;
   font-weight: 700;
   text-decoration: underline;
 }
