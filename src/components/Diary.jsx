@@ -488,7 +488,7 @@ export default function Diary() {
     const isLocalSongRequest = songPreference === "Local";
     const contextLabel = isLocalSongRequest ? localSongCountry : "";
     const apiStyle = isLocalSongRequest && localSongCountry
-      ? `Local ${localSongCountry}`
+      ? localSongCountry
       : songPreference;
 
     const songs = await recommendSongAction({
