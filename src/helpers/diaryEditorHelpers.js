@@ -164,6 +164,12 @@ export function clearEditorFormatting(editor, onSync) {
 
   document.execCommand("removeFormat");
 
+  ["bold", "italic", "underline", "strikeThrough", "superscript", "subscript"].forEach((command) => {
+    if (document.queryCommandState(command)) {
+      document.execCommand(command, false);
+    }
+  });
+
   for (let index = 0; index < 8; index += 1) {
     document.execCommand("outdent");
   }
@@ -179,11 +185,27 @@ export function clearEditorFormatting(editor, onSync) {
   document.execCommand("justifyLeft");
 
   if (selection.isCollapsed) {
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<span style="font-size: ${DEFAULT_EDITOR_FONT_SIZE}px; font-weight: 400; font-style: normal; text-decoration: none;">&#8203;</span>`
-    );
+    const range = selection.getRangeAt(0);
+    const resetSpan = document.createElement("span");
+    const marker = document.createTextNode("\u200B");
+
+    resetSpan.dataset.diaryFormatResetCaret = "true";
+    resetSpan.style.fontSize = `${DEFAULT_EDITOR_FONT_SIZE}px`;
+    resetSpan.style.fontWeight = "400";
+    resetSpan.style.fontStyle = "normal";
+    resetSpan.style.textDecoration = "none";
+    resetSpan.style.textDecorationLine = "none";
+    resetSpan.style.textIndent = "0";
+    resetSpan.style.margin = "0";
+    resetSpan.style.padding = "0";
+    resetSpan.appendChild(marker);
+
+    range.deleteContents();
+    range.insertNode(resetSpan);
+    range.setStart(marker, 1);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
 
   onSync?.();

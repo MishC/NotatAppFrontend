@@ -8,7 +8,6 @@ import {
   CaseLower,
   ChevronLeft,
   ChevronRight,
-  Eraser,
   FileDown,
   Heading1,
   Image,
@@ -16,6 +15,7 @@ import {
   Music,
   Plus,
   Quote,
+  RemoveFormatting,
   Rows3,
   Search,
   Smile,
@@ -175,7 +175,7 @@ export default function DiaryEditor({
         <DiaryToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
         <DiaryToolbarButton title="Superscript" Icon={Superscript} onClick={() => runCommand("superscript")} />
         <DiaryToolbarButton title="Subscript" Icon={Subscript} onClick={() => runCommand("subscript")} />
-        <DiaryToolbarButton title="Clear formatting" Icon={Eraser} onClick={clearFormatting} />
+        <DiaryToolbarButton title="Turn off formatting" Icon={RemoveFormatting} onClick={clearFormatting} />
         <div className="relative">
           <DiaryToolbarButton
             title="Alignment"
