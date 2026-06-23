@@ -151,6 +151,44 @@ export function insertQuoteInEditor(editor, onSync) {
   onSync?.();
 }
 
+export function clearEditorFormatting(editor, onSync) {
+  editor?.focus();
+  const selection = getSelectionInsideEditor(editor);
+
+  if (!selection) return;
+
+  const anchorElement =
+    selection.anchorNode?.nodeType === Node.ELEMENT_NODE
+      ? selection.anchorNode
+      : selection.anchorNode?.parentElement;
+
+  document.execCommand("removeFormat");
+
+  for (let index = 0; index < 8; index += 1) {
+    document.execCommand("outdent");
+  }
+
+  if (anchorElement?.closest?.("ul")) {
+    document.execCommand("insertUnorderedList");
+  }
+
+  if (anchorElement?.closest?.("ol")) {
+    document.execCommand("insertOrderedList");
+  }
+
+  document.execCommand("justifyLeft");
+
+  if (selection.isCollapsed) {
+    document.execCommand(
+      "insertHTML",
+      false,
+      `<span style="font-size: ${DEFAULT_EDITOR_FONT_SIZE}px; font-weight: 400; font-style: normal; text-decoration: none;">&#8203;</span>`
+    );
+  }
+
+  onSync?.();
+}
+
 export function insertDefaultLineBreakInEditor(editor) {
   editor?.focus();
   const selection = getSelectionInsideEditor(editor);

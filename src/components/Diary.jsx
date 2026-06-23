@@ -33,6 +33,7 @@ import {
 import {
   applyImageAlignment,
   changeEditorFontSize,
+  clearEditorFormatting,
   createImageWrapper,
   getImageWrapperFromNode,
   insertDefaultLineBreakInEditor,
@@ -203,6 +204,7 @@ export default function Diary() {
   const increaseFontSize = () => changeEditorFontSize(editorRef.current, 1, syncEditorToPage);
   const decreaseFontSize = () => changeEditorFontSize(editorRef.current, -1, syncEditorToPage);
   const insertQuote = () => insertQuoteInEditor(editorRef.current, syncEditorToPage);
+  const clearFormatting = () => clearEditorFormatting(editorRef.current, syncEditorToPage);
 
   const syncEditorToPage = () => {
     updateCurrentPage({
@@ -682,6 +684,7 @@ export default function Diary() {
           <DiaryEditor
             addPage={addPage}
             alignmentMenuOpen={alignmentMenuOpen}
+            clearFormatting={clearFormatting}
             decreaseFontSize={decreaseFontSize}
             deleteCurrentPage={deleteCurrentPage}
             editorRef={editorRef}

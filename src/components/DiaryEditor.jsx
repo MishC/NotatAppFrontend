@@ -8,6 +8,7 @@ import {
   CaseLower,
   ChevronLeft,
   ChevronRight,
+  Eraser,
   FileDown,
   Heading1,
   Image,
@@ -35,6 +36,7 @@ const baseSongStyleOptions = [
 export default function DiaryEditor({
   addPage,
   alignmentMenuOpen,
+  clearFormatting,
   decreaseFontSize,
   deleteCurrentPage,
   editorRef,
@@ -173,6 +175,7 @@ export default function DiaryEditor({
         <DiaryToolbarButton title="Underline" Icon={Underline} onClick={() => runCommand("underline")} />
         <DiaryToolbarButton title="Superscript" Icon={Superscript} onClick={() => runCommand("superscript")} />
         <DiaryToolbarButton title="Subscript" Icon={Subscript} onClick={() => runCommand("subscript")} />
+        <DiaryToolbarButton title="Clear formatting" Icon={Eraser} onClick={clearFormatting} />
         <div className="relative">
           <DiaryToolbarButton
             title="Alignment"
