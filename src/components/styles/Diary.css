@@ -114,17 +114,26 @@
 
 .diary-song-recommendation {
   border-left: 0;
-  margin: 1rem 0;
-  padding: 0.25rem 0;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: none;
 }
 
 .diary-song-recommendation strong {
+  display: block;
   font-weight: 700;
 }
 
-.diary-song-recommendation ul {
-  margin: 0.35rem 0 0;
-  padding-left: 1.1rem;
+.diary-song-recommendation__item {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 .diary-song-recommendation a {

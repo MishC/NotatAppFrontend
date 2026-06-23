@@ -328,7 +328,7 @@ export async function prepareSongsForEditor(songs) {
   );
 }
 
-function buildFormatResetLineHtml() {
+function buildNeutralLineHtml() {
   const resetStyle = [
     "font-size: 14px",
     "font-style: normal",
@@ -346,7 +346,7 @@ function buildFormatResetLineHtml() {
     "line-height: 1.5",
   ].join("; ");
 
-  return `<div class="diary-format-reset" style="${resetStyle};"><span class="diary-format-reset__spacer" style="${resetStyle};">&nbsp;</span><br></div>`;
+  return `<div class="diary-format-reset" style="${resetStyle};"><br></div>`;
 }
 
 export function buildSongRecommendationHtml(songs, contextLabel = "") {
@@ -356,20 +356,19 @@ export function buildSongRecommendationHtml(songs, contextLabel = "") {
       const link = getSafeSongLink(song?.link);
 
       if (link) {
-        return `<li><a href="${escapeHtml(link)}" title="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></li>`;
+        return `<div class="diary-song-recommendation__item"><a href="${escapeHtml(link)}" title="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></div>`;
       }
 
-      return `<li>${escapeHtml(label)}</li>`;
+      return `<div class="diary-song-recommendation__item">${escapeHtml(label)}</div>`;
     })
     .join("");
 
   return [
-    buildFormatResetLineHtml(),
-    '<div class="diary-song-recommendation">',
+    '<div class="diary-song-recommendation" style="font-size: 16px; font-style: normal; font-weight: 400; text-decoration: none; text-align: left; line-height: 1.5; margin: 0.5rem 0 0; padding: 0;">',
     `<strong>Song of the day${contextLabel ? ` - ${escapeHtml(contextLabel)}` : ""}</strong>`,
-    `<ul>${items}</ul>`,
+    items,
     "</div>",
-    buildFormatResetLineHtml(),
+    buildNeutralLineHtml(),
   ].join("");
 }
 
@@ -385,7 +384,7 @@ export function mergeSongRecommendationIntoPages({
   const htmlToInsert = buildSongRecommendationHtml(songs, contextLabel);
   const nextPages = pages.map((page, index) => {
     const pageHtml = index === pageIndex ? currentHtml : page.html || "";
-    const separator = pageHtml ? "<br>" : "";
+    const separator = pageHtml ? "<div><br></div>" : "";
     const html = index === lastIndex ? `${pageHtml}${separator}${htmlToInsert}` : pageHtml;
 
     if (index !== lastIndex && index !== pageIndex) return page;
