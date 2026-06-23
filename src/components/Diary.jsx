@@ -12,6 +12,7 @@ import {
   updateDiaryEntryAction,
   updateDiaryPageAction,
 } from "../actions/diaryAction";
+import { recommendSongAction } from "../actions/aiActions";
 import {
   formatDateDDMMYYYY,
   formatDiaryTitleDate,
@@ -19,22 +20,28 @@ import {
 } from "../helpers/dateHelpers";
 import {
   DEFAULT_DIARY_DATE,
-  DEFAULT_EDITOR_FONT_SIZE,
   DEFAULT_ENTRY_TITLE,
   DEFAULT_TITLE_FORMAT,
-  DIARY_IMAGE_ALIGN_CLASSES,
-  FONT_SIZE_STEP,
   PAGE_MAX_HEIGHT,
   attachDiaryPageImageToHtml,
   createPagePixelTiles,
-  escapeHtml,
   getDiaryApiBase,
-  getSelectionInsideEditor,
   htmlToText,
   normalizeLoadedDiaryPages,
   prepareDiaryPageForBackend,
-  sanitizeFileName,
 } from "../helpers/diaryHelpers";
+import {
+  applyImageAlignment,
+  changeEditorFontSize,
+  createImageWrapper,
+  getImageWrapperFromNode,
+  insertDefaultLineBreakInEditor,
+  insertNodeInEditor,
+  insertQuoteInEditor,
+  mergeSongRecommendationIntoPages,
+  resolveCountryFromGeolocation,
+} from "../helpers/diaryEditorHelpers";
+import { openDiaryPdfWindow } from "../helpers/diaryPdfHelpers";
 import "./styles/Diary.css";
 
 export default function Diary() {
@@ -48,6 +55,7 @@ export default function Diary() {
   const previousPageIndexRef = useRef(0);
   const pixelTimerRef = useRef(null);
   const API_URL_DIARY = getDiaryApiBase();
+  const API_URL_AI = import.meta.env.VITE_API_AI || import.meta.env.VITE_API_URL;
   const [diaryEntries, setDiaryEntries] = useState([]);
   const [loadedEntryId, setLoadedEntryId] = useState(null);
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
@@ -79,35 +87,10 @@ export default function Diary() {
   useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
 
   useEffect(() => {
-    if (!("geolocation" in navigator)) return;
-
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const url = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client");
-          url.searchParams.set("latitude", String(coords.latitude));
-          url.searchParams.set("longitude", String(coords.longitude));
-          url.searchParams.set("localityLanguage", "en");
-
-          const response = await fetch(url);
-          if (!response.ok) throw new Error("Country lookup failed.");
-
-          const data = await response.json();
-          const country = data?.countryName || data?.countryCode || "";
-          setLocalSongCountry(country);
-          setLocalSongAvailable(Boolean(country));
-        } catch (error) {
-          console.error(error);
-          setLocalSongCountry("");
-          setLocalSongAvailable(false);
-        }
-      },
-      () => {
-        setLocalSongCountry("");
-        setLocalSongAvailable(false);
-      },
-      { enableHighAccuracy: false, maximumAge: 600000, timeout: 5000 }
-    );
+    resolveCountryFromGeolocation().then((country) => {
+      setLocalSongCountry(country);
+      setLocalSongAvailable(Boolean(country));
+    });
   }, []);
 
   useEffect(() => {
@@ -139,65 +122,22 @@ export default function Diary() {
     );
   };
 
-  const getImageWrapperFromNode = (node) => {
-    const element =
-      node?.nodeType === Node.ELEMENT_NODE
-        ? node
-        : node?.parentElement;
-
-    if (!element) return null;
-
-    if (element.classList?.contains("diary-editor-image-wrap")) return element;
-
-    const image = element.matches?.(".diary-editor-image")
-      ? element
-      : element.closest?.(".diary-editor-image");
-
-    if (!image) return null;
-
-    const existingWrapper = image.closest(".diary-editor-image-wrap");
-    if (existingWrapper) return existingWrapper;
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "diary-editor-image-wrap diary-align-center";
-    wrapper.style.textAlign = "center";
-    image.replaceWith(wrapper);
-    wrapper.appendChild(image);
-    return wrapper;
-  };
-
-  const applyImageAlignment = (command) => {
-    const alignmentByCommand = {
-      justifyLeft: "left",
-      justifyCenter: "center",
-      justifyRight: "right",
-    };
-    const alignment = alignmentByCommand[command];
-
-    if (!alignment) return false;
-
-    const selection = getSelectionInsideEditor(editorRef.current);
-    const selectedWrapper = selectedImageWrapperRef.current;
-    const selectionWrapper = getImageWrapperFromNode(selection?.anchorNode);
-    const wrapper =
-      selectedWrapper && editorRef.current?.contains(selectedWrapper)
-        ? selectedWrapper
-        : selectionWrapper;
-
-    if (!wrapper) return false;
-
-    wrapper.classList.remove(...DIARY_IMAGE_ALIGN_CLASSES);
-    wrapper.classList.add(`diary-align-${alignment}`);
-    wrapper.style.textAlign = alignment;
-    selectedImageWrapperRef.current = wrapper;
-    syncEditorToPage();
-    return true;
-  };
-
   const runCommand = (command, value = null) => {
     editorRef.current?.focus();
 
-    if (applyImageAlignment(command)) return;
+    if (
+      applyImageAlignment({
+        command,
+        editor: editorRef.current,
+        selectedWrapper: selectedImageWrapperRef.current,
+        onSelectedWrapperChange: (wrapper) => {
+          selectedImageWrapperRef.current = wrapper;
+        },
+        onSync: syncEditorToPage,
+      })
+    ) {
+      return;
+    }
 
     document.execCommand(command, false, value);
     updateCurrentPage({
@@ -213,34 +153,6 @@ export default function Diary() {
       html: editorRef.current?.innerHTML || "",
       text: editorRef.current?.innerText || "",
     });
-  };
-
-  const insertNodeInEditor = (node) => {
-    editorRef.current?.focus();
-    const selection = getSelectionInsideEditor(editorRef.current);
-
-    if (!selection) {
-      editorRef.current?.appendChild(node);
-      syncEditorToPage();
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(node);
-    range.setStartAfter(node);
-    range.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    syncEditorToPage();
-  };
-
-  const createImageWrapper = (image) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "diary-editor-image-wrap diary-align-center";
-    wrapper.style.textAlign = "center";
-    wrapper.appendChild(image);
-    return wrapper;
   };
 
   const handleEditorClick = (e) => {
@@ -273,7 +185,7 @@ export default function Diary() {
       image.draggable = false;
 
       const wrapper = createImageWrapper(image);
-      insertNodeInEditor(wrapper);
+      insertNodeInEditor(editorRef.current, wrapper, syncEditorToPage);
       selectedImageWrapperRef.current = wrapper;
       setMsg("Image added to diary page.");
     };
@@ -281,68 +193,9 @@ export default function Diary() {
     reader.readAsDataURL(file);
   };
 
-  const changeFontSize = (direction) => {
-    editorRef.current?.focus();
-    const selection = getSelectionInsideEditor(editorRef.current);
-    const anchorElement =
-      selection?.anchorNode?.nodeType === Node.ELEMENT_NODE
-        ? selection.anchorNode
-        : selection?.anchorNode?.parentElement;
-    const currentSize = anchorElement
-      ? Number.parseFloat(window.getComputedStyle(anchorElement).fontSize)
-      : 18;
-    const nextSize = Math.max(8, Math.round(currentSize + FONT_SIZE_STEP * direction));
-
-    if (!selection || selection.isCollapsed) {
-      document.execCommand("insertHTML", false, `<span style="font-size: ${nextSize}px;">&#8203;</span>`);
-      syncEditorToPage();
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    const wrapper = document.createElement("span");
-    wrapper.style.fontSize = `${nextSize}px`;
-    wrapper.appendChild(range.extractContents());
-    range.insertNode(wrapper);
-
-    const nextRange = document.createRange();
-    nextRange.selectNodeContents(wrapper);
-    selection.removeAllRanges();
-    selection.addRange(nextRange);
-
-    syncEditorToPage();
-  };
-
-  const increaseFontSize = () => changeFontSize(1);
-  const decreaseFontSize = () => changeFontSize(-1);
-
-  const insertQuote = () => {
-    editorRef.current?.focus();
-    const selection = getSelectionInsideEditor(editorRef.current);
-    const selectedText = selection?.toString() || "";
-
-    if (!selection) {
-      document.execCommand("insertHTML", false, '<span style="font-style: italic;">„“</span>');
-      syncEditorToPage();
-      return;
-    }
-
-    const range = selection.getRangeAt(0);
-    const quoteNode = document.createElement("span");
-    quoteNode.style.fontStyle = "italic";
-    quoteNode.textContent = selectedText ? `„${selectedText}“` : "„“";
-
-    range.deleteContents();
-    range.insertNode(quoteNode);
-
-    const caretRange = document.createRange();
-    caretRange.setStart(quoteNode.firstChild, selectedText ? quoteNode.textContent.length : 1);
-    caretRange.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(caretRange);
-
-    syncEditorToPage();
-  };
+  const increaseFontSize = () => changeEditorFontSize(editorRef.current, 1, syncEditorToPage);
+  const decreaseFontSize = () => changeEditorFontSize(editorRef.current, -1, syncEditorToPage);
+  const insertQuote = () => insertQuoteInEditor(editorRef.current, syncEditorToPage);
 
   const syncEditorToPage = () => {
     updateCurrentPage({
@@ -351,33 +204,32 @@ export default function Diary() {
     });
   };
 
-  const insertDefaultLineBreak = () => {
-    editorRef.current?.focus();
-    const selection = getSelectionInsideEditor(editorRef.current);
+  const insertSongsOnLastPage = (songs, style) => {
+    if (!songs.length) return;
 
-    if (!selection) return;
+    const currentHtml = editorRef.current?.innerHTML || "";
+    const currentText = editorRef.current?.innerText || "";
+    const { htmlToInsert, lastIndex, nextPages } = mergeSongRecommendationIntoPages({
+      pages: pagesRef.current,
+      pageIndex,
+      currentHtml,
+      currentText,
+      songs,
+      style,
+    });
 
-    const range = selection.getRangeAt(0);
-    const lineBreak = document.createElement("br");
-    const resetSpan = document.createElement("span");
-    const spacer = document.createTextNode("\u00A0");
+    setPages(nextPages);
 
-    resetSpan.dataset.diaryEmptyLine = "true";
-    resetSpan.style.fontSize = `${DEFAULT_EDITOR_FONT_SIZE}px`;
-    resetSpan.style.fontWeight = "400";
-    resetSpan.style.fontStyle = "normal";
-    resetSpan.style.textDecoration = "none";
-    resetSpan.appendChild(spacer);
+    if (pageIndex !== lastIndex) {
+      setPageIndex(lastIndex);
+      setEditorLoadKey((key) => key + 1);
+      return;
+    }
 
-    range.deleteContents();
-    range.insertNode(resetSpan);
-    range.insertNode(lineBreak);
-
-    const caretRange = document.createRange();
-    caretRange.setStart(spacer, 1);
-    caretRange.collapse(true);
-    selection.removeAllRanges();
-    selection.addRange(caretRange);
+    requestAnimationFrame(() => {
+      if (!editorRef.current) return;
+      editorRef.current.innerHTML = `${currentHtml}${currentHtml ? "<br>" : ""}${htmlToInsert}`;
+    });
   };
 
   const deleteCurrentPage = () => {
@@ -400,7 +252,7 @@ export default function Diary() {
     if (e.key !== "Enter") return;
 
     e.preventDefault();
-    insertDefaultLineBreak();
+    insertDefaultLineBreakInEditor(editorRef.current);
     updateCurrentPage({
       html: editorRef.current?.innerHTML || "",
       text: editorRef.current?.innerText || "",
@@ -612,16 +464,27 @@ export default function Diary() {
     }
   };
 
-  const handleSongSuggestion = (songPreference) => {
-    const text = editorRef.current?.innerText?.trim();
+  const handleSongSuggestion = async (songPreference) => {
+    syncEditorToPage();
 
-
-    if (!text) {
-      setMsg("Write something first, then AI can choose a song from the diary text.");
+    if (!loadedEntryId) {
+      setMsg("Save or load this diary entry first, then AI can choose a song.");
       return;
     }
 
-    setMsg(`AI song picker is ready for ${songPreference || "your selected style"}.`);
+    const songs = await recommendSongAction({
+      guest,
+      API_URL_AI,
+      diaryEntryId: loadedEntryId,
+      style: songPreference,
+      setLoading: setLoadingEntry,
+      setError: setMsg,
+    });
+
+    if (!songs.length) return;
+
+    insertSongsOnLastPage(songs, songPreference);
+    setMsg("Song recommendation inserted on the last diary page.");
   };
 
   const handleTitleFormatChange = (nextFormat) => {
@@ -642,83 +505,10 @@ export default function Diary() {
       html: index === pageIndex ? editorRef.current?.innerHTML || "" : page.html || "",
     }));
     const title = entryTitle || DEFAULT_ENTRY_TITLE;
-    const pagesHtml = printablePages
-      .map(
-        (page) => `
-          <section class="pdf-page">
-            <main class="pdf-content">${page.html || ""}</main>
-          </section>
-        `
-      )
-      .join("");
-    const printWindow = window.open("", "_blank", "width=900,height=1100");
 
-    if (!printWindow) {
+    if (!openDiaryPdfWindow({ pages: printablePages, title })) {
       setMsg("Allow pop-ups to save this diary page as PDF.");
-      return;
     }
-
-    printWindow.document.write(`
-      <!doctype html>
-      <html>
-        <head>
-          <title>${escapeHtml(sanitizeFileName(title))}.pdf</title>
-          <style>
-            @page { size: A4; margin: 14mm; }
-            * { box-sizing: border-box; }
-            body {
-              margin: 0;
-              background: white;
-              color: #1f2937;
-              font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            }
-            .pdf-page {
-              width: 210mm;
-              min-height: 297mm;
-              margin: 0 auto;
-              padding: 14mm;
-              page-break-after: always;
-              background: white;
-            }
-            .pdf-page:last-child {
-              page-break-after: auto;
-            }
-            .pdf-content {
-              min-height: calc(297mm - 28mm);
-              font-size: 18px;
-              line-height: 2;
-              white-space: normal;
-              overflow-wrap: anywhere;
-            }
-            .pdf-content img {
-              display: block;
-              max-width: 100%;
-              max-height: 320px;
-              margin: 12px 0;
-              border-radius: 16px;
-              object-fit: contain;
-            }
-            @media print {
-              body { background: white; margin: 0; }
-              .pdf-page {
-                width: auto;
-                min-height: auto;
-                margin: 0;
-                padding: 0;
-              }
-              .pdf-content {
-                margin: 0;
-                padding: 0;
-              }
-            }
-          </style>
-        </head>
-        <body>${pagesHtml}</body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
   };
 
   const setEmptyDiaryPageForDate = (normalizedDate) => {

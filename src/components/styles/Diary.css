@@ -94,6 +94,23 @@
   margin: 0;
 }
 
+.diary-song-recommendation {
+  margin: 1rem 0;
+  border-left: 3px solid rgb(var(--diary-emerald));
+  padding: 0.25rem 0 0.25rem 0.75rem;
+}
+
+.diary-song-recommendation ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.diary-song-recommendation a {
+  color: rgb(var(--link));
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .diary-sidebar-desktop-only {
   display: none;
 }
