@@ -248,18 +248,6 @@ export function getSongLabel(song) {
   return artist || title || "Recommended song";
 }
 
-export function getSafeSongLink(link) {
-  const value = String(link || "").trim();
-  if (!value) return "";
-
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-
 export function getSongSearchLink(song) {
   const label = getSongLabel(song);
   if (!label || label === "Recommended song") return "";
@@ -267,87 +255,29 @@ export function getSongSearchLink(song) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
 }
 
-function getYoutubeUrlParts(link) {
+export function getSafeSongLink(link) {
+  const value = String(link || "").trim();
+  if (!value) return "";
+
   try {
-    const url = new URL(link);
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
+
     const host = url.hostname.toLowerCase().replace(/^m\./, "").replace(/^www\./, "");
+    const isYouTubeHost = host === "youtube.com" || host.endsWith(".youtube.com") || host === "youtu.be";
+    if (!isYouTubeHost) return url.href;
 
-    return { url, host };
-  } catch {
-    return null;
-  }
-}
-
-function getYoutubeVideoUrlForOEmbed(link) {
-  const parts = getYoutubeUrlParts(link);
-  if (!parts) return "";
-
-  const { url, host } = parts;
-
-  try {
-    if (host === "youtu.be") {
-      const videoId = url.pathname.split("/").filter(Boolean)[0];
-      return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : "";
-    }
-
-    if (!host.endsWith("youtube.com")) return "";
-
-    const watchId = url.searchParams.get("v");
-    if (watchId) return `https://www.youtube.com/watch?v=${encodeURIComponent(watchId)}`;
-
-    const videoPathMatch = url.pathname.match(/^\/(?:shorts|embed)\/([^/?#]+)/);
-    if (!videoPathMatch?.[1]) return "";
-
-    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoPathMatch[1])}`;
+    return url.pathname === "/results" ? url.href : "";
   } catch {
     return "";
   }
 }
 
-function isGoogleVideoLink(link) {
-  const parts = getYoutubeUrlParts(link);
-  return Boolean(parts?.host.endsWith("googlevideo.com"));
-}
-
-async function isYoutubeVideoLinkValid(link) {
-  const videoUrl = getYoutubeVideoUrlForOEmbed(link);
-  if (!videoUrl) return true;
-
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 4500);
-
-  try {
-    const response = await fetch(
-      `https://www.youtube.com/oembed?url=${encodeURIComponent(videoUrl)}&format=json`,
-      {
-        cache: "no-store",
-        signal: controller.signal,
-      }
-    );
-
-    return response.ok;
-  } catch {
-    return false;
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-}
-
 export async function prepareSongsForEditor(songs) {
-  return Promise.all(
-    songs.map(async (song) => {
-      const backendLink = getSafeSongLink(song?.link);
-
-      if (backendLink) {
-        if (isGoogleVideoLink(backendLink)) return { ...song, link: "" };
-
-        const isValid = await isYoutubeVideoLinkValid(backendLink);
-        return { ...song, link: isValid ? backendLink : "" };
-      }
-
-      return { ...song, link: getSongSearchLink(song) };
-    })
-  );
+  return songs.map((song) => ({
+    ...song,
+    link: getSongSearchLink(song),
+  }));
 }
 
 function buildNeutralLineHtml() {
