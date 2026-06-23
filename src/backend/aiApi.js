@@ -78,7 +78,7 @@ async function apiRequest({
   return expectJson ? readBody(res) : null;
 }
 
-export async function recommendSongApi({ API_URL_AI, diaryEntryId, style } = {}) {
+export async function recommendSongApi({ API_URL_AI, diaryEntryId, style, country } = {}) {
   const id = Number(diaryEntryId);
   if (!Number.isFinite(id) || id <= 0) throw new Error("DiaryEntryId is required.");
 
@@ -90,6 +90,7 @@ export async function recommendSongApi({ API_URL_AI, diaryEntryId, style } = {})
     body: {
       diaryEntryId: id,
       style: style || null,
+      country: country || null,
     },
   });
 }

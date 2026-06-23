@@ -28,8 +28,8 @@ import { DIARY_TITLE_DATE_FORMATS } from "../helpers/dateHelpers";
 import { diaryEmojiOptions } from "../helpers/diaryEmojiOptions";
 
 const baseSongStyleOptions = [
-  { label: "International", value: "International hits" },
-  { label: "Just music (no words)", value: "Electronic/Classical (no words)" },
+  { label: "International", value: "International" },
+  { label: "Just music (no words)", value: "Classic/Electronic" },
 ];
 
 export default function DiaryEditor({

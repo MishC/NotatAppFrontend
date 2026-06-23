@@ -7,6 +7,8 @@ function normalizeSongs(payload) {
     title: song?.title ?? song?.Title ?? "",
     artist: song?.artist ?? song?.Artist ?? "",
     link: song?.link ?? song?.Link ?? "",
+    style: song?.style ?? song?.Style ?? "",
+    country: song?.country ?? song?.Country ?? "",
   }));
 }
 
@@ -15,6 +17,7 @@ export async function recommendSongAction({
   API_URL_AI,
   diaryEntryId,
   style,
+  country,
   setSongs,
   setLoading,
   setError,
@@ -38,6 +41,7 @@ export async function recommendSongAction({
       API_URL_AI,
       diaryEntryId: id,
       style,
+      country,
     });
     const songs = normalizeSongs(payload);
 

@@ -487,15 +487,20 @@ export default function Diary() {
 
     const isLocalSongRequest = songPreference === "Local";
     const contextLabel = isLocalSongRequest ? localSongCountry : "";
-    const apiStyle = isLocalSongRequest && localSongCountry
-      ? localSongCountry
-      : songPreference;
+    const apiStyle = isLocalSongRequest ? null : songPreference;
+    const apiCountry = isLocalSongRequest ? localSongCountry : null;
+
+    if (isLocalSongRequest && !apiCountry) {
+      setMsg("Local song needs a detected country first.");
+      return;
+    }
 
     const songs = await recommendSongAction({
       guest,
       API_URL_AI,
       diaryEntryId: loadedEntryId,
       style: apiStyle,
+      country: apiCountry,
       setLoading: setLoadingEntry,
       setError: setMsg,
     });
