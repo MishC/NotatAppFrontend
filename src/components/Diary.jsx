@@ -61,6 +61,9 @@ export default function Diary() {
   const [showRuledLines, setShowRuledLines] = useState(false);
   const [emojiMenuOpen, setEmojiMenuOpen] = useState(false);
   const [alignmentMenuOpen, setAlignmentMenuOpen] = useState(false);
+  const [songMenuOpen, setSongMenuOpen] = useState(false);
+  const [localSongAvailable, setLocalSongAvailable] = useState(false);
+  const [localSongCountry, setLocalSongCountry] = useState("");
   const [pagePixels, setPagePixels] = useState([]);
   const [msg, setMsg] = useState("");
 
@@ -74,6 +77,38 @@ export default function Diary() {
   }, [pages]);
 
   useEffect(()=>{if (msg) { const timer = setTimeout(() => setMsg(""), 3000); return () => clearTimeout(timer); } },[msg])
+
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const url = new URL("https://api.bigdatacloud.net/data/reverse-geocode-client");
+          url.searchParams.set("latitude", String(coords.latitude));
+          url.searchParams.set("longitude", String(coords.longitude));
+          url.searchParams.set("localityLanguage", "en");
+
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Country lookup failed.");
+
+          const data = await response.json();
+          const country = data?.countryName || data?.countryCode || "";
+          setLocalSongCountry(country);
+          setLocalSongAvailable(Boolean(country));
+        } catch (error) {
+          console.error(error);
+          setLocalSongCountry("");
+          setLocalSongAvailable(false);
+        }
+      },
+      () => {
+        setLocalSongCountry("");
+        setLocalSongAvailable(false);
+      },
+      { enableHighAccuracy: false, maximumAge: 600000, timeout: 5000 }
+    );
+  }, []);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -577,7 +612,7 @@ export default function Diary() {
     }
   };
 
-  const handleSongSuggestion = () => {
+  const handleSongSuggestion = (songPreference) => {
     const text = editorRef.current?.innerText?.trim();
 
 
@@ -586,7 +621,7 @@ export default function Diary() {
       return;
     }
 
-    setMsg("AI song picker is ready to connect to the music recommendation API.");
+    setMsg(`AI song picker is ready for ${songPreference || "your selected style"}.`);
   };
 
   const handleTitleFormatChange = (nextFormat) => {
@@ -851,6 +886,8 @@ export default function Diary() {
             increaseFontSize={increaseFontSize}
             insertQuote={insertQuote}
             insertText={insertText}
+            localSongAvailable={localSongAvailable}
+            localSongCountry={localSongCountry}
             loadingEntry={loadingEntry}
             lookupDate={lookupDate}
             pageIndex={pageIndex}
@@ -859,9 +896,11 @@ export default function Diary() {
             runCommand={runCommand}
             setAlignmentMenuOpen={setAlignmentMenuOpen}
             setEmojiMenuOpen={setEmojiMenuOpen}
+            setSongMenuOpen={setSongMenuOpen}
             setLookupDate={setLookupDate}
             setShowRuledLines={setShowRuledLines}
             showRuledLines={showRuledLines}
+            songMenuOpen={songMenuOpen}
             titleFormat={titleFormat}
           />
 

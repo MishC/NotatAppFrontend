@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   AlignJustify,
   AlignCenter,
@@ -26,6 +27,11 @@ import DiaryToolbarButton from "./DiaryToolbarButton";
 import { DIARY_TITLE_DATE_FORMATS } from "../helpers/dateHelpers";
 import { diaryEmojiOptions } from "../helpers/diaryEmojiOptions";
 
+const baseSongStyleOptions = [
+  { label: "International", value: "International hits" },
+  { label: "Just music (no words)", value: "Electronic/Classical (no words)" },
+];
+
 export default function DiaryEditor({
   addPage,
   alignmentMenuOpen,
@@ -50,6 +56,8 @@ export default function DiaryEditor({
   increaseFontSize,
   insertQuote,
   insertText,
+  localSongAvailable,
+  localSongCountry,
   loadingEntry,
   lookupDate,
   pageIndex,
@@ -58,11 +66,36 @@ export default function DiaryEditor({
   runCommand,
   setAlignmentMenuOpen,
   setEmojiMenuOpen,
+  setSongMenuOpen,
   setLookupDate,
   setShowRuledLines,
   showRuledLines,
+  songMenuOpen,
   titleFormat,
 }) {
+  const [songMenuPosition, setSongMenuPosition] = useState({ left: 0, top: 0 });
+  const songStyleOptions = [
+    ...(localSongAvailable
+      ? [{ label: "Local", value: localSongCountry ? `Local (${localSongCountry})` : "Local" }]
+      : []),
+    ...baseSongStyleOptions,
+  ];
+
+  const openSongMenuNearMouse = (event) => {
+    const menuWidth = 224;
+    const menuHeight = localSongAvailable ? 136 : 96;
+    const left = Math.min(event.clientX + 12, window.innerWidth - menuWidth - 8);
+    const top = Math.min(event.clientY, window.innerHeight - menuHeight - 8);
+
+    setSongMenuPosition({
+      left: Math.max(8, left),
+      top: Math.max(8, top),
+    });
+    setSongMenuOpen((value) => !value);
+    setAlignmentMenuOpen(false);
+    setEmojiMenuOpen(false);
+  };
+
   return (
     <div className="diary-editor-shell flex min-h-0 flex-col rounded-[28px] border border-emerald-200 bg-white/80 p-4 shadow-xl shadow-emerald-900/5 md:p-6">
       {!guest && (
@@ -145,9 +178,11 @@ export default function DiaryEditor({
           <DiaryToolbarButton
             title="Alignment"
             Icon={AlignJustify}
+            active={alignmentMenuOpen}
             onClick={() => {
               setAlignmentMenuOpen((value) => !value);
               setEmojiMenuOpen(false);
+              setSongMenuOpen(false);
             }}
           />
           {alignmentMenuOpen && (
@@ -171,7 +206,14 @@ export default function DiaryEditor({
           )}
         </div>
         <DiaryToolbarButton title="Quote" Icon={Quote} onClick={insertQuote} />
-        <DiaryToolbarButton title="Image" Icon={Image} onClick={handleImageButtonClick} />
+        <DiaryToolbarButton
+          title="Image"
+          Icon={Image}
+          onClick={() => {
+            setSongMenuOpen(false);
+            handleImageButtonClick();
+          }}
+        />
         <input
           ref={imageInputRef}
           type="file"
@@ -212,18 +254,50 @@ export default function DiaryEditor({
         </button>
         <DiaryToolbarButton title="Delete current page" Icon={Trash2} onClick={deleteCurrentPage} />
         <DiaryToolbarButton title="Save as PDF" Icon={FileDown} onClick={handleSaveAsPdf} />
-        <DiaryToolbarButton title="Suggest song" Icon={Music} onClick={handleSongSuggestion} />
+        <div className="relative">
+          <DiaryToolbarButton
+            title="Suggest song"
+            Icon={Music}
+            active={songMenuOpen}
+            onClick={openSongMenuNearMouse}
+          />
+          {songMenuOpen && (
+            <div
+              className="fixed z-[100000] w-56 rounded-2xl border border-emerald-100 bg-white/95 p-2 shadow-xl backdrop-blur"
+              style={{
+                left: `${songMenuPosition.left}px`,
+                top: `${songMenuPosition.top}px`,
+              }}
+            >
+              {songStyleOptions.map((style) => (
+                <button
+                  key={style.value}
+                  type="button"
+                  onClick={() => {
+                    handleSongSuggestion(style.value);
+                    setSongMenuOpen(false);
+                  }}
+                  className="w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 transition hover:bg-emerald-50"
+                >
+                  {style.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="relative">
           <DiaryToolbarButton
             title="Emoji"
             Icon={Smile}
+            active={emojiMenuOpen}
             onClick={() => {
               setEmojiMenuOpen((value) => !value);
               setAlignmentMenuOpen(false);
+              setSongMenuOpen(false);
             }}
           />
           {emojiMenuOpen && (
-            <div className="absolute right-0 top-12 z-30 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
+            <div className="absolute left-full top-0 z-30 ml-2 w-72 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-xl backdrop-blur">
               <div className="grid grid-cols-8 gap-1">
                 {diaryEmojiOptions.map((emoji) => (
                   <button
