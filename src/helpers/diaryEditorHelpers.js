@@ -248,24 +248,6 @@ export function getSongLabel(song) {
   return artist || title || "Recommended song";
 }
 
-export function getSafeSongLink(link) {
-  const value = String(link || "").trim();
-  if (!value) return "";
-
-  try {
-    const url = new URL(value);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return "";
-
-    const host = url.hostname.toLowerCase().replace(/^m\./, "").replace(/^www\./, "");
-    const isYouTubeHost = host === "youtube.com" || host.endsWith(".youtube.com") || host === "youtu.be";
-    if (!isYouTubeHost) return url.href;
-
-    return url.pathname === "/results" ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-
 export async function prepareSongsForEditor(songs) {
   return songs;
 }
@@ -295,7 +277,7 @@ export function buildSongRecommendationHtml(songs, contextLabel = "") {
   const items = songs
     .map((song) => {
       const label = getSongLabel(song);
-      const link = getSafeSongLink(song?.link);
+      const link = String(song?.link || "").trim();
 
       if (link) {
         return `<div class="diary-song-recommendation__item"><a href="${escapeHtml(link)}" title="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></div>`;
