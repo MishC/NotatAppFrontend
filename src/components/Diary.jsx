@@ -40,6 +40,7 @@ import {
   insertNodeInEditor,
   insertQuoteInEditor,
   mergeSongRecommendationIntoPages,
+  prepareSongsForEditor,
   resolveCountryFromGeolocation,
 } from "../helpers/diaryEditorHelpers";
 import { openDiaryPdfWindow } from "../helpers/diaryPdfHelpers";
@@ -512,7 +513,9 @@ export default function Diary() {
       return;
     }
 
-    insertSongsOnLastPage(songs, contextLabel);
+    const songsForEditor = await prepareSongsForEditor(songs);
+
+    insertSongsOnLastPage(songsForEditor, contextLabel);
     setMsg("Song recommendation inserted on the last diary page.");
   };
 

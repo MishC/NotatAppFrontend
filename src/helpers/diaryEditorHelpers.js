@@ -245,6 +245,89 @@ export function getSongSearchLink(song) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
 }
 
+function getYoutubeUrlParts(link) {
+  try {
+    const url = new URL(link);
+    const host = url.hostname.toLowerCase().replace(/^m\./, "").replace(/^www\./, "");
+
+    return { url, host };
+  } catch {
+    return null;
+  }
+}
+
+function getYoutubeVideoUrlForOEmbed(link) {
+  const parts = getYoutubeUrlParts(link);
+  if (!parts) return "";
+
+  const { url, host } = parts;
+
+  try {
+    if (host === "youtu.be") {
+      const videoId = url.pathname.split("/").filter(Boolean)[0];
+      return videoId ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}` : "";
+    }
+
+    if (!host.endsWith("youtube.com")) return "";
+
+    const watchId = url.searchParams.get("v");
+    if (watchId) return `https://www.youtube.com/watch?v=${encodeURIComponent(watchId)}`;
+
+    const videoPathMatch = url.pathname.match(/^\/(?:shorts|embed)\/([^/?#]+)/);
+    if (!videoPathMatch?.[1]) return "";
+
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(videoPathMatch[1])}`;
+  } catch {
+    return "";
+  }
+}
+
+function isGoogleVideoLink(link) {
+  const parts = getYoutubeUrlParts(link);
+  return Boolean(parts?.host.endsWith("googlevideo.com"));
+}
+
+async function isYoutubeVideoLinkValid(link) {
+  const videoUrl = getYoutubeVideoUrlForOEmbed(link);
+  if (!videoUrl) return true;
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 4500);
+
+  try {
+    const response = await fetch(
+      `https://www.youtube.com/oembed?url=${encodeURIComponent(videoUrl)}&format=json`,
+      {
+        cache: "no-store",
+        signal: controller.signal,
+      }
+    );
+
+    return response.ok;
+  } catch {
+    return false;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+export async function prepareSongsForEditor(songs) {
+  return Promise.all(
+    songs.map(async (song) => {
+      const backendLink = getSafeSongLink(song?.link);
+
+      if (backendLink) {
+        if (isGoogleVideoLink(backendLink)) return { ...song, link: "" };
+
+        const isValid = await isYoutubeVideoLinkValid(backendLink);
+        return { ...song, link: isValid ? backendLink : "" };
+      }
+
+      return { ...song, link: getSongSearchLink(song) };
+    })
+  );
+}
+
 function buildFormatResetLineHtml() {
   const resetStyle = [
     "font-size: 14px",
@@ -270,7 +353,7 @@ export function buildSongRecommendationHtml(songs, contextLabel = "") {
   const items = songs
     .map((song) => {
       const label = getSongLabel(song);
-      const link = getSafeSongLink(song?.link) || getSongSearchLink(song);
+      const link = getSafeSongLink(song?.link);
 
       if (link) {
         return `<li><a href="${escapeHtml(link)}" title="${escapeHtml(link)}" target="_blank" rel="noreferrer noopener">${escapeHtml(label)}</a></li>`;
