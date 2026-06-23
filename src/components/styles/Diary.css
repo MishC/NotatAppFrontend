@@ -94,6 +94,24 @@
   margin: 0;
 }
 
+.diary-format-reset,
+.diary-format-reset__spacer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-align: left;
+  text-decoration: none;
+  text-decoration-line: none;
+  text-indent: 0;
+}
+
 .diary-song-recommendation {
   border-left: 0;
   margin: 1rem 0;

@@ -245,6 +245,27 @@ export function getSongSearchLink(song) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
 }
 
+function buildFormatResetLineHtml() {
+  const resetStyle = [
+    "font-size: 14px",
+    "font-style: normal",
+    "font-weight: 400",
+    "text-decoration: none",
+    "text-decoration-line: none",
+    "text-indent: 0",
+    "margin: 0",
+    "padding: 0",
+    "border: 0",
+    "background: transparent",
+    "color: inherit",
+    "letter-spacing: 0",
+    "text-align: left",
+    "line-height: 1.5",
+  ].join("; ");
+
+  return `<div class="diary-format-reset" style="${resetStyle};"><span class="diary-format-reset__spacer" style="${resetStyle};">&nbsp;</span><br></div>`;
+}
+
 export function buildSongRecommendationHtml(songs, contextLabel = "") {
   const items = songs
     .map((song) => {
@@ -260,10 +281,12 @@ export function buildSongRecommendationHtml(songs, contextLabel = "") {
     .join("");
 
   return [
+    buildFormatResetLineHtml(),
     '<div class="diary-song-recommendation">',
     `<strong>Song of the day${contextLabel ? ` - ${escapeHtml(contextLabel)}` : ""}</strong>`,
     `<ul>${items}</ul>`,
     "</div>",
+    buildFormatResetLineHtml(),
   ].join("");
 }
 
