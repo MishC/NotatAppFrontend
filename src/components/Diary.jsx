@@ -485,11 +485,17 @@ export default function Diary() {
       return;
     }
 
+    const isLocalSongRequest = songPreference === "Local";
+    const contextLabel = isLocalSongRequest ? localSongCountry : "";
+    const apiStyle = isLocalSongRequest && localSongCountry
+      ? `Local ${localSongCountry}`
+      : songPreference;
+
     const songs = await recommendSongAction({
       guest,
       API_URL_AI,
       diaryEntryId: loadedEntryId,
-      style: songPreference,
+      style: apiStyle,
       setLoading: setLoadingEntry,
       setError: setMsg,
     });
@@ -499,7 +505,6 @@ export default function Diary() {
       return;
     }
 
-    const contextLabel = songPreference === "Local" ? localSongCountry : "";
     insertSongsOnLastPage(songs, contextLabel);
     setMsg("Song recommendation inserted on the last diary page.");
   };
