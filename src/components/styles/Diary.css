@@ -95,8 +95,13 @@
 }
 
 .diary-song-recommendation {
+  border-left: 0;
   margin: 1rem 0;
   padding: 0.25rem 0;
+}
+
+.diary-song-recommendation strong {
+  font-weight: 700;
 }
 
 .diary-song-recommendation ul {
