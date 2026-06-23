@@ -248,13 +248,6 @@ export function getSongLabel(song) {
   return artist || title || "Recommended song";
 }
 
-export function getSongSearchLink(song) {
-  const label = getSongLabel(song);
-  if (!label || label === "Recommended song") return "";
-
-  return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
-}
-
 export function getSafeSongLink(link) {
   const value = String(link || "").trim();
   if (!value) return "";
@@ -274,10 +267,7 @@ export function getSafeSongLink(link) {
 }
 
 export async function prepareSongsForEditor(songs) {
-  return songs.map((song) => ({
-    ...song,
-    link: getSongSearchLink(song),
-  }));
+  return songs;
 }
 
 function buildNeutralLineHtml() {
