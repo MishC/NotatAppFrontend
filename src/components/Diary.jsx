@@ -211,7 +211,7 @@ export default function Diary() {
     });
   };
 
-  const insertSongsOnLastPage = (songs) => {
+  const insertSongsOnLastPage = (songs, contextLabel = "") => {
     if (!songs.length) return;
 
     const currentHtml = editorRef.current?.innerHTML || "";
@@ -222,19 +222,26 @@ export default function Diary() {
       currentHtml,
       currentText,
       songs,
+      contextLabel,
     });
 
+    pagesRef.current = nextPages;
     setPages(nextPages);
 
     if (pageIndex !== lastIndex) {
       setPageIndex(lastIndex);
-      setEditorLoadKey((key) => key + 1);
+      requestAnimationFrame(() => {
+        if (editorRef.current) {
+          editorRef.current.innerHTML = nextPages[lastIndex]?.html || "";
+        }
+        setEditorLoadKey((key) => key + 1);
+      });
       return;
     }
 
     requestAnimationFrame(() => {
       if (!editorRef.current) return;
-      editorRef.current.innerHTML = `${currentHtml}${currentHtml ? "<br>" : ""}${htmlToInsert}`;
+      editorRef.current.innerHTML = nextPages[lastIndex]?.html || `${currentHtml}${currentHtml ? "<br>" : ""}${htmlToInsert}`;
     });
   };
 
@@ -487,9 +494,13 @@ export default function Diary() {
       setError: setMsg,
     });
 
-    if (!songs.length) return;
+    if (!songs.length) {
+      setMsg("No song recommendations found.");
+      return;
+    }
 
-    insertSongsOnLastPage(songs, songPreference);
+    const contextLabel = songPreference === "Local" ? localSongCountry : "";
+    insertSongsOnLastPage(songs, contextLabel);
     setMsg("Song recommendation inserted on the last diary page.");
   };
 
@@ -683,7 +694,6 @@ export default function Diary() {
             insertQuote={insertQuote}
             insertText={insertText}
             localSongAvailable={localSongAvailable}
-            localSongCountry={localSongCountry}
             loadingEntry={loadingEntry}
             lookupDate={lookupDate}
             pageIndex={pageIndex}

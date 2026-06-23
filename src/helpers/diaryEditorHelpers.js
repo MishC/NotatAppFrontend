@@ -207,7 +207,7 @@ export function getSongSearchLink(song) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(label)}`;
 }
 
-export function buildSongRecommendationHtml(songs) {
+export function buildSongRecommendationHtml(songs, contextLabel = "") {
   const items = songs
     .map((song) => {
       const label = getSongLabel(song);
@@ -223,7 +223,7 @@ export function buildSongRecommendationHtml(songs) {
 
   return [
     '<div class="diary-song-recommendation">',
-    "<strong>Song of the day</strong>",
+    `<strong>Song of the day${contextLabel ? ` - ${escapeHtml(contextLabel)}` : ""}</strong>`,
     `<ul>${items}</ul>`,
     "</div>",
   ].join("");
@@ -235,9 +235,10 @@ export function mergeSongRecommendationIntoPages({
   currentHtml,
   currentText,
   songs,
+  contextLabel = "",
 }) {
   const lastIndex = Math.max(0, pages.length - 1);
-  const htmlToInsert = buildSongRecommendationHtml(songs);
+  const htmlToInsert = buildSongRecommendationHtml(songs, contextLabel);
   const nextPages = pages.map((page, index) => {
     const pageHtml = index === pageIndex ? currentHtml : page.html || "";
     const separator = pageHtml ? "<br>" : "";

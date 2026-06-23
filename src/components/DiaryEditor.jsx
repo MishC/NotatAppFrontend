@@ -57,7 +57,6 @@ export default function DiaryEditor({
   insertQuote,
   insertText,
   localSongAvailable,
-  localSongCountry,
   loadingEntry,
   lookupDate,
   pageIndex,
@@ -76,7 +75,7 @@ export default function DiaryEditor({
   const [songMenuPosition, setSongMenuPosition] = useState({ left: 0, top: 0 });
   const songStyleOptions = [
     ...(localSongAvailable
-      ? [{ label: "Local", value: localSongCountry ? `Local (${localSongCountry})` : "Local" }]
+      ? [{ label: "Local", value: "Local" }]
       : []),
     ...baseSongStyleOptions,
   ];
