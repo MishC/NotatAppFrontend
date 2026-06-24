@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Save } from "lucide-react";
 import DiaryEditor from "./DiaryEditor";
@@ -46,6 +46,37 @@ import {
 import { openDiaryPdfWindow } from "../helpers/diaryPdfHelpers";
 import "./styles/Diary.css";
 
+function cssTextToStyle(cssText) {
+  const allowedProperties = new Set([
+    "background",
+    "backgroundColor",
+    "border",
+    "borderColor",
+    "boxShadow",
+  ]);
+
+  return String(cssText || "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((style, declaration) => {
+      const colonIndex = declaration.indexOf(":");
+      if (colonIndex <= 0) return style;
+
+      const property = declaration
+        .slice(0, colonIndex)
+        .trim()
+        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const value = declaration.slice(colonIndex + 1).trim();
+
+      if (allowedProperties.has(property) && value) {
+        style[property] = value;
+      }
+
+      return style;
+    }, {});
+}
+
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
   const guest = useSelector((s) => s.auth.guest);
@@ -63,6 +94,7 @@ export default function Diary() {
   const [pages, setPages] = useState([{ title: DEFAULT_ENTRY_TITLE, html: "", text: "" }]);
   const [pageIndex, setPageIndex] = useState(0);
   const [frameStyle, setFrameStyle] = useState("marker");
+  const [frameCss, setFrameCss] = useState("");
   const [lookupDate, setLookupDate] = useState(formatDateDDMMYYYY(DEFAULT_DIARY_DATE));
   const [diaryDate, setDiaryDate] = useState(DEFAULT_DIARY_DATE);
   const [titleFormat, setTitleFormat] = useState(DEFAULT_TITLE_FORMAT);
@@ -81,6 +113,14 @@ export default function Diary() {
   const entryTitle = currentPage.title;
   const entryText = currentPage.text;
   const userName = user?.name || user?.email || "Guest";
+  const frameCssStyle = useMemo(() => cssTextToStyle(frameCss), [frameCss]);
+
+  const handleFrameChange = (nextFrameStyle) => {
+    setFrameStyle(nextFrameStyle);
+    if (nextFrameStyle !== "ai") {
+      setFrameCss("");
+    }
+  };
 
   useEffect(() => {
     pagesRef.current = pages;
@@ -693,6 +733,7 @@ export default function Diary() {
             editorRef={editorRef}
             emojiMenuOpen={emojiMenuOpen}
             entryText={entryText}
+            frameCssStyle={frameCssStyle}
             frameStyle={frameStyle}
             goToPage={goToPage}
             guest={guest}
@@ -728,7 +769,9 @@ export default function Diary() {
 
           <DiarySidebar
             activeFrame={frameStyle}
-            onFrameChange={setFrameStyle}
+            API_URL_AI={API_URL_AI}
+            onFrameChange={handleFrameChange}
+            onFrameCssChange={setFrameCss}
             onInsertPrompt={insertText}
             onMessage={setMsg}
           />

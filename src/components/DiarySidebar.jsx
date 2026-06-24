@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
+import { generateFrameApi } from "../backend/aiApi";
 
 const promptOptions = [
   "What felt lighter today?",
@@ -15,7 +16,9 @@ const frameOptions = [
 
 export default function DiarySidebar({
   activeFrame,
+  API_URL_AI,
   onFrameChange,
+  onFrameCssChange,
   onInsertPrompt,
   onMessage,
 }) {
@@ -30,25 +33,14 @@ export default function DiarySidebar({
 
     setLoadingFrame(true);
     try {
-      const response = await fetch("/api/diary/generate-frame", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: framePrompt }),
+      const data = await generateFrameApi({
+        API_URL_AI,
+        description: framePrompt,
       });
 
-      if (!response.ok) {
-        throw new Error("AI frame API is not available yet.");
-      }
-
-      const data = await response.json();
-      if (data?.frameTheme) {
-        onFrameChange(data.frameTheme);
-      }
-
-      onMessage(data?.message || "AI frame generated.");
+      onFrameCssChange(data?.css || "");
+      onFrameChange("ai");
+      onMessage("AI frame generated.");
     } catch (error) {
       console.error(error);
       onMessage(error.message || "Could not generate AI frame.");
@@ -114,7 +106,7 @@ export default function DiarySidebar({
           value={framePrompt}
           onChange={(e) => setFramePrompt(e.target.value)}
           className="mt-3 min-h-24 w-full resize-none rounded-xl border border-violet-100 bg-white/80 p-3 text-sm text-slate-700 outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-          placeholder="Example: black teen diary frame with silver stars"
+          placeholder="Give color of the frame or gradient"
         />
         <button
           type="button"

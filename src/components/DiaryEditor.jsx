@@ -42,6 +42,7 @@ export default function DiaryEditor({
   editorRef,
   emojiMenuOpen,
   entryText,
+  frameCssStyle,
   frameStyle,
   goToPage,
   guest,
@@ -333,7 +334,11 @@ export default function DiaryEditor({
       </div>
 
       <div className="diary-page-stage">
-        <div key={pageIndex} className={`diary-frame diary-frame--${frameStyle} diary-page-fade`}>
+        <div
+          key={pageIndex}
+          className={`diary-frame diary-frame--${frameStyle} diary-page-fade`}
+          style={frameCssStyle}
+        >
           <div className="diary-frame__inner">
             <div className="diary-editor-page-wrap relative min-h-0 flex-1">
               {!entryText && (

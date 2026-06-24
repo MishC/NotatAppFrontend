@@ -95,5 +95,20 @@ export async function recommendSongApi({ API_URL_AI, diaryEntryId, style, countr
   });
 }
 
+export async function generateFrameApi({ API_URL_AI, description } = {}) {
+  const value = String(description || "").trim();
+  if (!value) throw new Error("Description is required.");
+
+  const url = `${getAiBaseUrl(API_URL_AI)}/frame`;
+
+  return apiRequest({
+    url,
+    method: "POST",
+    body: {
+      description: value,
+    },
+  });
+}
+
 export const getSongApi = recommendSongApi;
 export const GetSong = recommendSongApi;
