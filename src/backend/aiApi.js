@@ -6,6 +6,8 @@ function getAiBaseUrl(API_URL_AI) {
   const explicit = String(API_URL_AI || "").replace(/\/$/, "");
 
   if (explicit) {
+    if (/\/api\/AI\/frame$/i.test(explicit)) return explicit.replace(/\/frame$/i, "");
+    if (/\/api\/AI\/song$/i.test(explicit)) return explicit.replace(/\/song$/i, "");
     if (/\/api\/AI$/i.test(explicit)) return explicit;
     if (/\/api$/i.test(explicit)) return `${explicit}/AI`;
     return `${explicit}/api/AI`;
@@ -72,6 +74,8 @@ async function apiRequest({
 
     const err = new Error(msg);
     err.status = res.status;
+    err.url = url;
+    err.method = method;
     throw err;
   }
 
@@ -112,3 +116,5 @@ export async function generateFrameApi({ API_URL_AI, description } = {}) {
 
 export const getSongApi = recommendSongApi;
 export const GetSong = recommendSongApi;
+export const getFrameApi = generateFrameApi;
+export const GenerateFrame = generateFrameApi;

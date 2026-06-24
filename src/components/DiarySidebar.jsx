@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
-import { generateFrameApi } from "../backend/aiApi";
+import { generateFrameAction } from "../actions/aiActions";
 
 const promptOptions = [
   "What felt lighter today?",
@@ -17,6 +17,7 @@ const frameOptions = [
 export default function DiarySidebar({
   activeFrame,
   API_URL_AI,
+  guest,
   onFrameChange,
   onFrameCssChange,
   onInsertPrompt,
@@ -26,27 +27,16 @@ export default function DiarySidebar({
   const [loadingFrame, setLoadingFrame] = useState(false);
 
   const generateFrame = async () => {
-    if (!framePrompt.trim()) {
-      onMessage("Write a short frame idea first.");
-      return;
-    }
-
-    setLoadingFrame(true);
-    try {
-      const data = await generateFrameApi({
-        API_URL_AI,
-        description: framePrompt,
-      });
-
-      onFrameCssChange(data?.css || "");
-      onFrameChange("ai");
-      onMessage("AI frame generated.");
-    } catch (error) {
-      console.error(error);
-      onMessage(error.message || "Could not generate AI frame.");
-    } finally {
-      setLoadingFrame(false);
-    }
+    await generateFrameAction({
+      guest,
+      API_URL_AI,
+      description: framePrompt,
+      setFrameCss: onFrameCssChange,
+      setFrameStyle: onFrameChange,
+      setLoading: setLoadingFrame,
+      setError: onMessage,
+      setMsg: onMessage,
+    });
   };
 
   return (
