@@ -50,6 +50,25 @@ function normalizeFrameCss(payload) {
   return "";
 }
 
+function getFallbackFrameCss(description) {
+  const prompt = String(description || "").toLowerCase();
+  const palette = prompt.includes("blue")
+    ? ["#1d4ed8", "#67e8f9", "#f8fafc"]
+    : prompt.includes("pink") || prompt.includes("rose")
+      ? ["#be185d", "#f9a8d4", "#fff7ed"]
+      : prompt.includes("green") || prompt.includes("emerald")
+        ? ["#047857", "#6ee7b7", "#f7fee7"]
+        : prompt.includes("black") || prompt.includes("dark")
+          ? ["#111827", "#7c3aed", "#f8fafc"]
+          : ["#7c3aed", "#f59e0b", "#fff7ed"];
+
+  return [
+    `background: linear-gradient(135deg, ${palette[0]} 0%, ${palette[1]} 48%, ${palette[2]} 100%)`,
+    `border: 4px solid ${palette[0]}`,
+    `box-shadow: 0 24px 50px ${palette[0]}33, inset 0 0 0 2px rgba(255,255,255,0.32)`,
+  ].join("; ");
+}
+
 function getFrameErrorMessage(error) {
   if (error?.status === 405) {
     return "AI frame endpoint rejected POST. Expected backend route: POST /api/AI/frame. Check that the deployed backend has this controller route.";
@@ -64,6 +83,12 @@ function getFrameErrorMessage(error) {
   }
 
   return error?.message || "Could not generate AI frame.";
+}
+
+function isEmptyFrameCssError(error) {
+  return String(error?.message || "")
+    .toLowerCase()
+    .includes("empty frame css");
 }
 
 export async function recommendSongAction({
@@ -143,8 +168,11 @@ export async function generateFrameAction({
     const css = normalizeFrameCss(payload);
 
     if (!css) {
-      setError?.("AI frame response did not include CSS or an image URL.");
-      return null;
+      const fallbackCss = getFallbackFrameCss(prompt);
+      setFrameCss?.(fallbackCss);
+      setFrameStyle?.("ai");
+      setMsg?.("AI returned an empty frame, so a local frame style was applied.");
+      return { css: fallbackCss, raw: payload, fallback: true };
     }
 
     setFrameCss?.(css);
@@ -153,6 +181,14 @@ export async function generateFrameAction({
     return { css, raw: payload };
   } catch (error) {
     console.error(error);
+    if (error?.status === 400 && isEmptyFrameCssError(error)) {
+      const fallbackCss = getFallbackFrameCss(prompt);
+      setFrameCss?.(fallbackCss);
+      setFrameStyle?.("ai");
+      setMsg?.("AI returned an empty frame, so a local frame style was applied.");
+      return { css: fallbackCss, raw: null, fallback: true };
+    }
+
     setError?.(getFrameErrorMessage(error));
     return null;
   } finally {

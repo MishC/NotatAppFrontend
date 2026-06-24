@@ -111,6 +111,7 @@ export async function generateFrameApi({ API_URL_AI, description } = {}) {
     body: {
       description: value,
       prompt: value,
+      style: value,
     },
   });
 }
