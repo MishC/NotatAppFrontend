@@ -9,6 +9,8 @@ const API_FORGOT_PASSWORD = `${API_PREFIX}/forgot-password`;
 const API_RESET_PASSWORD = `${API_PREFIX}/reset-password`;
 
 let refreshPromise = null;
+let refreshTokenUnavailable = false;
+let authRedirectStarted = false;
 
 ////
 function toMsg(body, status) {
@@ -27,6 +29,7 @@ function toMsg(body, status) {
 
 
 export async function refreshAccessToken() {
+  if (refreshTokenUnavailable) throw new Error("Unauthorized");
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
@@ -37,6 +40,9 @@ export async function refreshAccessToken() {
 
     if (!res.ok) {
       const body = await readBody(res);
+      if (res.status === 401) {
+        handleSessionExpired();
+      }
       throw new Error(toMsg(body, res.status));
     }
 
@@ -45,12 +51,30 @@ export async function refreshAccessToken() {
     if (!accessToken) throw new Error("no_access_token");
 
     localStorage.setItem("accessToken", accessToken);
+    refreshTokenUnavailable = false;
     return accessToken;
   })().finally(() => {
     refreshPromise = null;
   });
 
   return refreshPromise;
+}
+
+export function handleSessionExpired() {
+  refreshTokenUnavailable = true;
+  localStorage.removeItem("accessToken");
+
+  if (authRedirectStarted) return;
+  authRedirectStarted = true;
+
+  if (window.location.pathname !== "/auth") {
+    window.location.href = "/auth";
+  }
+}
+
+export function resetAuthSessionState() {
+  refreshTokenUnavailable = false;
+  authRedirectStarted = false;
 }
 
 async function readBody(res) {
@@ -87,8 +111,8 @@ async function apiJson(url, options = {}) {
 
   let res = await doFetch();
 
-  if (res.status === 401) {
-    const newToken = await refreshAccessToken(); // may throw
+  if (res.status === 401 && options.retryOnUnauthorized) {
+    const newToken = await refreshAccessToken();
     res = await doFetch(newToken);
   }
 

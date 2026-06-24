@@ -1,4 +1,4 @@
-import { refreshAccessToken } from "./authApi";
+import { handleSessionExpired, refreshAccessToken } from "./authApi";
 
 const isGuest = () => localStorage.getItem("guest") === "true";
 
@@ -62,8 +62,7 @@ async function apiRequest({
         isFormData,
       });
     } catch {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth";
+      handleSessionExpired();
       throw new Error("Unauthorized");
     }
   }
@@ -78,8 +77,7 @@ async function apiRequest({
       `HTTP error! status: ${res.status}`;
 
     if (res.status === 401) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth";
+      handleSessionExpired();
     }
 
     const err = new Error(msg);
@@ -115,8 +113,7 @@ async function apiBlobUrlRequest({ url, retry = true }) {
         retry: false,
       });
     } catch {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth";
+      handleSessionExpired();
       throw new Error("Unauthorized");
     }
   }
@@ -288,5 +285,4 @@ export async function deleteDiaryEntriesByDateApi({
 
   return true;
 }
-
 

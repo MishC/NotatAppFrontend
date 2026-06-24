@@ -1,4 +1,4 @@
-import { refreshAccessToken } from "./authApi";
+import { handleSessionExpired, refreshAccessToken } from "./authApi";
 
 const isGuest = () => localStorage.getItem("guest") === "true";
 
@@ -30,8 +30,7 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
       await refreshAccessToken();
       return apiRequest({ url, method, body, expectJson, retry: false });
     } catch {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth";
+      handleSessionExpired();
       throw new Error("Unauthorized");
     }
   }
@@ -45,8 +44,7 @@ async function apiRequest({ url, method = "GET", body, expectJson = true, retry 
       `HTTP error! status: ${res.status}`;
 
     if (res.status === 401) {
-      localStorage.removeItem("accessToken");
-      window.location.href = "/auth";
+      handleSessionExpired();
     }
 
     const err = new Error(msg);

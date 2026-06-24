@@ -5,6 +5,7 @@ import {
   logoutApi,
   forgotPasswordApi,
   resetPasswordApi,
+  resetAuthSessionState,
 } from "../backend/authApi";
 import { setAuthedUser, setUser, setGuest, resetAuth } from "../reducers/authSlice";
 
@@ -97,6 +98,7 @@ export async function verify2faAction({
     }
 
     localStorage.setItem("accessToken", accessToken);
+    resetAuthSessionState();
     dispatch(setAuthedUser(email));
     dispatch(setUser({ email }));
     dispatch(setGuest(false));
