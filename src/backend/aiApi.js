@@ -110,6 +110,7 @@ export async function generateFrameApi({ API_URL_AI, description } = {}) {
     method: "POST",
     body: {
       description: value,
+      prompt: value,
     },
   });
 }

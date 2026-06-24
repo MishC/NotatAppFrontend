@@ -1,4 +1,4 @@
-import { formatDiaryTitleDate, todayYYYYMMDD } from "./dateHelpers";
+import { formatDiaryTitleDate, todayYYYYMMDD } from "./diaryDateHelpers";
 
 const PAGE_PIXEL_TILE_COUNT = 144;
 
@@ -48,10 +48,120 @@ export function getDiaryApiBase() {
   return `${apiBase}/diary`;
 }
 
+export function cssTextToStyle(cssText) {
+  const allowedProperties = new Set([
+    "background",
+    "backgroundBlendMode",
+    "backgroundColor",
+    "backgroundImage",
+    "backgroundPosition",
+    "backgroundRepeat",
+    "backgroundSize",
+    "border",
+    "borderColor",
+    "borderRadius",
+    "boxShadow",
+  ]);
+
+  return String(cssText || "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((style, declaration) => {
+      const colonIndex = declaration.indexOf(":");
+      if (colonIndex <= 0) return style;
+
+      const property = declaration
+        .slice(0, colonIndex)
+        .trim()
+        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const value = declaration.slice(colonIndex + 1).trim();
+
+      if (allowedProperties.has(property) && value) {
+        style[property] = value;
+      }
+
+      return style;
+    }, {});
+}
+
 export function htmlToText(html) {
   const container = document.createElement("div");
   container.innerHTML = html || "";
   return container.innerText || "";
+}
+
+// text: reads the current contentEditable page into a stable page snapshot.
+export function getEditorSnapshot(editor) {
+  return {
+    html: editor?.innerHTML || "",
+    text: editor?.innerText || "",
+  };
+}
+
+// text: builds the page list used by the PDF export without mutating editor state.
+export function buildPrintableDiaryPages(pages, pageIndex, editor) {
+  return pages.map((page, index) => ({
+    ...page,
+    html: index === pageIndex ? editor?.innerHTML || "" : page.html || "",
+  }));
+}
+
+// image/text: prepares editor HTML and local images for the diary backend payload.
+export async function prepareDiaryPagesForSave({ pages, pageIndex, editor }) {
+  return Promise.all(
+    pages.map(async (page, index) => {
+      const rawHtml = index === pageIndex ? editor?.innerHTML || "" : page.html || "";
+      const prepared = await prepareDiaryPageForBackend(rawHtml, index + 1);
+
+      return {
+        ...page,
+        html: rawHtml,
+        contentForApi: prepared.content,
+        text: index === pageIndex ? editor?.innerText || "" : page.text,
+        image: prepared.image,
+      };
+    })
+  );
+}
+
+// date/text: creates a blank diary page with a title derived from the selected date.
+export function createEmptyDiaryPageForDate(normalizedDate, titleFormat) {
+  return {
+    id: null,
+    pageNumber: 1,
+    title: formatDiaryTitleDate(normalizedDate, titleFormat),
+    html: "",
+    text: "",
+  };
+}
+
+// date/text: creates a new editor page and keeps its title aligned with the active date format.
+export function createDiaryPageForIndex(index, diaryDate, titleFormat) {
+  return {
+    id: null,
+    pageNumber: index + 1,
+    title: formatDiaryTitleDate(diaryDate, titleFormat),
+    html: "",
+    text: "",
+  };
+}
+
+// text: chooses which page should become active after deleting a diary page.
+export function getPageIndexAfterDelete(pagesLength, pageIndex) {
+  return pageIndex === pagesLength - 1 ? Math.max(0, pageIndex - 1) : pageIndex;
+}
+
+// text/date: converts the song dropdown value into the AI request style and optional country.
+export function getSongRequestDetails(songPreference, localSongCountry) {
+  const isLocalSongRequest = songPreference === "Local";
+
+  return {
+    isLocalSongRequest,
+    contextLabel: isLocalSongRequest ? localSongCountry : "",
+    apiStyle: isLocalSongRequest ? null : songPreference,
+    apiCountry: isLocalSongRequest ? localSongCountry : null,
+  };
 }
 
 function ensureDiaryImagesWrapped(container) {

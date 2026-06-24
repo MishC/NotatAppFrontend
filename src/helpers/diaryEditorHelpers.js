@@ -91,6 +91,18 @@ export function applyImageAlignment({
   return true;
 }
 
+// text/image: opens recommendation links and tracks the image wrapper selected in the editor.
+export function handleDiaryEditorClick({ event, selectedImageWrapperRef }) {
+  const link = event.target.closest?.(".diary-song-recommendation a[href]");
+  if (link) {
+    event.preventDefault();
+    window.open(link.href, "_blank", "noopener,noreferrer");
+    return;
+  }
+
+  selectedImageWrapperRef.current = getImageWrapperFromNode(event.target);
+}
+
 export function changeEditorFontSize(editor, direction, onSync) {
   editor?.focus();
   const selection = getSelectionInsideEditor(editor);

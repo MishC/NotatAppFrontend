@@ -17,25 +17,32 @@ import {
   formatDateDDMMYYYY,
   formatDiaryTitleDate,
   parseDiaryDateInput,
-} from "../helpers/dateHelpers";
+} from "../helpers/diaryDateHelpers";
 import {
   DEFAULT_DIARY_DATE,
   DEFAULT_ENTRY_TITLE,
   DEFAULT_TITLE_FORMAT,
   PAGE_MAX_HEIGHT,
   attachDiaryPageImageToHtml,
+  buildPrintableDiaryPages,
+  createDiaryPageForIndex,
+  createEmptyDiaryPageForDate,
   createPagePixelTiles,
+  cssTextToStyle,
   getDiaryApiBase,
+  getEditorSnapshot,
+  getPageIndexAfterDelete,
+  getSongRequestDetails,
   htmlToText,
   normalizeLoadedDiaryPages,
-  prepareDiaryPageForBackend,
+  prepareDiaryPagesForSave,
 } from "../helpers/diaryHelpers";
 import {
   applyImageAlignment,
   changeEditorFontSize,
   clearEditorFormatting,
   createImageWrapper,
-  getImageWrapperFromNode,
+  handleDiaryEditorClick,
   insertDefaultLineBreakInEditor,
   insertNodeInEditor,
   insertQuoteInEditor,
@@ -45,37 +52,6 @@ import {
 } from "../helpers/diaryEditorHelpers";
 import { openDiaryPdfWindow } from "../helpers/diaryPdfHelpers";
 import "./styles/Diary.css";
-
-function cssTextToStyle(cssText) {
-  const allowedProperties = new Set([
-    "background",
-    "backgroundColor",
-    "border",
-    "borderColor",
-    "boxShadow",
-  ]);
-
-  return String(cssText || "")
-    .split(";")
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .reduce((style, declaration) => {
-      const colonIndex = declaration.indexOf(":");
-      if (colonIndex <= 0) return style;
-
-      const property = declaration
-        .slice(0, colonIndex)
-        .trim()
-        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-      const value = declaration.slice(colonIndex + 1).trim();
-
-      if (allowedProperties.has(property) && value) {
-        style[property] = value;
-      }
-
-      return style;
-    }, {});
-}
 
 export default function Diary() {
   const user = useSelector((s) => s.auth.user);
@@ -182,31 +158,17 @@ export default function Diary() {
     }
 
     document.execCommand(command, false, value);
-    updateCurrentPage({
-      html: editorRef.current?.innerHTML || "",
-      text: editorRef.current?.innerText || "",
-    });
+    updateCurrentPage(getEditorSnapshot(editorRef.current));
   };
 
   const insertText = (text) => {
     editorRef.current?.focus();
     document.execCommand("insertText", false, text);
-    updateCurrentPage({
-      html: editorRef.current?.innerHTML || "",
-      text: editorRef.current?.innerText || "",
-    });
+    updateCurrentPage(getEditorSnapshot(editorRef.current));
   };
 
-  const handleEditorClick = (e) => {
-    const link = e.target.closest?.(".diary-song-recommendation a[href]");
-    if (link) {
-      e.preventDefault();
-      window.open(link.href, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    selectedImageWrapperRef.current = getImageWrapperFromNode(e.target);
-  };
+  const handleEditorClick = (event) =>
+    handleDiaryEditorClick({ event, selectedImageWrapperRef });
 
   const handleImageButtonClick = () => {
     setEmojiMenuOpen(false);
@@ -248,10 +210,7 @@ export default function Diary() {
   const clearFormatting = () => clearEditorFormatting(editorRef.current, syncEditorToPage);
 
   const syncEditorToPage = () => {
-    updateCurrentPage({
-      html: editorRef.current?.innerHTML || "",
-      text: editorRef.current?.innerText || "",
-    });
+    updateCurrentPage(getEditorSnapshot(editorRef.current));
   };
 
   const insertSongsOnLastPage = (songs, contextLabel = "") => {
@@ -290,14 +249,14 @@ export default function Diary() {
 
   const deleteCurrentPage = () => {
     if (pages.length === 1) {
-      setPages([{ title: formatDiaryTitleDate(diaryDate, titleFormat), html: "", text: "" }]);
+      setPages([createEmptyDiaryPageForDate(diaryDate, titleFormat)]);
       setPageIndex(0);
       setEditorLoadKey((key) => key + 1);
       setMsg("Page cleared.");
       return;
     }
 
-    const nextIndex = pageIndex === pages.length - 1 ? pageIndex - 1 : pageIndex;
+    const nextIndex = getPageIndexAfterDelete(pages.length, pageIndex);
     setPages((prev) => prev.filter((_, index) => index !== pageIndex));
     setPageIndex(nextIndex);
     setEditorLoadKey((key) => key + 1);
@@ -309,10 +268,7 @@ export default function Diary() {
 
     e.preventDefault();
     insertDefaultLineBreakInEditor(editorRef.current);
-    updateCurrentPage({
-      html: editorRef.current?.innerHTML || "",
-      text: editorRef.current?.innerText || "",
-    });
+    updateCurrentPage(getEditorSnapshot(editorRef.current));
   };
 
   const goToPage = (nextIndex) => {
@@ -325,13 +281,7 @@ export default function Diary() {
     const nextIndex = pages.length;
     setPages((prev) => [
       ...prev,
-      {
-        id: null,
-        pageNumber: prev.length + 1,
-        title: formatDiaryTitleDate(diaryDate, titleFormat),
-        html: "",
-        text: "",
-      },
+      createDiaryPageForIndex(prev.length, diaryDate, titleFormat),
     ]);
     syncEditorToPage();
     setPageIndex(nextIndex);
@@ -349,13 +299,7 @@ export default function Diary() {
     if (nextIndex >= pagesRef.current.length) {
       setPages((prev) => [
         ...prev,
-        {
-          id: null,
-          pageNumber: prev.length + 1,
-          title: formatDiaryTitleDate(diaryDate, titleFormat),
-          html: "",
-          text: "",
-        },
+        createDiaryPageForIndex(prev.length, diaryDate, titleFormat),
       ]);
     }
 
@@ -371,18 +315,11 @@ export default function Diary() {
       return;
     }
 
-    const currentPages = await Promise.all(pagesRef.current.map(async (page, index) => {
-      const rawHtml = index === pageIndex ? editorRef.current?.innerHTML || "" : page.html || "";
-      const prepared = await prepareDiaryPageForBackend(rawHtml, index + 1);
-
-      return {
-        ...page,
-        html: rawHtml,
-        contentForApi: prepared.content,
-        text: index === pageIndex ? editorRef.current?.innerText || "" : page.text,
-        image: prepared.image,
-      };
-    }));
+    const currentPages = await prepareDiaryPagesForSave({
+      pages: pagesRef.current,
+      pageIndex,
+      editor: editorRef.current,
+    });
     const title = formatDiaryTitleDate(diaryDate, titleFormat);
 
     setLoadingEntry(true);
@@ -528,10 +465,12 @@ export default function Diary() {
       return;
     }
 
-    const isLocalSongRequest = songPreference === "Local";
-    const contextLabel = isLocalSongRequest ? localSongCountry : "";
-    const apiStyle = isLocalSongRequest ? null : songPreference;
-    const apiCountry = isLocalSongRequest ? localSongCountry : null;
+    const {
+      isLocalSongRequest,
+      contextLabel,
+      apiStyle,
+      apiCountry,
+    } = getSongRequestDetails(songPreference, localSongCountry);
 
     if (isLocalSongRequest && !apiCountry) {
       setMsg("Local song needs a detected country first.");
@@ -572,10 +511,11 @@ export default function Diary() {
   const handleSaveAsPdf = () => {
     syncEditorToPage();
 
-    const printablePages = pagesRef.current.map((page, index) => ({
-      ...page,
-      html: index === pageIndex ? editorRef.current?.innerHTML || "" : page.html || "",
-    }));
+    const printablePages = buildPrintableDiaryPages(
+      pagesRef.current,
+      pageIndex,
+      editorRef.current
+    );
     const title = entryTitle || DEFAULT_ENTRY_TITLE;
 
     if (!openDiaryPdfWindow({ pages: printablePages, title })) {
@@ -584,11 +524,11 @@ export default function Diary() {
   };
 
   const setEmptyDiaryPageForDate = (normalizedDate) => {
-    const title = formatDiaryTitleDate(normalizedDate, titleFormat);
+    const page = createEmptyDiaryPageForDate(normalizedDate, titleFormat);
 
     setDiaryDate(normalizedDate);
     setLoadedEntryId(null);
-    setPages([{ id: null, pageNumber: 1, title, html: "", text: "" }]);
+    setPages([page]);
     setPageIndex(0);
     setEditorLoadKey((key) => key + 1);
   };
@@ -770,6 +710,7 @@ export default function Diary() {
           <DiarySidebar
             activeFrame={frameStyle}
             API_URL_AI={API_URL_AI}
+            guest={guest}
             onFrameChange={handleFrameChange}
             onFrameCssChange={setFrameCss}
             onInsertPrompt={insertText}
