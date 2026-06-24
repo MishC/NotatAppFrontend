@@ -50,23 +50,22 @@ function normalizeFrameCss(payload) {
   return "";
 }
 
-function getFallbackFrameCss(description) {
-  const prompt = String(description || "").toLowerCase();
-  const palette = prompt.includes("blue")
-    ? ["#1d4ed8", "#67e8f9", "#f8fafc"]
-    : prompt.includes("pink") || prompt.includes("rose")
-      ? ["#be185d", "#f9a8d4", "#fff7ed"]
-      : prompt.includes("green") || prompt.includes("emerald")
-        ? ["#047857", "#6ee7b7", "#f7fee7"]
-        : prompt.includes("black") || prompt.includes("dark")
-          ? ["#111827", "#7c3aed", "#f8fafc"]
-          : ["#7c3aed", "#f59e0b", "#fff7ed"];
-
+function getUniversalFallbackFrameCss() {
   return [
-    `background: linear-gradient(135deg, ${palette[0]} 0%, ${palette[1]} 48%, ${palette[2]} 100%)`,
-    `border: 4px solid ${palette[0]}`,
-    `box-shadow: 0 24px 50px ${palette[0]}33, inset 0 0 0 2px rgba(255,255,255,0.32)`,
+    "background: linear-gradient(135deg, #4c1d95 0%, #0f766e 52%, #f8fafc 100%)",
+    "border: 4px solid #4c1d95",
+    "box-shadow: 0 24px 50px rgba(76,29,149,0.24), inset 0 0 0 2px rgba(255,255,255,0.36)",
   ].join("; ");
+}
+
+function applyUniversalFallbackFrame({ setFrameCss, setFrameStyle, setMsg }) {
+  const css = getUniversalFallbackFrameCss();
+
+  setFrameCss?.(css);
+  setFrameStyle?.("ai");
+  setMsg?.("AI frame fallback applied because OpenAI did not return CSS.");
+
+  return { css, raw: null, fallback: true };
 }
 
 function getFrameErrorMessage(error) {
@@ -80,6 +79,10 @@ function getFrameErrorMessage(error) {
 
   if (error?.status === 401 || error?.status === 403) {
     return "You must be logged in to generate an AI frame.";
+  }
+
+  if (error?.status === 400 && isEmptyFrameCssError(error)) {
+    return "OpenAI did not return frame CSS.";
   }
 
   return error?.message || "Could not generate AI frame.";
@@ -168,11 +171,7 @@ export async function generateFrameAction({
     const css = normalizeFrameCss(payload);
 
     if (!css) {
-      const fallbackCss = getFallbackFrameCss(prompt);
-      setFrameCss?.(fallbackCss);
-      setFrameStyle?.("ai");
-      setMsg?.("AI returned an empty frame, so a local frame style was applied.");
-      return { css: fallbackCss, raw: payload, fallback: true };
+      return applyUniversalFallbackFrame({ setFrameCss, setFrameStyle, setMsg });
     }
 
     setFrameCss?.(css);
@@ -180,15 +179,11 @@ export async function generateFrameAction({
     setMsg?.("AI frame generated.");
     return { css, raw: payload };
   } catch (error) {
-    console.error(error);
     if (error?.status === 400 && isEmptyFrameCssError(error)) {
-      const fallbackCss = getFallbackFrameCss(prompt);
-      setFrameCss?.(fallbackCss);
-      setFrameStyle?.("ai");
-      setMsg?.("AI returned an empty frame, so a local frame style was applied.");
-      return { css: fallbackCss, raw: null, fallback: true };
+      return applyUniversalFallbackFrame({ setFrameCss, setFrameStyle, setMsg });
     }
 
+    console.error(error);
     setError?.(getFrameErrorMessage(error));
     return null;
   } finally {

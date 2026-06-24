@@ -96,7 +96,7 @@ export default function DiarySidebar({
           value={framePrompt}
           onChange={(e) => setFramePrompt(e.target.value)}
           className="mt-3 min-h-24 w-full resize-none rounded-xl border border-violet-100 bg-white/80 p-3 text-sm text-slate-700 outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-          placeholder="Give color of the frame or gradient"
+          placeholder="Color, gradient, or vibe, e.g. black-green-blue gradient, frozen, disco"
         />
         <button
           type="button"

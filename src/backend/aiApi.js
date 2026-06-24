@@ -104,6 +104,14 @@ export async function generateFrameApi({ API_URL_AI, description } = {}) {
   if (!value) throw new Error("Description is required.");
 
   const url = `${getAiBaseUrl(API_URL_AI)}/frame`;
+  const instructions = [
+    "Use auto mode for the user's diary frame request.",
+    "If the user gives explicit colors or a gradient, such as black-green-blue gradient, parse those colors first and generate CSS directly.",
+    "If the backend cannot confidently parse the request, or the user gives a vibe such as frozen, disco, summer, or play, send the original user text to OpenAI and let OpenAI interpret it.",
+    "Return valid CSS declarations only for a diary frame.",
+    "Use only these properties when possible: background, background-color, background-image, background-size, background-position, background-repeat, border, border-color, border-radius, box-shadow.",
+    "Do not return markdown, explanation, JSON prose, or an empty response.",
+  ].join(" ");
 
   return apiRequest({
     url,
@@ -112,6 +120,10 @@ export async function generateFrameApi({ API_URL_AI, description } = {}) {
       description: value,
       prompt: value,
       style: value,
+      vibe: value,
+      mode: "auto",
+      fallbackToOpenAI: true,
+      instructions,
     },
   });
 }
